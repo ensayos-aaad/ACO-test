@@ -41,7 +41,7 @@ de antemano.
 | `PROTOCOLO.md`    | Borrador v0.2 de los mensajes del gemelo (campos, bits, frecuencias) |
 | `DECISIONES-PRUEBA.md` | Preguntas de diseño con todas las opciones: ✅ elegida / ❌ descartada |
 | `ARTEFACTOS.md`   | Los 17 artefactos de software (→ `gemelo/`), su estado, su avance y los requisitos de reproducción |
-| `oraculo/`        | Reservada para el oráculo; solo README, sin código           |
+| `oraculo/`        | El oráculo: ejecuta las celdas de los notebooks; `TOLERANCIAS.md` (declaradas antes) y `RESULTADOS.md` (C1–C5) |
 | `gemelo/`         | **El código**: `aco_gemelo/` (mundo, protocolo, canal, agente, madre, motor), `tests/`, `environment.yml` |
 | `bosquejo/`       | Plano de ensayo (a mano y en limpio)                         |
 
@@ -49,7 +49,7 @@ de antemano.
 
 **Dónde quedamos:** fase 1 del gemelo en construcción. Hechos los artefactos
 **1 (entorno), 3 (protocolo), 4 (mundo), 5 (canal), 6 (agente), 7 (madre), 8 (motor), 9 (configuración y
-línea de comandos), 10 (métricas) y 11 (visualización)**: 241 pruebas en PASA.
+línea de comandos), 10 (métricas), 11 (visualización) y 12 (oráculo)**: 241 pruebas del gemelo + 7 del oráculo en PASA.
 El detalle y el avance de los 17 artefactos están en `ARTEFACTOS.md`.
 
 **Cómo comprobar que todo sigue bien** (desde `gemelo/`):
@@ -61,11 +61,13 @@ El detalle y el avance de los 17 artefactos están en `ARTEFACTOS.md`.
 `python -X utf8 -m aco_gemelo batch --config configs/default.yaml --semillas 30` (deja un CSV en `resultados/`,
 que git ignora).
 
-**Siguiente paso: artefacto 12, oráculo del puente doble** (`oraculo/`): reproducir, a partir de los notebooks de
-`referencia/` (sin modificarlos, citando archivo y celda), p1 (deneubourg [5]), la dinámica (deneubourg [7]) y el
-histograma de r = 1 y r = 2 (montecarlo_aco [4]), con tolerancias declaradas **antes** de correr. Ojo con F-012:
-con el ciclo de vida de un solo depósito, la colonia del gemelo no prefiere la rama corta; C2 y C3 probablemente
-den NO PASA y eso es un resultado válido.
+**Decisión pendiente del operador (F-014):** en el puente doble el gemelo no reproduce la ruptura de simetría
+ni la preferencia por la rama corta (C2, C3 y C4 NO PASA), porque las 6 agentes salen juntas en el tick 0 y
+eligen rama una sola vez. Opciones: salidas escalonadas desde el nido, viajes repetidos (ida y vuelta varias
+veces antes de asentarse), ambas, o dejarlo así y documentarlo. Toca D3, I5 y G1.
+
+**Siguiente artefacto: 14, experimentos en lote** (4 modos × 30 semillas → CSV), después 15 notebook, 16 NetLogo
+y 17 guía de reproducción. El 13 (pruebas automáticas) se cumple al tener todas las pruebas en PASA.
 
 **Ver un ensayo:** `python -X utf8 -m aco_gemelo run --config configs/default.yaml --png final.png --animacion ensayo.gif`.
 
@@ -91,8 +93,8 @@ den NO PASA y eso es un resultado válido.
 operador decide si se sigue o se para. No se hace commit sin su aprobación. Respuestas ejecutivas.
 El modelo en uso se anota en los commits (los artefactos 1 y 3–6 son de Claude Fable 5.2).
 
-Criterios de PROMPT-ZERO: **C1 PASA** a nivel del programa de agente (prueba en
-`gemelo/tests/test_agente.py`); C2–C6 **NO PROBADO**.
+Criterios de PROMPT-ZERO (ver `oraculo/RESULTADOS.md`): **C1 PASA** (contra `p1` del oráculo) · **C2 NO PASA** ·
+**C3 NO PASA** · **C4 NO PASA** · **C5 PASA** · C6 NO PROBADO (lo evalúa el operador).
 
 ## Convenciones
 
@@ -102,6 +104,12 @@ Criterios de PROMPT-ZERO: **C1 PASA** a nivel del programa de agente (prueba en
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-17 03:17 -0500
+- Artefacto 11 sincronizado (`04424b8`).
+- **Artefacto 12 hecho** (Claude Opus 5.5): `oraculo/` ejecuta el código de las celdas de los notebooks **tal cual** (con `ast`, sin copiarlo). Tolerancias declaradas a las 03:13, antes de escribir el código, por delegación del operador y sin su aprobación explícita. El oráculo reproduce los notebooks (7 pruebas en PASA); la forma de "U" con r = 1 pasa muy justa (70,7 % frente a 70 %).
+- **Gemelo frente al oráculo:** C1 PASA, C2 NO PASA, C3 NO PASA, C4 NO PASA, C5 PASA. **F-014:** la causa es que las agentes salen todas juntas y eligen una sola vez (binomial pura, sin retroalimentación). Queda una decisión de diseño para el operador.
+- Nuevas inconsistencias de la referencia: I15 (`p1` solo usa la diferencia de feromona) e I16. Sin commit todavía.
 
 ### 2026-11-17 03:10 -0500
 - Artefacto 10 sincronizado (`1121178`).

@@ -20,7 +20,7 @@ solo con esta definición.
 | 9 | Configuración YAML + línea de comandos | `gemelo/configs/` · `gemelo/aco_gemelo/` | **Hecho** | 100 % (2/2) |
 | 10 | Métricas (convergencia, calidad frente al BFS, conocimiento, bytes) | `gemelo/aco_gemelo/metricas/` | **Hecho** | 100 % (3/3) |
 | 11 | Visualización (PNG, GIF y MP4 con el estilo del plano) | `gemelo/aco_gemelo/visual/` | **Hecho** | 100 % (2/2) |
-| 12 | Oráculo del puente doble (a partir de los notebooks) | `oraculo/` | Borrador | 0 % (0/3) |
+| 12 | Oráculo del puente doble (a partir de los notebooks) | `oraculo/` | **Hecho** | 100 % (3/3) |
 | 13 | Pruebas automáticas (pytest) | `gemelo/tests/` | Por hacer | 0 % (0/1) |
 | 14 | Experimentos en lote → CSV (4 modos × 30 semillas) | `gemelo/experimentos/` | Por hacer | 0 % (0/2) |
 | 15 | Notebook de análisis | `gemelo/notebooks/` | Por hacer | 0 % (0/2) |
@@ -40,7 +40,7 @@ solo con esta definición.
 9. ✅ Toda la configuración sale del YAML (cada parámetro se puede cambiar; una clave desconocida es un error) · ✅ `run` y `batch` funcionan, también como `python -m aco_gemelo` (`tests/test_cli.py`: 28 PASA, 2026-11-17 02:55 -0500). Configuraciones de ejemplo: `default.yaml`, `aleatorio.yaml` y `puente_doble.yaml`.
 10. ✅ Mide la convergencia según G1 (también como serie tick a tick) · ✅ calidad = largo de la ruta / largo del BFS · ✅ cuenta bytes por familia de mensaje (`tests/test_metricas.py`: 15 PASA, 2026-11-17 03:02 -0500). Además: **conocimiento del mundo de la madre** (fracción de celdas que conoce y clasifica bien) y resumen de lote con intervalos de confianza de Wilson al 95 %.
 11. ✅ PNG del estado final (con la ruta de la verificadora) · ✅ animación GIF/MP4, un cuadro por tick (`tests/test_visual.py`: 11 PASA, 2026-11-17 03:10 -0500). Desde la línea de comandos: `run ... --png final.png --animacion ensayo.gif`. Ejemplo en `gemelo/docs/imagenes/`.
-12. Reproduce p1 (celda [5]) · la dinámica (celda [7]) · el histograma de r = 1 y r = 2 dentro de la tolerancia que se declare.
+12. ✅ Reproduce p1 (celda [5]; error ≤ 1e-12) · ✅ la dinámica (celda [7]; p_s final = 0,924 ≥ 0,9) · ✅ el histograma de r = 1 (extremos 70,7 % ≥ 70 %, **muy justo**) y r = 2 (80–100 %: 75,1 % ≥ 70 %), con las tolerancias de `oraculo/TOLERANCIAS.md` declaradas antes de correr (`oraculo/test_oraculo.py`: 7 PASA, 2026-11-17 03:17 -0500). La comparación del gemelo (C1–C5) está en `oraculo/RESULTADOS.md`.
 13. Todas las pruebas en PASA.
 14. Genera un CSV por condición · se puede reproducir con la semilla.
 15. Gráficas comparativas · prueba estadística de la varianza con y sin rescate.

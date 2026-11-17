@@ -1,14 +1,21 @@
 # oraculo/
 
-Aquí se ejecuta la implementación de referencia (los notebooks de `../referencia/`) para producir
-los valores contra los que se valida el firmware.
+Ejecuta la implementación de referencia (los notebooks de `../referencia/`) y compara el gemelo contra ella.
 
-Reglas:
-- No se edita nada en `../referencia/`. El código se importa o se copia aquí, **citando el archivo
-  y la celda de origen** en un comentario.
-- Las pruebas estocásticas fijan y registran la semilla del RNG (C5).
-- La prueba estadística, el número de ensayos y la tolerancia se declaran **antes** de correr
-  cada prueba, y el operador los aprueba.
+| Archivo | Qué hace |
+|---|---|
+| `TOLERANCIAS.md` | Pruebas y tolerancias, **declaradas antes de correr** (2026-11-17 03:13 -0500) |
+| `oraculo.py` | Lee el código de las celdas de los notebooks **tal cual** (sin copiarlo ni modificarlo) y lo ejecuta: `p1` (deneubourg [5]), dinámica con retardo (deneubourg [7]), f'(1/2) (deneubourg [9]), `experimento_individual` (montecarlo_aco [4]) |
+| `test_oraculo.py` | Parte A: el oráculo reproduce los notebooks (7 pruebas) |
+| `comparar.py` | Parte B: el gemelo frente al oráculo (criterios C1–C5); escribe `RESULTADOS.md` |
+| `RESULTADOS.md` | Último resultado de la comparación |
 
-Estado: vacía. Todavía no hay código; falta que el operador apruebe los criterios C1–C6.
-Candidatos y vacíos detectados: ver `../CONTEXT.md` §3 y §4.
+Desde la raíz del repositorio, con el Python del entorno `aco-gemelo`:
+
+```
+python -X utf8 -m pytest oraculo -q        # parte A
+python -X utf8 oraculo/comparar.py         # parte B (unos minutos)
+```
+
+Reglas: nada en `../referencia/` se modifica (lo comprueba una prueba); las pruebas estocásticas fijan la
+semilla (`numpy.random.seed(2026)` en el oráculo; semillas 0–99 en el gemelo).

@@ -131,6 +131,8 @@ verificación anterior (sympy faltante) usó por error `C:\Python311` y queda in
   parámetro. No hay resultados guardados para comparar con la Fig. 1.4 del libro.
 - **I9 [VACÍO]**: el repositorio fuente no tiene archivo LICENSE; el de trabajo es GPL v3.
   Falta aclarar la licencia del material copiado.
+- **I15 [INCONSISTENCIA]** (detectada en el artefacto 12): `p1(k, n, delta)` de deneubourg [5] solo recibe la *diferencia* m1 − m2 y pone el otro conteo en 0, así que no es la fórmula 1.1 cuando las dos ramas tienen feromona (por ejemplo, m1 = 10 y m2 = 3 da 0,646 en vez de 0,630). El oráculo la usa solo donde coinciden (una rama en 0).
+- **I16 [Observación]**: en deneubourg [7], `p_s_hist[0]` queda en 0 porque el ciclo empieza en t = 1; es un artefacto de inicialización, no un valor del modelo.
 - **I10 [Observación]**: los notebooks de `experimento_doble-puente/` y `hormigas-artificiales/`
   están duplicados; la fuente canónica no está declarada.
 
