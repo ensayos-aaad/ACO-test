@@ -14,6 +14,7 @@ ensayo:
   n_agentes: 6           # tamaño de la colonia (C4)
   limite: 2000           # máximo de ticks, verificación incluida (I11)
   rho: 0.01              # evaporación por tick (I3)
+  salida_cada: 0         # ticks entre la salida de una agente y la siguiente; 0 = todas juntas (J1)
 
 agente:
   alpha: 2.0             # exponente de la feromona (I1)
@@ -23,6 +24,7 @@ agente:
   deposito: calidad      # calidad (255 / largo de la ruta) | constante (I6)
   deposito_valor: 1      # unidades por celda en el modo constante
   delta_t: 10            # cada cuántos ticks informa su ESTADO a la madre
+  viajes: 1              # idas y vueltas con depósito antes de asentarse (J2)
 
 madre:
   modo: pista_de_baile   # ausente | pista_de_baile | rescate | difusion (F1)

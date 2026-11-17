@@ -10,7 +10,8 @@ Ciclo de vida (DECISIONES-PRUEBA.md, D3, I4 e I5; depósito a la vuelta, como en
 1. **IDA**: explora sin depositar y guarda su ruta, sin bucles, en una memoria de K movimientos.
 2. Al llegar a la meta avisa a la madre (DANZA) y pasa a **VOLVIENDO**: desanda su ruta
    depositando feromona.
-3. En el nido pasa a **SIGUIENDO**: recorre de nuevo su ruta hasta la meta.
+3. En el nido, si le faltan viajes (``viajes``, decisión J2), vuelve a explorar desde cero
+   con la feromona que ya hay; si no, pasa a **SIGUIENDO**: recorre de nuevo su ruta hasta la meta.
 4. En la meta queda **ASENTADA**.
 
 Si la memoria se llena antes de encontrar la meta, hace un **RETROCESO** al nido por su
@@ -92,6 +93,8 @@ class ConfigAgente:
         con_madre: si hay una madre a la que informar.
         verificadora: si es la agente verificadora.
         informa_mapa: si envía a la madre lo que descubre del mapa (FRAGMENTO).
+        viajes: idas y vueltas con depósito antes de asentarse (J2). Con 1, se asienta tras
+            la primera vuelta.
     """
 
     alpha: float = 2.0
@@ -104,6 +107,7 @@ class ConfigAgente:
     con_madre: bool = True
     verificadora: bool = False
     informa_mapa: bool = False
+    viajes: int = 1
 
 
 def prob_explotar(s: int, theta: float) -> float:
@@ -132,6 +136,8 @@ class Agente:
         self.indice = 0  #: posición dentro de la ruta al volver o al seguirla
         self.llegadas = 0
         self.reinicios = 0  #: veces que se le llenó la memoria
+        self.viajes_hechos = 0  #: idas y vueltas completas (con depósito)
+        self.entradas: list[Celda] = []  #: primera celda tras el nido de cada ruta que llegó a la meta
         self.conocidas: set[Celda] = set()  #: celdas observadas (un mapa de bits en el micro)
         self.obstaculos: set[Celda] = set()  #: obstáculos observados
         self.mapa_colonia: set[Celda] = set()  #: celdas que la colonia conoce (según la madre)
@@ -221,7 +227,12 @@ class Agente:
             return _mover(self._hacia(self.ruta[self.indice - 1]))
         if self.estado is Estado.VOLVIENDO:
             if self.indice == 0:
-                self.estado = Estado.SIGUIENDO
+                self.viajes_hechos += 1
+                if self.viajes_hechos < self.config.viajes:  # otro viaje: explora de nuevo
+                    self.ruta = [self.pos]
+                    self.estado = Estado.IDA
+                else:
+                    self.estado = Estado.SIGUIENDO
                 return self.decidir(percepto, ahora)
             return _mover(self._hacia(self.ruta[self.indice - 1]), self._deposito())
         # SIGUIENDO: recorre su ruta hasta la meta.
@@ -380,6 +391,8 @@ class Agente:
     def _llegar(self, ahora: int) -> dict[str, int]:
         """Llegó a la meta: avisa a la madre y empieza a volver (la verificadora se queda)."""
         self.llegadas += 1
+        if len(self.ruta) > 1:
+            self.entradas.append(self.ruta[1])
         flags = FLAG_ACK | (FLAG_VERIFICACION if self.config.verificadora else 0)
         if self.config.con_madre:
             movs = [self._direccion(a, b) for a, b in zip(self.ruta, self.ruta[1:])]

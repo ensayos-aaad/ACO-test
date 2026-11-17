@@ -1,16 +1,16 @@
 # RESULTADOS — gemelo frente al oráculo
 
 Generado por `python -X utf8 oraculo/comparar.py`. Pruebas y tolerancias: `TOLERANCIAS.md`
-(declaradas antes de correr). Gemelo: `gemelo/configs/puente_doble.yaml`, 100 semillas por r.
+(declaradas antes de correr). Gemelo: `gemelo/configs/puente_doble.yaml`, 100 semillas por r: 6 agentes, 50 viajes, salida cada 1 tick(s), k = 1.0, tau_max = 300.
 
 ## Resumen
 
 | Criterio | Resultado | Valor medido | Umbral declarado |
 |---|---|---|---|
 | C1 Regla de decisión | **PASA** | máx. \|z\| = 0.94 en 31 casos | \|z\| ≤ 4 en todos |
-| C2 Ruptura de simetría (r = 1) | **NO PASA** | extremos 0.22; gana abajo 13/22 (p = 0.523) | extremos ≥ 0,7 y p > 0,05 |
-| C3 Ramas desiguales (r = 2) | **NO PASA** | gemelo 0.13 frente a oráculo 0.75 (diferencia 0.62) | diferencia ≤ 0,15 |
-| C4 Puntos fijos | **NO PASA** | f'(1/2) = alpha; ensayos con x en [0,4; 0,6]: 0.38 | f'(1/2) = α y ≤ 0,2 |
+| C2 Ruptura de simetría (r = 1) | **PASA** | extremos 0.75; gana abajo 34/75 (p = 0.489) | extremos ≥ 0,7 y p > 0,05 |
+| C3 Ramas desiguales (r = 2) | **NO PASA** | gemelo 0.48 frente a oráculo 0.75 (diferencia 0.27) | diferencia ≤ 0,15 |
+| C4 Puntos fijos | **PASA** | f'(1/2) = alpha; ensayos con x en [0,4; 0,6]: 0.06 | f'(1/2) = α y ≤ 0,2 |
 | C5 Determinismo | **PASA** | gemelo y oráculo repiten con la misma semilla | igualdad exacta |
 | C6 Pedagógico | NO PROBADO | — | lo evalúa el operador |
 
@@ -19,8 +19,9 @@ Generado por `python -X utf8 oraculo/comparar.py`. Pruebas y tolerancias: `TOLER
 | | r = 1 | r = 2 |
 |---|---|---|
 | Oráculo (montecarlo_aco [4], 1000 hormigas, N = 1000) | 35 % · 11 % · 8 % · 10 % · 36 % | 5 % · 5 % · 6 % · 9 % · 75 % |
-| Gemelo (6 agentes, N = 100) | 9 % · 20 % · 38 % · 20 % · 13 % | 9 % · 20 % · 38 % · 20 % · 13 % |
-| Gemelo con 60 agentes (informativo, parte C) | 0 % · 5 % · 88 % · 7 % · 0 % | 0 % · 5 % · 88 % · 7 % · 0 % |
+| Gemelo (6 agentes, N = 100) | 41 % · 8 % · 6 % · 11 % · 34 % | 20 % · 7 % · 9 % · 16 % · 48 % |
+| Gemelo con 60 agentes, 10 semillas (informativo, parte C) | 0 % · 10 % · 80 % · 10 % · 0 % | 0 % · 0 % · 80 % · 20 % · 0 % |
+| Gemelo, tráfico de la 2.ª mitad de los viajes (informativo, J6) | 26 % · 21 % · 15 % · 19 % · 19 % | 12 % · 12 % · 15 % · 21 % · 40 % |
 
 Ensayos del gemelo que no se asentaron (6 agentes, ambos r): 0.
 Con 60 agentes: extremos en r = 1 = 0.00; x ≥ 0,8 en r = 2 = 0.00.

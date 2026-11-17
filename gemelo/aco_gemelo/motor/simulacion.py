@@ -48,6 +48,8 @@ class ConfigEnsayo:
         radio, p_perdida, retardo, formato: parámetros del canal.
         registrar: si se guarda la posición de cada agente y la serie de métricas en cada tick.
         pausa: segundos que duerme cada hilo entre dos pasos (solo motor de hilos).
+        salida_cada: ticks entre la salida de una agente y la siguiente (J1). Con 0 salen
+            todas en el tick 0.
     """
 
     n_agentes: int = 6
@@ -62,6 +64,7 @@ class ConfigEnsayo:
     formato: str = "binario"
     registrar: bool = False
     pausa: float = 0.0002
+    salida_cada: int = 0
 
 
 @dataclass
@@ -104,18 +107,21 @@ class ActorMundo:
         self.registrar = registrar
         self.pos: dict[int, Celda] = {}
         self.ok: dict[int, bool] = {}
+        self.activos: set[int] = set()  #: agentes que ya salieron del nido
         self.bloqueadas = 0
         self.historial: list[tuple[int, int, Celda]] = []
         canal.registrar(ID_MUNDO)
 
-    def agregar(self, id_agente: int) -> None:
-        """Pone un agente en el nido."""
+    def agregar(self, id_agente: int, activo: bool = True) -> None:
+        """Pone un agente en el nido. Si no está activo, espera allí sin percibir ni actuar."""
         self.pos[id_agente] = self.mundo.inicio
         self.ok[id_agente] = True
+        if activo:
+            self.activos.add(id_agente)
 
     def enviar_percepciones(self, ahora: int) -> None:
-        """Envía a cada agente lo que ve desde su celda."""
-        for i in sorted(self.pos):
+        """Envía a cada agente activo lo que ve desde su celda."""
+        for i in sorted(self.activos):
             otras = [c for j, c in self.pos.items() if j != i]
             self.canal.enviar(crear(
                 "PERCEPCION", src=ID_MUNDO, dst=i, tick=ahora % 65536,
@@ -162,7 +168,7 @@ class Simulacion:
         self.agentes = [Agente(i, self.canal, self._config_agente, cfg.semilla)
                         for i in range(1, cfg.n_agentes + 1)]
         for agente in self.agentes:
-            self.actor_mundo.agregar(agente.id)
+            self.actor_mundo.agregar(agente.id, activo=cfg.salida_cada == 0)
         self.verificadora: Agente | None = None
         self.ticks_asentadas: int | None = None
         self.serie: list[dict[str, float]] = []
@@ -181,8 +187,17 @@ class Simulacion:
         self.actor_mundo.agregar(self.verificadora.id)
         return self.verificadora
 
+    def _soltar(self) -> None:
+        """Activa a las agentes cuyo turno de salir del nido ya llegó (J1)."""
+        cada = self.config.salida_cada
+        if cada:
+            for j, agente in enumerate(self.agentes):
+                if self.tick >= j * cada:
+                    self.actor_mundo.activos.add(agente.id)
+
     def _avanzar_fase(self) -> tuple[bool, Agente | None]:
         """Revisa la fase al empezar un tick. Devuelve (terminó, verificadora recién lanzada)."""
+        self._soltar()
         if self.verificadora is None:
             if self._todas_asentadas():
                 self.ticks_asentadas = self.tick
@@ -305,7 +320,7 @@ class Simulacion:
                 t = self.tick
                 self.canal.avanzar(t)
                 self.actor_mundo.enviar_percepciones(t)
-                pendientes = {a.id for a in self._actores()}
+                pendientes = {a.id for a in self._actores()} & self.actor_mundo.activos
                 plazo = time.monotonic() + 10
                 while pendientes:  # pregunta-respuesta: espera la acción de cada agente
                     pendientes -= self.actor_mundo.aplicar_acciones(t)

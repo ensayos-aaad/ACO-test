@@ -131,3 +131,26 @@ def test_ensayo_minimo_en_un_corredor():
     assert r.ticks_total == 13 + 5
     assert r.trafico["agente_madre"]["enviados"] == 0  # sin madre no se le habla
     assert r.trafico["mundo_agente"]["enviados"] == 2 * 13 + 2 * 2 * 5  # percepción y acción por tick
+
+
+# ---------------------------------------------------------------- salidas escalonadas (J1)
+
+
+def test_salidas_escalonadas():
+    """Con salida_cada = 3, la agente j (desde 0) no se mueve antes del tick 3·j."""
+    r = ensayo(0, salida_cada=3)
+    primero = {}
+    for t, i, _ in r.historial:
+        primero.setdefault(i, t)
+    for i in range(1, 7):
+        assert primero[i] == 3 * (i - 1)
+    assert r.asentadas and r.bloqueadas == 0
+    assert ensayo(0, salida_cada=3) == r  # sigue siendo reproducible
+
+
+def test_salidas_escalonadas_con_hilos():
+    """Sin madre, el motor de hilos da exactamente lo mismo que el determinista."""
+    con_hilos = ensayo(2, motor="hilos", salida_cada=2)
+    determinista = ensayo(2, salida_cada=2)
+    assert sorted(con_hilos.historial) == sorted(determinista.historial)
+    assert replace(con_hilos, historial=[]) == replace(determinista, historial=[])

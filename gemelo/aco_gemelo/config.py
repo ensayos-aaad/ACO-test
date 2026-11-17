@@ -75,7 +75,7 @@ def config_ensayo(datos: dict[str, Any], semilla: int | None = None) -> ConfigEn
     if "retardo" in canal:
         canal["retardo"] = tuple(canal["retardo"])
     ensayo = dict(datos.get("ensayo") or {})
-    _revisar("ensayo", ensayo, ("n_agentes", "limite", "rho", "registrar", "pausa"))
+    _revisar("ensayo", ensayo, ("n_agentes", "limite", "rho", "registrar", "pausa", "salida_cada"))
     return ConfigEnsayo(
         semilla=datos.get("semilla", 0) if semilla is None else semilla,
         agente=ConfigAgente(**agente), madre=ConfigMadre(**madre), **ensayo, **canal)

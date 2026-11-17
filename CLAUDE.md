@@ -49,7 +49,7 @@ de antemano.
 
 **Dónde quedamos:** fase 1 del gemelo en construcción. Hechos los artefactos
 **1 (entorno), 3 (protocolo), 4 (mundo), 5 (canal), 6 (agente), 7 (madre), 8 (motor), 9 (configuración y
-línea de comandos), 10 (métricas), 11 (visualización) y 12 (oráculo)**: 241 pruebas del gemelo + 7 del oráculo en PASA.
+línea de comandos), 10 (métricas), 11 (visualización) y 12 (oráculo)**: 245 pruebas del gemelo + 7 del oráculo en PASA.
 El detalle y el avance de los 17 artefactos están en `ARTEFACTOS.md`.
 
 **Cómo comprobar que todo sigue bien** (desde `gemelo/`):
@@ -61,10 +61,10 @@ El detalle y el avance de los 17 artefactos están en `ARTEFACTOS.md`.
 `python -X utf8 -m aco_gemelo batch --config configs/default.yaml --semillas 30` (deja un CSV en `resultados/`,
 que git ignora).
 
-**Decisión pendiente del operador (F-014):** en el puente doble el gemelo no reproduce la ruptura de simetría
-ni la preferencia por la rama corta (C2, C3 y C4 NO PASA), porque las 6 agentes salen juntas en el tick 0 y
-eligen rama una sola vez. Opciones: salidas escalonadas desde el nido, viajes repetidos (ida y vuelta varias
-veces antes de asentarse), ambas, o dejarlo así y documentarlo. Toca D3, I5 y G1.
+**Opción c aplicada (F-015):** salidas escalonadas (`ensayo.salida_cada`) y viajes repetidos (`agente.viajes`),
+activas solo en `configs/puente_doble.yaml` (J1–J6). Con eso **C2 y C4 pasan**; C3 no (la rama corta gana en el
+48 % frente al 75 % del oráculo). **Decisiones abiertas:** (1) ¿se activa la opción c también en los mundos L y
+aleatorio (J5)? (2) ¿se investiga C3 (escala de niveles, depósito al llegar) o se acepta y documenta?
 
 **Siguiente artefacto: 14, experimentos en lote** (4 modos × 30 semillas → CSV), después 15 notebook, 16 NetLogo
 y 17 guía de reproducción. El 13 (pruebas automáticas) se cumple al tener todas las pruebas en PASA.
@@ -93,8 +93,8 @@ y 17 guía de reproducción. El 13 (pruebas automáticas) se cumple al tener tod
 operador decide si se sigue o se para. No se hace commit sin su aprobación. Respuestas ejecutivas.
 El modelo en uso se anota en los commits (los artefactos 1 y 3–6 son de Claude Fable 5.2).
 
-Criterios de PROMPT-ZERO (ver `oraculo/RESULTADOS.md`): **C1 PASA** (contra `p1` del oráculo) · **C2 NO PASA** ·
-**C3 NO PASA** · **C4 NO PASA** · **C5 PASA** · C6 NO PROBADO (lo evalúa el operador).
+Criterios de PROMPT-ZERO (ver `oraculo/RESULTADOS.md`): **C1 PASA** · **C2 PASA** · **C3 NO PASA** · **C4 PASA** ·
+**C5 PASA** · C6 NO PROBADO (lo evalúa el operador).
 
 ## Convenciones
 
@@ -104,6 +104,12 @@ Criterios de PROMPT-ZERO (ver `oraculo/RESULTADOS.md`): **C1 PASA** (contra `p1`
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-17 03:37 -0500
+- Artefacto 12 sincronizado (`87262a3`). El operador eligió la **opción c** de F-014.
+- Ronda 3 de decisiones (J1–J6), declarada a las 03:21 **antes** de implementar: salidas escalonadas, 50 viajes en el puente doble, escala 1 nivel = 20 depósitos con k = 1 (con k = 20 en niveles, p nunca pasaba de 0,75 y C3 era inalcanzable), mismo estadístico x.
+- Implementado (Claude Opus 5.5): `ConfigAgente.viajes`, `ConfigEnsayo.salida_cada`; por defecto se comportan como antes. 4 pruebas nuevas (245 en total).
+- **F-015:** C2 y C4 pasan a PASA (el gemelo reproduce la "U" del notebook con r = 1); C3 sigue NO PASA (48 % frente a 75 %). Con 60 agentes los niveles se saturan y no converge. Sin commit todavía.
 
 ### 2026-11-17 03:17 -0500
 - Artefacto 11 sincronizado (`04424b8`).

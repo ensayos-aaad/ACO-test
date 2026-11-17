@@ -120,7 +120,7 @@ def test_escenario_aleatorio_siempre_tiene_camino():
 def test_escenario_puente_doble():
     mundo = crear_mundo(cargar(CONFIGS / "puente_doble.yaml"))
     assert (mundo.ancho, mundo.alto, mundo.largo_optimo()) == (3, 5, 4)
-    assert (mundo.tau_max, mundo.unidad_deposito) == (15.0, 1.0)
+    assert (mundo.tau_max, mundo.unidad_deposito) == (300.0, 1.0)  # J3: 1 nivel = 20 depósitos
     mundo = crear_mundo({"mundo": {"escenario": "puente_doble", "r": "3/2"}})
     assert mundo.alto == 4
 

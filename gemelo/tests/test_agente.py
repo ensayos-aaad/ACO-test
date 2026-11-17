@@ -232,3 +232,23 @@ def test_la_regla_de_decision_reproduce_la_formula_de_deneubourg(m_corta, m_larg
     corta = sum(agente.elegir(vecinas) == hacia_corta for _ in range(n))
     p = (m_corta + 20) ** 2 / ((m_corta + 20) ** 2 + (m_larga + 20) ** 2)
     assert abs(corta / n - p) <= 4 * math.sqrt(p * (1 - p) / n)
+
+
+# ---------------------------------------------------------------- viajes repetidos (J2)
+
+
+def test_viajes_repetidos_en_un_corredor():
+    """Con 3 viajes: deposita 3 veces en cada celda de la ruta y solo entonces se asienta."""
+    mundo = Mundo(5, 1, [], inicio=(0, 0), meta=(4, 0), **PUENTE)
+    banco = Banco(mundo)
+    a = banco.agregar(Agente(1, banco.canal, ConfigAgente(deposito="constante", viajes=3,
+                                                          con_madre=False)))
+    banco.correr(200, hasta=lambda: a.estado is Estado.ASENTADA)
+    assert a.estado is Estado.ASENTADA and a.pos == mundo.meta
+    assert a.viajes_hechos == 3 and a.llegadas == 4  # 3 llegadas explorando + la última
+    assert a.entradas == [(1, 0)] * 3
+    assert [mundo.feromona((x, 0)) for x in range(5)] == [0, 3, 3, 3, 3]
+
+
+def test_con_un_viaje_se_comporta_como_antes():
+    assert ConfigAgente().viajes == 1

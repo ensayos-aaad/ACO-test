@@ -108,3 +108,18 @@ Respaldo: **L** = literatura · **L?** = literatura citada de memoria, sin verif
 > **Pendiente técnico original:** la agente percibe la feromona en 16 niveles (E3). Con τ₀ = 1 todas las celdas
 > se leen como nivel 0, así que la regla τ^α necesita un piso. Lo natural es el offset de Deneubourg, (k + nivel)^α. Se resuelve
 > y se documenta al construir el agente.
+
+## J. Ronda 3 — salidas escalonadas y viajes repetidos (opción c de F-014)
+
+2026-11-17 03:21 -0500. El operador eligió la **opción c** (salidas escalonadas + viajes repetidos). Los valores los fijó Claude
+(Opus 5.5) **antes de implementarla y de correr nada**, razonando desde el notebook y no ajustándolos a los
+resultados de C2–C4. Las tolerancias de `oraculo/TOLERANCIAS.md` **no cambian**.
+
+| ID | Decisión | Valor | Por qué |
+|---|---|---|---|
+| J1 | Salidas escalonadas | Las agentes salen del nido **de a una, cada `salida_cada` ticks** (nuevo parámetro de `ensayo`). Por defecto 0 = todas juntas, como hasta ahora; en el puente doble, **1** | En montecarlo_aco [4] llega una hormiga cada 2 s con un cruce de 20 s, unas 10 por tiempo de cruce. El cruce corto del gemelo dura 4 ticks; con 6 agentes, una por tick es lo más cercano posible |
+| J2 | Viajes repetidos | Cada agente hace **`viajes` idas y vueltas** (nuevo parámetro de `agente`): al volver al nido depositando, si le faltan viajes, explora de nuevo; con el último, va a la meta y se asienta (D3/I5 se conservan al final). Por defecto 1 = como hasta ahora; en el puente doble, **50** | 6 × 50 = 300 decisiones por ensayo; el notebook mide 500 hormigas (de la 501 a la 1000). Es la mitad, pero del mismo orden |
+| J3 | Escala de la feromona percibida | En el puente doble, **1 nivel = 20 depósitos**: `tau_max` = 300, `unidad_deposito` = 1, **`k` = 1** (k = 20 depósitos de Deneubourg = 1 nivel) | Con 16 niveles y k = 20 medido en niveles, p nunca pasa de 0,75 y C3 (x ≥ 0,8) sería inalcanzable. Con k en las mismas unidades que los niveles, la regla es (1 + m/20)², proporcional a (20 + m)² (Deneubourg), salvo el redondeo a niveles. 15 niveles = 300 depósitos = todas las decisiones de un ensayo |
+| J4 | Límite de ticks del puente doble | **6000** | 50 viajes por la rama larga (r = 2) son unos 17 ticks cada uno: ~850 ticks por agente; 6000 deja margen |
+| J5 | Mundo L y aleatorio | **Sin cambios por ahora** (`viajes` = 1, `salida_cada` = 0). Se mide aparte, como informativo, y se decide después | Activarlos cambia las líneas base F-010 y F-013 |
+| J6 | Estadístico x | **El mismo de TOLERANCIAS.md** (fracción de agentes cuya ruta final pasa por la rama corta). Como informativo se reporta además el tráfico de la segunda mitad de los viajes, análogo a las hormigas 501–1000 del notebook | No mover el criterio después de ver los resultados |

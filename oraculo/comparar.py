@@ -33,10 +33,13 @@ CONFIG = AQUI.parent / "gemelo" / "configs" / "puente_doble.yaml"
 N_SEMILLAS = 100
 
 
-def ensayo_puente(r: int, semilla: int, n_agentes: int | None = None) -> float | None:
+def ensayo_puente(r: int, semilla: int, n_agentes: int | None = None,
+                  tardio: bool = False) -> float | None:
     """x del gemelo: fracción de agentes asentadas cuya ruta pasa por la rama corta (o de abajo).
 
-    Devuelve ``None`` si la colonia no se asentó dentro del límite.
+    Devuelve ``None`` si la colonia no se asentó dentro del límite. Con ``tardio`` devuelve en
+    cambio la fracción de los viajes de la segunda mitad que entraron por la rama corta
+    (informativo, J6; análogo a las hormigas 501–1000 del notebook).
     """
     datos = cargar(CONFIG)
     datos["mundo"] = {**datos["mundo"], "r": r}
@@ -50,11 +53,15 @@ def ensayo_puente(r: int, semilla: int, n_agentes: int | None = None) -> float |
     if not resultado.asentadas:
         return None
     entrada_corta = puente.rama_corta[1]
+    if tardio:
+        tarde = [e for a in sim.agentes for e in a.entradas[len(a.entradas) // 2:]]
+        return sum(e == entrada_corta for e in tarde) / len(tarde)
     return sum(entrada_corta in a.ruta for a in sim.agentes) / len(sim.agentes)
 
 
-def serie_gemelo(r: int, n_agentes: int | None = None) -> list[float | None]:
-    return [ensayo_puente(r, s, n_agentes) for s in range(N_SEMILLAS)]
+def serie_gemelo(r: int, n_agentes: int | None = None, tardio: bool = False,
+                 n: int = N_SEMILLAS) -> list[float | None]:
+    return [ensayo_puente(r, s, n_agentes, tardio) for s in range(n)]
 
 
 def c1() -> tuple[bool, list[tuple[int, float, float, float]]]:
@@ -118,18 +125,24 @@ def main() -> int:
         conteos, _ = np.histogram(validos, bins=o.BINS)
         return " · ".join(f"{100 * c / len(xs):.0f} %" for c in conteos)
 
+    config = cargar(CONFIG)
+
     info = {}
+    n_info = 10  # 60 agentes con 50 viajes es caro: solo 10 semillas (informativo)
     for r in (1, 2):
-        xs = serie_gemelo(r, 60)
-        info[r] = (histograma(xs), sum(x is not None and (x <= 0.2 or x >= 0.8) for x in xs) / N_SEMILLAS,
-                   sum(x is not None and x >= 0.8 for x in xs) / N_SEMILLAS)
+        xs = serie_gemelo(r, 60, n=n_info)
+        info[r] = (histograma(xs), sum(x is not None and (x <= 0.2 or x >= 0.8) for x in xs) / n_info,
+                   sum(x is not None and x >= 0.8 for x in xs) / n_info)
+    tardio = {r: histograma(serie_gemelo(r, tardio=True)) for r in (1, 2)}
 
     lineas = [
         "# RESULTADOS — gemelo frente al oráculo",
         "",
         "Generado por `python -X utf8 oraculo/comparar.py`. Pruebas y tolerancias: `TOLERANCIAS.md`",
         "(declaradas antes de correr). Gemelo: `gemelo/configs/puente_doble.yaml`, "
-        f"{N_SEMILLAS} semillas por r.",
+        f"{N_SEMILLAS} semillas por r: {config['ensayo']['n_agentes']} agentes, "
+        f"{config['agente'].get('viajes', 1)} viajes, salida cada {config['ensayo'].get('salida_cada', 0)} tick(s), "
+        f"k = {config['agente']['k']}, tau_max = {config['mundo']['tau_max']}.",
         "",
         "## Resumen",
         "",
@@ -147,8 +160,9 @@ def main() -> int:
         "| | r = 1 | r = 2 |",
         "|---|---|---|",
         f"| Oráculo (montecarlo_aco [4], 1000 hormigas, N = 1000) | {' · '.join(f'{v:.0f} %' for v in o.montecarlo(1.0)[1])} | {' · '.join(f'{v:.0f} %' for v in o.montecarlo(2.0)[1])} |",
-        f"| Gemelo (6 agentes, N = {N_SEMILLAS}) | {histograma(gemelo_r1)} | {histograma(gemelo_r2)} |",
-        f"| Gemelo con 60 agentes (informativo, parte C) | {info[1][0]} | {info[2][0]} |",
+        f"| Gemelo ({config['ensayo']['n_agentes']} agentes, N = {N_SEMILLAS}) | {histograma(gemelo_r1)} | {histograma(gemelo_r2)} |",
+        f"| Gemelo con 60 agentes, 10 semillas (informativo, parte C) | {info[1][0]} | {info[2][0]} |",
+        f"| Gemelo, tráfico de la 2.ª mitad de los viajes (informativo, J6) | {tardio[1]} | {tardio[2]} |",
         "",
         f"Ensayos del gemelo que no se asentaron (6 agentes, ambos r): {no_asentadas}.",
         f"Con 60 agentes: extremos en r = 1 = {info[1][1]:.2f}; x ≥ 0,8 en r = 2 = {info[2][2]:.2f}.",
