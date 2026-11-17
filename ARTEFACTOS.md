@@ -23,7 +23,7 @@ solo con esta definición.
 | 12 | Oráculo del puente doble (a partir de los notebooks) | `oraculo/` | **Hecho** | 100 % (3/3) |
 | 13 | Pruebas automáticas (pytest) | `gemelo/tests/` | Por hacer | 0 % (0/1) |
 | 14 | Experimentos en lote → CSV (4 modos × 30 semillas) | `gemelo/experimentos/` | **Hecho** | 100 % (2/2) |
-| 15 | Notebook de análisis | `gemelo/notebooks/` | Por hacer | 0 % (0/2) |
+| 15 | Notebook de análisis | `gemelo/notebooks/` | **Hecho** | 100 % (2/2) |
 | 16 | Demostración del mundo en NetLogo + puente Python | `gemelo/netlogo/` | Por hacer | 0 % (0/3) |
 | 17 | **Guía de reproducción autocontenida** | `gemelo/REPRODUCIR.md` | Por hacer | 0 % (0/4) |
 
@@ -43,7 +43,7 @@ solo con esta definición.
 12. ✅ Reproduce p1 (celda [5]; error ≤ 1e-12) · ✅ la dinámica (celda [7]; p_s final = 0,924 ≥ 0,9) · ✅ el histograma de r = 1 (extremos 70,7 % ≥ 70 %, **muy justo**) y r = 2 (80–100 %: 75,1 % ≥ 70 %), con las tolerancias de `oraculo/TOLERANCIAS.md` declaradas antes de correr (`oraculo/test_oraculo.py`: 7 PASA, 2026-11-17 03:17 -0500). La comparación del gemelo (C1–C5) está en `oraculo/RESULTADOS.md`.
 13. Todas las pruebas en PASA.
 14. ✅ Genera un CSV por condición (más `resumen.csv` con intervalos de confianza) · ✅ se puede reproducir con la semilla, sin importar el número de procesos (`tests/test_experimentos.py`: 11 PASA, 2026-11-17 04:49 -0500). Planes: `experimentos/modos.yaml` y `experimentos/rescate.yaml`; datos en `experimentos/datos/`.
-15. Gráficas comparativas · prueba estadística de la varianza con y sin rescate.
+15. ✅ Gráficas comparativas (4 figuras en `notebooks/figuras/`) · ✅ prueba estadística de la varianza con y sin rescate (Brown-Forsythe, más Mann-Whitney y Fisher, con Bonferroni) (`tests/test_notebook.py`: 1 PASA, 2026-11-17 04:58 -0500). Conclusiones calculadas desde los datos.
 16. El mundo vive en los patches · `py:setup` usa el Python del entorno · un agente Python se mueve según el protocolo.
 17. Ver la sección siguiente.
 

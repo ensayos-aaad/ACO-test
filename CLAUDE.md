@@ -49,7 +49,7 @@ de antemano.
 
 **Dónde quedamos:** fase 1 del gemelo en construcción. Hechos los artefactos
 **1 (entorno), 3 (protocolo), 4 (mundo), 5 (canal), 6 (agente), 7 (madre), 8 (motor), 9 (configuración y
-línea de comandos), 10 (métricas), 11 (visualización), 12 (oráculo) y 14 (experimentos)**: 258 pruebas del gemelo + 7 del oráculo en PASA.
+línea de comandos), 10 (métricas), 11 (visualización), 12 (oráculo), 14 (experimentos) y 15 (notebook)**: 259 pruebas del gemelo + 7 del oráculo en PASA.
 El detalle y el avance de los 17 artefactos están en `ARTEFACTOS.md`.
 
 **Cómo comprobar que todo sigue bien** (desde `gemelo/`):
@@ -74,11 +74,14 @@ se reconsidera al llegar al hardware.
 verificación (18 → 25–27/30), pero nada es significativo tras corregir por comparaciones múltiples, y con 10 viajes
 la madre ya no reduce la varianza del tiempo.
 
-**Aviso del operador:** el límite de 5 horas del plan está al **90 %** (2026-11-17 04:55 -0500). La sesión se pausa aquí y
+**Aviso del operador (ya atendido):** el límite de 5 horas del plan estuvo al **90 %** (2026-11-17 04:55 -0500). La sesión se pausa aquí y
 **se espera su señal** para seguir.
 
-**Siguiente artefacto: 15, notebook de análisis** (`gemelo/notebooks/`): gráficas comparativas a partir de
-`experimentos/datos/` y la prueba estadística de la varianza con y sin rescate.
+**Análisis (artefacto 15, F-019):** `gemelo/notebooks/analisis.ipynb` (4 figuras y pruebas con Bonferroni). La
+hipótesis de `resumen.pdf` (el rescate reduce la varianza) **no queda apoyada**; las pruebas son exploratorias.
+
+**Siguiente artefacto: 16, demostración con NetLogo** (`gemelo/netlogo/`): el mundo vive en los patches, `py:setup`
+usa el Python del entorno y un agente Python se mueve según el protocolo. Luego 17, guía de reproducción.
 
 **Siguiente artefacto: 14, experimentos en lote** (4 modos × 30 semillas → CSV), después 15 notebook, 16 NetLogo
 y 17 guía de reproducción. El 13 (pruebas automáticas) se cumple al tener todas las pruebas en PASA.
@@ -93,7 +96,7 @@ y 17 guía de reproducción. El 13 (pruebas automáticas) se cumple al tener tod
 - Sin implementar: `BALIZA`, `ALERTA`, `SIGUEME` (comunicación entre agentes, E1) y `STOP`.
 - `gemelo/tests/apoyo.py` (banco provisional) se conserva para las pruebas unitarias; el motor da los mismos tiempos.
 
-**Después:** 16 demostración NetLogo → 17 guía de reproducción.
+**Después:** 17 guía de reproducción (y el 13, pruebas automáticas, se cierra con todo en PASA).
 
 **Pendiente de revisión por el operador** (aprobado "con bendición", ver ASSUMPTIONS.md):
 - `DECISIONES-PRUEBA.md`: ronda 1 (A–G) y ronda 2 (I1–I15, valores elegidos por Claude).
@@ -117,6 +120,10 @@ Criterios de PROMPT-ZERO (ver `oraculo/RESULTADOS.md`): **C1 PASA** · **C2 PASA
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-17 04:58 -0500
+- El operador da la señal para seguir. **Artefacto 15 hecho** (Claude Opus 5.5): `gemelo/notebooks/analisis.ipynb`, ejecutado y guardado con sus salidas; 4 figuras en `notebooks/figuras/`; conclusiones calculadas desde los datos; prueba `tests/test_notebook.py` (259 en total).
+- **F-019:** la hipótesis de `resumen.pdf` no queda apoyada (varianza con rescate no menor de forma significativa). Se corrigió en el notebook una afirmación de método: las pruebas se fijaron después de la mirada exploratoria de F-018. Sin commit todavía.
 
 ### 2026-11-17 04:55 -0500
 - Cierre por límite del plan: el operador avisa que el límite de 5 horas está al 90 %. Se actualiza "Para retomar", el README y el CHANGELOG, se sincroniza y se espera su señal para el artefacto 15.
