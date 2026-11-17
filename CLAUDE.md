@@ -50,7 +50,7 @@ de antemano.
 
 **Dónde quedamos:** fase 1 del gemelo en construcción. Hechos los artefactos
 **1 (entorno), 3 (protocolo), 4 (mundo), 5 (canal), 6 (agente), 7 (madre), 8 (motor), 9 (configuración y
-línea de comandos), 10 (métricas), 11 (visualización), 12 (oráculo), 14 (experimentos) 13 (pruebas) y 15 (notebook)**: 259 pruebas del gemelo + 7 del oráculo en PASA.
+línea de comandos), 10 (métricas), 11 (visualización), 12 (oráculo), 13 (pruebas), 14 (experimentos) y 15 (notebook)**: 259 pruebas del gemelo + 7 del oráculo en PASA.
 El detalle y el avance de los 17 artefactos están en `ARTEFACTOS.md`.
 
 **Cómo comprobar que todo sigue bien** (desde `gemelo/`):
