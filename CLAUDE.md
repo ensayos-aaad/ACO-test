@@ -38,7 +38,7 @@ de antemano.
 | `ASSUMPTIONS.md`  | Suposiciones y sesgos declarados (A-001 a A-004)             |
 | `CHANGELOG.md`    | Cambios por sesión                                           |
 | `CHECKLIST-ENTORNO.md` | Software necesario: instalado `[x]` / falta `[ ]`       |
-| `PROTOCOLO.md`    | Borrador v0.1 de los mensajes del gemelo (campos, bits, frecuencias) |
+| `PROTOCOLO.md`    | Borrador v0.2 de los mensajes del gemelo (campos, bits, frecuencias) |
 | `DECISIONES-PRUEBA.md` | Preguntas de diseño con todas las opciones: ✅ elegida / ❌ descartada |
 | `ARTEFACTOS.md`   | Los 17 artefactos de software (→ `gemelo/`), su estado, su avance y los requisitos de reproducción |
 | `oraculo/`        | Reservada para el oráculo; solo README, sin código           |
@@ -62,6 +62,11 @@ Criterios de aceptación C1–C6: todos **NO PROBADO** (son candidatos; el opera
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-16 20:58 -0500
+- **Artefacto 3 hecho** (Claude Fable 5.2): `gemelo/aco_gemelo/protocolo/` con los 16 mensajes declarados una sola vez (`MENSAJES`) y los codificadores JSON y binario derivados de esa tabla. 74 pruebas en PASA (94 en total).
+- `PROTOCOLO.md` pasa a **v0.2**: 8 vecinos, verificadora (H4 resuelto), `SIGUEME` con `n`, orden de bits MSB primero. Sigue sin la aprobación del operador.
+- Desviación de B2: se hicieron JSON **y** binario a la vez, porque al declarar los campos una sola vez el binario salía casi gratis y garantiza la equivalencia. A confirmar por el operador.
 
 ### 2026-11-16 20:54 -0500
 - **Artefacto 4 hecho** (Claude Fable 5.2): `gemelo/aco_gemelo/mundo/` con `Mundo` (8 vecinos sin cortar esquinas, BFS, feromona por celda con saturación y q4) y los escenarios `mundo_l`, `mundo_aleatorio` y `puente_doble(r, ancho)`. 18 pruebas en PASA (20 con las del entorno).

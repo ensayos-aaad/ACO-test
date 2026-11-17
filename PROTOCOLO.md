@@ -1,6 +1,13 @@
-# PROTOCOLO — mensajes del gemelo ACO (borrador v0.1)
+# PROTOCOLO — mensajes del gemelo ACO (borrador v0.2)
 
-**Estado:** propuesta de Claude, **sin aprobar** por el operador · 2026-11-16 20:07 -0500
+**Estado:** propuesta de Claude, **sin aprobar** por el operador · v0.2 del 2026-11-16 20:58 -0500
+**Implementación:** `gemelo/aco_gemelo/protocolo/codec.py` (la tabla `MENSAJES` es la fuente de verdad; las pruebas comprueban los tamaños de este documento).
+
+**Cambios de la v0.2** (por las decisiones de DECISIONES-PRUEBA.md):
+- Vecindad de 8 por defecto (C2): `mov` de 3 bits, `PERCEPCION` con 9 celdas.
+- Verificadora (D3, H4): bit `verificadora` en `INICIO`, flag `verificacion` en la cabecera y motivos de `FIN`.
+- `SIGUEME` lleva el campo `n` y hasta 4 movimientos del tamaño de `mov`.
+- Orden de bits: un solo flujo, del más significativo al menos significativo (antes decía *little-endian*).
 **Alcance:** las 3 fases del gemelo (Python → Python + NetLogo + MQTT → ESP32 + RPi), ver CONTEXT §8.
 
 ## 0. Principios
@@ -27,8 +34,8 @@
 | `q4` / `q8` | 4 / 8 | Valor cuantizado: v ≈ q · v_max / (2ⁿ − 1) | Feromona, pesos |
 | `sat8` | 8 | Contador que se satura en 255 | Experiencia, llegadas |
 
-Orden de bytes: *little-endian* (ESP32 y x86 lo comparten). Dentro de un byte, los bits se empaquetan
-del más significativo al menos significativo.
+Orden de bits: el mensaje es un solo flujo de bits, del más significativo al menos significativo. Un campo
+de 16 bits va con el byte alto primero. Las listas de tamaño variable se rellenan con ceros hasta el byte.
 
 ## 2. Cabeceras
 
@@ -52,7 +59,8 @@ del más significativo al menos significativo.
 | 0 `ack` | Se pide confirmación (`ACK` con el mismo `seq`) |
 | 1 `rescate` | El contenido es la **condición inicial** de un rescate |
 | 2 `ultimo` | Último fragmento de una serie |
-| 3–7 | Reservados |
+| 3 `verificacion` | Lo envía la agente verificadora (en `DANZA`: "llegué siguiendo solo el rastro") |
+| 4–7 | Reservados |
 
 `seq`: contador de 8 bits por emisor, que vuelve a 0. Sirve para detectar pérdidas y duplicados.
 
@@ -123,9 +131,10 @@ Carga: **16 bits (2 B)** · total **5 B**.
 | Campo | Bits | Significado |
 |---|---|---|
 | `ruta_id` | 8 | Ruta que conoce el líder |
-| `prox_movs` | 8 | Los próximos 4 movimientos (4 × 2 bits) |
+| `n` | 3 | Cuántos movimientos siguen (0–4) |
+| `movs` | n × `mov` | Los próximos movimientos, completados a byte |
 
-Carga: **16 bits (2 B)** · total **5 B**.
+Carga: hasta **24 bits (3 B)** · total **6 B**.
 
 ### Familia 2 — Agente → Madre
 
@@ -161,7 +170,7 @@ Carga: **40 bits (5 B)** · total **12 B**. Un mundo de 8 × 8 son 4 bloques.
 | `largo` | 8 | Número de movimientos L, que también mide la calidad (más corta = mejor) |
 | `movs` | 2·L | La ruta (3·L con 8-vecindad), completada a byte |
 
-Carga: 24 + 2L bits. Con la ruta del plano (L ≈ 14): **7 B** · total **14 B**. Máximo L = 60 → 18 B.
+Carga: 24 + 3L bits con 8 vecinos (24 + 2L con 4). Con la ruta del plano (L ≈ 14) y 8 vecinos: **9 B** · total **16 B**. Con L = 60: 26 B · total 33 B.
 
 **2.3 `PIDE_RESCATE`** (el agente decide por sí mismo que está rezagado)
 
@@ -186,7 +195,8 @@ Carga: **16 bits (2 B)** · total **9 B**.
 | `vecindad` | 1 | 0 = 4 · 1 = 8 |
 | `modo_com` | 1 | 0 = solo estigmergia · 1 = también mensajes entre agentes |
 | `modo_madre` | 2 | 00 = ausente · 01 = pista de baile · 10 = rescate · 11 = difusión cada Δt |
-| reservado | 4 | |
+| `verificadora` | 1 | 1 = este agente es la verificadora: solo explota el rastro |
+| reservado | 3 | |
 | `semilla` | 16 | Semilla del generador aleatorio del agente (en el hardware real puede sustituirse por `esp_random()`) |
 | `delta_t` | 8 | Ticks entre sincronizaciones |
 | `K` | 8 | Memoria del agente (pasos recordados) |
@@ -229,21 +239,22 @@ Con 8 × 8: 8 + 128 = **17 B** sin feromona · 8 + 384 = **49 B** con ella · to
 Carga: **16 bits (2 B)** · total **9 B**.
 
 **3.5 `FIN`**: `motivo` (2) + reservado (6) = 1 B · total 8 B.
+Motivos: 00 = camino verificado · 01 = se agotó el límite de pasos · 10 = la verificadora falló (ciclo o sin rastro) · 11 = abortado.
 
 **x.7 `ACK`** (cualquier familia salvo la 1): solo la cabecera larga; `seq` es el que se confirma.
 
-## 4. Resumen de tamaños y frecuencias (mundo de 8 × 8, 4-vecindad)
+## 4. Resumen de tamaños y frecuencias (mundo de 8 × 8, 8-vecindad)
 
 | Mensaje | Sentido | Total (B) | Cuándo | Entrega |
 |---|---|---|---|---|
-| PERCEPCION | Mundo → Ag | 14 | Cada tick | Garantizada |
+| PERCEPCION | Mundo → Ag | 18 | Cada tick | Garantizada |
 | ACCION | Ag → Mundo | 9 | Cada tick | Garantizada |
 | BALIZA | Ag → vecinos | **6** | Cada tick o cada n ticks | Sin garantía |
 | ALERTA | Ag → vecinos | **5** | Por evento | Sin garantía |
-| SIGUEME | Ag → vecino | **5** | Por evento | Sin garantía |
+| SIGUEME | Ag → vecino | **6** | Por evento | Sin garantía |
 | ESTADO | Ag → Madre | 11 | Cada Δt | Sin garantía |
 | FRAGMENTO | Ag → Madre | 12 | Si hay novedades, ≤ 1 por Δt | Sin garantía |
-| DANZA | Ag → Madre | 14 (L = 14) | Al llegar a la meta | Con ACK |
+| DANZA | Ag → Madre | 16 (L = 14) | Al llegar a la meta | Con ACK |
 | PIDE_RESCATE | Ag → Madre | 9 | Por evento | Con ACK |
 | INICIO | Madre → todos | 14 | Al empezar el ensayo | Con ACK |
 | RECLUTA | Madre → todos | ≤ 17 | Cada Δt (modo pista de baile) | Sin garantía |

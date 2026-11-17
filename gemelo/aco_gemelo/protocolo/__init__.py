@@ -1,0 +1,41 @@
+"""Protocolo de mensajes del gemelo: definición de campos y codificadores JSON ↔ binario."""
+
+from .codec import (
+    FLAG_ACK,
+    FLAG_RESCATE,
+    FLAG_ULTIMO,
+    FLAG_VERIFICACION,
+    ID_DIFUSION,
+    ID_MADRE,
+    ID_MUNDO,
+    MENSAJES,
+    Contexto,
+    a_binario,
+    a_json,
+    byte_a_celda,
+    celda_a_byte,
+    crear,
+    de_binario,
+    de_json,
+    nombre_de,
+)
+
+__all__ = [
+    "Contexto",
+    "FLAG_ACK",
+    "FLAG_RESCATE",
+    "FLAG_ULTIMO",
+    "FLAG_VERIFICACION",
+    "ID_DIFUSION",
+    "ID_MADRE",
+    "ID_MUNDO",
+    "MENSAJES",
+    "a_binario",
+    "a_json",
+    "byte_a_celda",
+    "celda_a_byte",
+    "crear",
+    "de_binario",
+    "de_json",
+    "nombre_de",
+]
