@@ -27,7 +27,7 @@ de antemano.
 
 | Archivo / carpeta | Contenido                                                    |
 |-------------------|--------------------------------------------------------------|
-| `README.md`       | Título y descripción breve                                   |
+| `README.md`       | Portada: insignias de IA (Claude Opus 5.5), fases, mapa de documentos, uso de IA |
 | `LICENSE`         | GPL v3                                                       |
 | `CLAUDE.md`       | Este archivo: reglas permanentes, contexto e historial       |
 | `PROMPT-ZERO.md`  | Método de trabajo, criterios C1–C6 y tarea de la Sesión 0    |
@@ -62,6 +62,9 @@ Criterios de aceptación C1–C6: todos **NO PROBADO** (son candidatos; el opera
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-16 20:31 -0500
+- `README.md` raíz actualizado: insignia "Built with AI" (la misma de la referencia) + insignia del modelo **Claude Opus 5.5**, estado por fases, mapa de documentos y una sección de uso de IA.
 
 ### 2026-11-16 20:29 -0500
 - Sesgo declarado por el operador: **recibe más información de la que puede procesar y "echa la bendición"**. Se registra en ASSUMPTIONS; las decisiones de la ronda 1 quedan como aprobadas con carga alta. Desde ahora, respuestas ejecutivas.
