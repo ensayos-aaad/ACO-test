@@ -21,6 +21,16 @@ Formato: fecha · qué se intentó · qué pasó · evidencia · qué se aprendi
   | Difusión | 59 ± 24, máx. 135 | 31/40 | 1,33 | 1171 |
 
   Las 6 agentes se asientan en 40/40 con todos los modos · Script de comparación (scratchpad); la prueba `test_con_cualquier_modo_la_colonia_se_asienta_y_la_madre_acelera` fija lo esencial con 20 semillas · Lecturas: (1) la pista de baile y la difusión **bajan el tiempo, su dispersión y el largo de la ruta**; (2) **el rescate no cambia nada**: con el umbral del 50 % ninguna agente llega a contar como rezagada antes de asentarse, así que la hipótesis de `resumen.pdf` **no se pudo poner a prueba todavía** (hay que barrer el umbral o cambiar la métrica de experiencia); (3) **la verificadora sigue fallando en ~1 de cada 4 semillas** con cualquier modo: los rastros cruzados la llevan a callejones (I12 le prohíbe volver sobre sus pasos). Nada de esto se ajustó.
+- **F-013** · 2026-11-17 03:02 -0500 · Comparación de los 4 modos con las métricas del artefacto 10 (mundo L, 6 agentes, **30 semillas**, sin evaporación) · Resultados:
+
+  | Modo | Verificadas (IC 95 %) | Ticks hasta asentarse: media / varianza / máx. | Ruta / óptima | Conocimiento de la madre | Bytes madre ↔ agentes |
+  |---|---|---|---|---|---|
+  | Ausente | 20/30 (49–81 %) | 102 / 1857 / 301 | 1,78 | — | 0 |
+  | Pista de baile | 21/30 (52–83 %) | 75 / 523 / 112 | 1,34 | — | 836 |
+  | Rescate | 20/30 (49–81 %) | 102 / 1857 / 301 | 1,78 | 99 % | 1331 |
+  | Difusión | 24/30 (63–90 %) | 58 / 527 / 135 | 1,47 | 83 % | 1185 |
+
+  · `python -m aco_gemelo batch` con un YAML por modo · Lecturas: (1) **la madre reduce la varianza del tiempo de convergencia a menos de un tercio** (1857 → 523–527), que es la hipótesis de `resumen.pdf`, pero la logran la pista de baile y la difusión, **no el rescate**, que sigue sin dispararse (I14); (2) en la tasa de verificación los intervalos de confianza se solapan: **con 30 semillas no hay diferencia demostrable entre modos**; (3) en difusión la madre conoce menos mapa (83 %) porque la colonia termina antes; (4) defecto corregido: el `FIN` que difunde el motor se contaba como tráfico de la colonia aunque no hubiera madre.
 - **F-012** · 2026-11-17 02:55 -0500 · Primera corrida por línea de comandos de las tres configuraciones de ejemplo (30 semillas cada una, **con evaporación ρ = 0,01**, que es el valor por defecto I3) · Resultados:
 
   | Configuración | Asentadas | Verificadas | Ruta verificada / óptima |

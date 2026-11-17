@@ -46,7 +46,7 @@ class ConfigEnsayo:
         semilla: semilla de las agentes y del canal.
         agente, madre: configuración de las agentes y de la madre.
         radio, p_perdida, retardo, formato: parámetros del canal.
-        registrar: si se guarda la posición de cada agente en cada tick.
+        registrar: si se guarda la posición de cada agente y la serie de métricas en cada tick.
         pausa: segundos que duerme cada hilo entre dos pasos (solo motor de hilos).
     """
 
@@ -78,7 +78,10 @@ class Resultado:
     bloqueadas: int  #: acciones que el mundo rechazó
     trafico: dict[str, dict[str, int]]  #: mensajes y bytes por familia
     memoria_madre: int  #: bytes que recuerda la madre al terminar
+    modo_madre: str = "ausente"
+    conocimiento: float | None = None  #: fracción del mundo que la madre conoce bien
     historial: list[tuple[int, int, Celda]] = field(default_factory=list)
+    serie: list[dict[str, float]] = field(default_factory=list)  #: evolución tick a tick
 
     @property
     def razon(self) -> float | None:
@@ -159,6 +162,7 @@ class Simulacion:
             self.actor_mundo.agregar(agente.id)
         self.verificadora: Agente | None = None
         self.ticks_asentadas: int | None = None
+        self.serie: list[dict[str, float]] = []
         self.tick = 0
 
     # ------------------------------------------------------------------ fases
@@ -182,6 +186,24 @@ class Simulacion:
             return False, None
         return self.verificadora.estado in (Estado.ASENTADA, Estado.FALLIDA), None
 
+    def _conocimiento(self) -> float | None:
+        from ..metricas import conocimiento_del_mundo  # aquí para no crear un ciclo de imports
+
+        return conocimiento_del_mundo(self.madre, self.mundo) if self.con_madre else None
+
+    def _registrar_tick(self) -> None:
+        """Guarda las métricas del tick que acaba de terminar (solo si ``registrar``)."""
+        if not self.config.registrar:
+            return
+        trafico = self.canal.trafico
+        self.serie.append({
+            "tick": self.tick,
+            "llegaron": sum(a.llegadas >= 1 for a in self.agentes),
+            "asentadas": sum(a.estado is Estado.ASENTADA for a in self.agentes),
+            "conocimiento": self._conocimiento(),
+            "bytes_madre": trafico[2].bytes + trafico[3].bytes,
+        })
+
     def _resultado(self) -> Resultado:
         v = self.verificadora
         verificada = v is not None and v.estado is Estado.ASENTADA
@@ -192,6 +214,8 @@ class Simulacion:
         else:
             motivo = "limite"
         codigo = {"verificada": 0, "limite": 1, "verificadora_fallo": 2}[motivo]
+        # Sin madre, el FIN es solo un aviso del motor: no cuenta como tráfico de la colonia.
+        trafico = None if self.con_madre else self.canal.resumen()
         self.canal.enviar(crear("FIN", src=ID_MADRE, dst=ID_DIFUSION, tick=self.tick % 65536,
                                 motivo=codigo))
         return Resultado(
@@ -203,9 +227,12 @@ class Simulacion:
             largo_optimo=self.mundo.largo_optimo(),
             largo_verificado=len(v.ruta) - 1 if verificada else None,
             bloqueadas=self.actor_mundo.bloqueadas,
-            trafico=self.canal.resumen(),
+            trafico=trafico or self.canal.resumen(),
             memoria_madre=self.madre.memoria_usada() if self.con_madre else 0,
+            modo_madre=self.config.madre.modo.name.lower(),
+            conocimiento=self._conocimiento(),
             historial=self.actor_mundo.historial,
+            serie=self.serie,
         )
 
     # ------------------------------------------------------------------ motores
@@ -234,6 +261,7 @@ class Simulacion:
             self.actor_mundo.aplicar_acciones(t)
             self.madre.paso(t)
             self.actor_mundo.cerrar_tick()
+            self._registrar_tick()
             self.tick += 1
         resultado = self._resultado()
         for agente in self._actores():  # entrega el FIN
@@ -279,6 +307,7 @@ class Simulacion:
                     if pendientes:
                         time.sleep(self.config.pausa)
                 self.actor_mundo.cerrar_tick()
+                self._registrar_tick()
                 self.tick += 1
             resultado = self._resultado()
             time.sleep(20 * self.config.pausa)  # da tiempo a que lean el FIN

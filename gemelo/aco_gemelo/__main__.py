@@ -15,32 +15,12 @@ from pathlib import Path
 from typing import Any
 
 from .config import cargar, config_ensayo, crear_mundo
-from .motor import Resultado, Simulacion
+from .metricas import fila, resumen
+from .motor import Simulacion
 
-_FAMILIAS = ("mundo_agente", "agente_agente", "agente_madre", "madre_agente")
 
-
-def fila(semilla: int, datos: dict[str, Any], resultado: Resultado) -> dict[str, Any]:
-    """Aplana un resultado en una fila de CSV."""
-    salida = {
-        "semilla": semilla,
-        "escenario": (datos.get("mundo") or {}).get("escenario", "L"),
-        "modo_madre": config_ensayo(datos).madre.modo.name.lower(),
-        "motivo": resultado.motivo,
-        "asentadas": int(resultado.asentadas),
-        "verificada": int(resultado.verificada),
-        "ticks_asentadas": resultado.ticks_asentadas,
-        "ticks_total": resultado.ticks_total,
-        "largo_optimo": resultado.largo_optimo,
-        "largo_verificado": resultado.largo_verificado,
-        "razon": None if resultado.razon is None else round(resultado.razon, 4),
-        "bloqueadas": resultado.bloqueadas,
-        "memoria_madre": resultado.memoria_madre,
-    }
-    for familia in _FAMILIAS:
-        salida[f"mensajes_{familia}"] = resultado.trafico[familia]["enviados"]
-        salida[f"bytes_{familia}"] = resultado.trafico[familia]["bytes"]
-    return salida
+def _escenario(datos: dict[str, Any]) -> str:
+    return (datos.get("mundo") or {}).get("escenario", "L")
 
 
 def ejecutar(datos: dict[str, Any], semilla: int, motor: str = "determinista"):
@@ -55,7 +35,7 @@ def _run(args: argparse.Namespace) -> int:
     semilla = datos.get("semilla", 0) if args.semilla is None else args.semilla
     dibujo, resultado = ejecutar(datos, semilla, args.motor)
     print(f"Mundo (semilla {semilla}):\n{dibujo}\n")
-    for clave, valor in fila(semilla, datos, resultado).items():
+    for clave, valor in fila(semilla, _escenario(datos), resultado).items():
         print(f"{clave:28} {'' if valor is None else valor}")
     return 0
 
@@ -63,21 +43,28 @@ def _run(args: argparse.Namespace) -> int:
 def _batch(args: argparse.Namespace) -> int:
     datos = cargar(args.config)
     semillas = range(args.semilla_inicial, args.semilla_inicial + args.semillas)
-    filas = [fila(s, datos, ejecutar(datos, s)[1]) for s in semillas]
+    filas = [fila(s, _escenario(datos), ejecutar(datos, s)[1]) for s in semillas]
     salida = Path(args.salida or f"resultados/{Path(args.config).stem}.csv")
     salida.parent.mkdir(parents=True, exist_ok=True)
     with open(salida, "w", newline="", encoding="utf-8") as archivo:
         escritor = csv.DictWriter(archivo, fieldnames=list(filas[0]))
         escritor.writeheader()
         escritor.writerows(filas)
-    n = len(filas)
-    verificadas = [f for f in filas if f["verificada"]]
-    print(f"{n} ensayos → {salida}")
-    print(f"asentadas:   {sum(f['asentadas'] for f in filas)}/{n}")
-    print(f"verificadas: {len(verificadas)}/{n}")
-    if verificadas:
-        print(f"razón media (ruta verificada / óptima): "
-              f"{sum(f['razon'] for f in verificadas) / len(verificadas):.2f}")
+    r = resumen(filas)
+    print(f"{r['n']} ensayos → {salida}")
+    for nombre in ("asentadas", "verificadas"):
+        t = r[nombre]
+        print(f"{nombre + ':':12} {t['exitos']}/{t['n']}"
+              f"  (IC 95 %: {t['ic95_bajo']:.0%} a {t['ic95_alto']:.0%})")
+    if r["ticks_media"] is not None:
+        print(f"ticks hasta asentarse: media {r['ticks_media']:.1f}, "
+              f"varianza {r['ticks_varianza']:.1f}, máximo {r['ticks_max']:.0f}")
+    if r["razon_media"] is not None:
+        print(f"razón media (ruta verificada / óptima): {r['razon_media']:.2f}")
+    if r["conocimiento_medio"] is not None:
+        print(f"conocimiento del mundo de la madre: {r['conocimiento_medio']:.0%}")
+    print(f"bytes madre ↔ agentes por ensayo: "
+          f"{r['bytes_agente_madre_media'] + r['bytes_madre_agente_media']:.0f}")
     return 0
 
 
