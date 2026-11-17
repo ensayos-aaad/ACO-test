@@ -12,7 +12,7 @@ solo con esta definición.
 | 1 | Entorno reproducible (`environment.yml`) | `gemelo/` | **Hecho** | 100 % (3/3) |
 | 2 | Especificación del protocolo | `gemelo/docs/` (hoy `PROTOCOLO.md`) | Borrador | 33 % (1/3) |
 | 3 | Codificadores JSON ↔ binario | `gemelo/aco_gemelo/protocolo/` | Por hacer | 0 % (0/3) |
-| 4 | Mundo + BFS + escenarios (L, aleatorio, puente doble) | `gemelo/aco_gemelo/mundo/` | Por hacer | 0 % (0/4) |
+| 4 | Mundo + BFS + escenarios (L, aleatorio, puente doble) | `gemelo/aco_gemelo/mundo/` | **Hecho** | 100 % (4/4) |
 | 5 | Canal en memoria (con retardo y pérdida simulados) | `gemelo/aco_gemelo/canal/` | Por hacer | 0 % (0/3) |
 | 6 | Agente (paso no bloqueante, roles, verificadora) | `gemelo/aco_gemelo/agente/` | Por hacer | 0 % (0/4) |
 | 7 | Madre (4 modos, memoria en bytes) | `gemelo/aco_gemelo/madre/` | Por hacer | 0 % (0/4) |
@@ -32,7 +32,7 @@ solo con esta definición.
 1. ✅ Se crea con `conda env create` · ✅ fija las versiones · ✅ las pruebas corren dentro del entorno (`tests/test_entorno.py`: 2 PASA, 2026-11-16 20:50 -0500).
 2. ✅ Ejemplo binario verificado · el operador lo aprueba · incluye la verificadora (H4).
 3. Lo que se codifica y decodifica vuelve igual (JSON y binario) · los tamaños coinciden con la especificación · el JSON y el binario llevan la misma información.
-4. La meta siempre es alcanzable · el BFS con 8 vecinos no corta esquinas · la L coincide con el plano · el escenario de puente doble está parametrizado por r.
+4. ✅ La meta siempre es alcanzable (200 semillas por escenario) · ✅ el BFS con 8 vecinos no corta esquinas · ✅ la L coincide con el plano · ✅ el escenario de puente doble está parametrizado por r (`tests/test_mundo.py`: 18 PASA, 2026-11-16 20:54 -0500).
 5. Entrega dentro del radio r · las pérdidas y retardos son los mismos con la misma semilla · cuenta mensajes y bytes.
 6. Nunca entra en un obstáculo ni sale de la grilla · la memoria K se respeta · cambia de rol por umbral · la verificadora solo explota y detecta ciclos.
 7. Los 4 modos son seleccionables · actúa solo cada Δt · no supera su presupuesto de bytes · detecta a la rezagada por umbral.

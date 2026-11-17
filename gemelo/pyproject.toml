@@ -1,0 +1,9 @@
+[project]
+name = "aco-gemelo"
+version = "0.1.0"
+description = "Gemelo de software de una colonia ACO sobre arquitectura edge"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
