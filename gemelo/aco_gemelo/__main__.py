@@ -3,6 +3,7 @@
 Desde la carpeta ``gemelo/``::
 
     python -m aco_gemelo run   --config configs/default.yaml
+    python -m aco_gemelo run   --config configs/default.yaml --png final.png --animacion ensayo.gif
     python -m aco_gemelo batch --config configs/default.yaml --semillas 30
 """
 
@@ -23,27 +24,41 @@ def _escenario(datos: dict[str, Any]) -> str:
     return (datos.get("mundo") or {}).get("escenario", "L")
 
 
-def ejecutar(datos: dict[str, Any], semilla: int, motor: str = "determinista"):
-    """Corre un ensayo. Devuelve el mundo inicial (como texto) y el resultado."""
+def ejecutar(datos: dict[str, Any], semilla: int, motor: str = "determinista",
+             registrar: bool = False):
+    """Corre un ensayo. Devuelve el mundo (al terminar), su dibujo inicial y el resultado."""
     mundo = crear_mundo(datos, semilla)
     dibujo = str(mundo)
-    return dibujo, Simulacion(mundo, config_ensayo(datos, semilla)).correr(motor)
+    config = config_ensayo(datos, semilla)
+    if registrar:
+        config.registrar = True
+    return mundo, dibujo, Simulacion(mundo, config).correr(motor)
 
 
 def _run(args: argparse.Namespace) -> int:
     datos = cargar(args.config)
     semilla = datos.get("semilla", 0) if args.semilla is None else args.semilla
-    dibujo, resultado = ejecutar(datos, semilla, args.motor)
+    imagenes = bool(args.png or args.animacion)
+    mundo, dibujo, resultado = ejecutar(datos, semilla, args.motor, registrar=imagenes)
     print(f"Mundo (semilla {semilla}):\n{dibujo}\n")
     for clave, valor in fila(semilla, _escenario(datos), resultado).items():
         print(f"{clave:28} {'' if valor is None else valor}")
+    n_agentes = config_ensayo(datos).n_agentes
+    if args.png:
+        from .visual import png_final
+
+        print(f"PNG: {png_final(mundo, resultado, n_agentes, args.png)}")
+    if args.animacion:
+        from .visual import animar
+
+        print(f"Animación: {animar(mundo, resultado, n_agentes, args.animacion, fps=args.fps)}")
     return 0
 
 
 def _batch(args: argparse.Namespace) -> int:
     datos = cargar(args.config)
     semillas = range(args.semilla_inicial, args.semilla_inicial + args.semillas)
-    filas = [fila(s, _escenario(datos), ejecutar(datos, s)[1]) for s in semillas]
+    filas = [fila(s, _escenario(datos), ejecutar(datos, s)[2]) for s in semillas]
     salida = Path(args.salida or f"resultados/{Path(args.config).stem}.csv")
     salida.parent.mkdir(parents=True, exist_ok=True)
     with open(salida, "w", newline="", encoding="utf-8") as archivo:
@@ -77,6 +92,9 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("--config", required=True, help="archivo YAML de configuración")
     run.add_argument("--semilla", type=int, help="reemplaza la semilla del archivo")
     run.add_argument("--motor", choices=("determinista", "hilos"), default="determinista")
+    run.add_argument("--png", help="guarda una imagen del estado final (por ejemplo final.png)")
+    run.add_argument("--animacion", help="guarda la animación del ensayo (.gif o .mp4)")
+    run.add_argument("--fps", type=int, default=8, help="cuadros por segundo de la animación")
     run.set_defaults(func=_run)
     batch = sub.add_parser("batch", help="corre varios ensayos y guarda un CSV")
     batch.add_argument("--config", required=True, help="archivo YAML de configuración")

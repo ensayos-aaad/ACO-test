@@ -82,6 +82,9 @@ class Resultado:
     conocimiento: float | None = None  #: fracción del mundo que la madre conoce bien
     historial: list[tuple[int, int, Celda]] = field(default_factory=list)
     serie: list[dict[str, float]] = field(default_factory=list)  #: evolución tick a tick
+    #: feromona de cada celda (por filas) al cerrar cada tick; solo con ``registrar``
+    feromona: list[list[float]] = field(default_factory=list)
+    ruta_verificada: list[Celda] | None = None  #: celdas de la ruta de la verificadora
 
     @property
     def razon(self) -> float | None:
@@ -163,6 +166,7 @@ class Simulacion:
         self.verificadora: Agente | None = None
         self.ticks_asentadas: int | None = None
         self.serie: list[dict[str, float]] = []
+        self.feromona: list[list[float]] = []
         self.tick = 0
 
     # ------------------------------------------------------------------ fases
@@ -203,6 +207,9 @@ class Simulacion:
             "conocimiento": self._conocimiento(),
             "bytes_madre": trafico[2].bytes + trafico[3].bytes,
         })
+        m = self.mundo
+        self.feromona.append([round(m.feromona((x, y)), 6)
+                              for y in range(m.alto) for x in range(m.ancho)])
 
     def _resultado(self) -> Resultado:
         v = self.verificadora
@@ -233,6 +240,8 @@ class Simulacion:
             conocimiento=self._conocimiento(),
             historial=self.actor_mundo.historial,
             serie=self.serie,
+            feromona=self.feromona,
+            ruta_verificada=list(v.ruta) if verificada else None,
         )
 
     # ------------------------------------------------------------------ motores

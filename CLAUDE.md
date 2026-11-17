@@ -49,7 +49,7 @@ de antemano.
 
 **Dónde quedamos:** fase 1 del gemelo en construcción. Hechos los artefactos
 **1 (entorno), 3 (protocolo), 4 (mundo), 5 (canal), 6 (agente), 7 (madre), 8 (motor), 9 (configuración y
-línea de comandos) y 10 (métricas)**: 230 pruebas en PASA.
+línea de comandos), 10 (métricas) y 11 (visualización)**: 241 pruebas en PASA.
 El detalle y el avance de los 17 artefactos están en `ARTEFACTOS.md`.
 
 **Cómo comprobar que todo sigue bien** (desde `gemelo/`):
@@ -61,10 +61,13 @@ El detalle y el avance de los 17 artefactos están en `ARTEFACTOS.md`.
 `python -X utf8 -m aco_gemelo batch --config configs/default.yaml --semillas 30` (deja un CSV en `resultados/`,
 que git ignora).
 
-**Siguiente paso: artefacto 11, visualización** (`gemelo/aco_gemelo/visual/`): PNG del estado final y
-animación GIF/MP4 con el estilo del plano (obstáculos oscuros, I rojo, F morado, agentes verdes, feromona
-verde, madre azul). Con `registrar: true` el `Resultado` ya trae `historial` (posiciones) y `serie` (métricas
-por tick); falta guardar la feromona por tick para animarla.
+**Siguiente paso: artefacto 12, oráculo del puente doble** (`oraculo/`): reproducir, a partir de los notebooks de
+`referencia/` (sin modificarlos, citando archivo y celda), p1 (deneubourg [5]), la dinámica (deneubourg [7]) y el
+histograma de r = 1 y r = 2 (montecarlo_aco [4]), con tolerancias declaradas **antes** de correr. Ojo con F-012:
+con el ciclo de vida de un solo depósito, la colonia del gemelo no prefiere la rama corta; C2 y C3 probablemente
+den NO PASA y eso es un resultado válido.
+
+**Ver un ensayo:** `python -X utf8 -m aco_gemelo run --config configs/default.yaml --png final.png --animacion ensayo.gif`.
 
 **Problemas abiertos que dejó la madre (F-010):**
 - La verificadora falla en ~1 de cada 4 semillas con cualquier modo (rastros cruzados + no puede volver
@@ -99,6 +102,11 @@ Criterios de PROMPT-ZERO: **C1 PASA** a nivel del programa de agente (prueba en
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-17 03:10 -0500
+- Artefacto 10 sincronizado (`1121178`).
+- **Artefacto 11 hecho** (Claude Opus 5.5): `gemelo/aco_gemelo/visual/` con `png_final` y `animar` (GIF con Pillow, MP4 con ffmpeg), en el estilo del plano: obstáculos sombreados, I rojo, F morado, agentes como pastillas verdes con su número, verificadora ámbar, feromona verde y la madre azul arriba con su enlace (no aparece en modo ausente). El motor ahora guarda la feromona por tick y la ruta de la verificadora. Opciones nuevas en `run`: `--png`, `--animacion`, `--fps`. 11 pruebas nuevas en PASA (241 en total). Ejemplo en `gemelo/docs/imagenes/`.
+- `.gitattributes`: GIF y MP4 como binarios. Sin commit todavía.
 
 ### 2026-11-17 03:02 -0500
 - Artefacto 9 sincronizado (`b7d3fb9`). **Cambio de modelo a Claude Opus 5.5** por decisión del operador; el código del artefacto 10 lo escribió Fable 5.2 y lo cerró Opus 5.5.

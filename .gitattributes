@@ -4,3 +4,5 @@
 *.jpg binary
 *.xopp binary
 *.pyc binary
+*.gif binary
+*.mp4 binary
