@@ -42,31 +42,33 @@ de antemano.
 | `DECISIONES-PRUEBA.md` | Preguntas de diseño con todas las opciones: ✅ elegida / ❌ descartada |
 | `ARTEFACTOS.md`   | Los 17 artefactos de software (→ `gemelo/`), su estado, su avance y los requisitos de reproducción |
 | `oraculo/`        | Reservada para el oráculo; solo README, sin código           |
-| `gemelo/`         | **El código**: `aco_gemelo/` (mundo, protocolo, canal, agente), `tests/`, `environment.yml` |
+| `gemelo/`         | **El código**: `aco_gemelo/` (mundo, protocolo, canal, agente, madre, motor), `tests/`, `environment.yml` |
 | `bosquejo/`       | Plano de ensayo (a mano y en limpio)                         |
 
 ## Para retomar (estado al 2026-11-17 02:45 -0500)
 
 **Dónde quedamos:** fase 1 del gemelo en construcción. Hechos los artefactos
-**1 (entorno), 3 (protocolo), 4 (mundo), 5 (canal), 6 (agente) y 7 (madre)**: 170 pruebas en PASA.
+**1 (entorno), 3 (protocolo), 4 (mundo), 5 (canal), 6 (agente), 7 (madre) y 8 (motor)**: 187 pruebas en PASA.
 El detalle y el avance de los 17 artefactos están en `ARTEFACTOS.md`.
 
 **Cómo comprobar que todo sigue bien** (desde `gemelo/`):
 `C:/Users/Usuario/anaconda3/envs/aco-gemelo/python.exe -I -X utf8 -m pytest -q -W ignore`
 (si el entorno no existe: `conda env create -f gemelo/environment.yml`).
 
-**Siguiente paso: artefacto 8, el motor** (`gemelo/aco_gemelo/motor/`): reemplaza el banco provisional
-`gemelo/tests/apoyo.py`; un motor determinista con semilla y otro con hilos que corren el mismo `paso()`;
-límite de pasos (I11); lanza la verificadora cuando todas se asientan y envía `FIN`.
+**Siguiente paso: artefacto 9, configuración YAML y línea de comandos** (`gemelo/configs/`,
+`python -m aco_gemelo run|batch`): todo el ensayo sale de un YAML (escenario L, aleatorio o puente doble;
+distancia mínima I13; parámetros de `ConfigEnsayo`). Un ensayo ya se corre con
+`Simulacion(mundo, ConfigEnsayo(...)).correr("determinista" | "hilos")` y devuelve un `Resultado`.
 
 **Problemas abiertos que dejó la madre (F-010):**
 - La verificadora falla en ~1 de cada 4 semillas con cualquier modo (rastros cruzados + no puede volver
   sobre sus pasos, I12). Es el principal obstáculo para el criterio de convergencia G1.
 - El modo rescate no llega a dispararse con el umbral del 50 % (I14): la hipótesis de `resumen.pdf`
   sigue sin probarse.
-- Sin implementar: `BALIZA`, `ALERTA`, `SIGUEME` (comunicación entre agentes, E1), `STOP` y el envío de `FIN`.
+- Sin implementar: `BALIZA`, `ALERTA`, `SIGUEME` (comunicación entre agentes, E1) y `STOP`.
+- `gemelo/tests/apoyo.py` (banco provisional) se conserva para las pruebas unitarias; el motor da los mismos tiempos.
 
-**Después:** 9 configuración y CLI → 10 métricas →
+**Después:** 10 métricas →
 11 visualización → 12 oráculo → 14 experimentos → 15 notebook → 16 demostración NetLogo → 17 guía de reproducción.
 
 **Pendiente de revisión por el operador** (aprobado "con bendición", ver ASSUMPTIONS.md):
@@ -91,6 +93,11 @@ Criterios de PROMPT-ZERO: **C1 PASA** a nivel del programa de agente (prueba en
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-17 02:49 -0500
+- **Artefacto 8 hecho** (Claude Fable 5.2): `gemelo/aco_gemelo/motor/` con `Simulacion` (fases colonia → verificadora → cierre con `FIN`), `ActorMundo`, `ConfigEnsayo` y `Resultado`. Motor determinista y motor de hilos (un hilo por agente y otro para la madre; el mundo espera la acción de cada agente, como en el ejemplo 5 de la referencia). 17 pruebas nuevas en PASA (187 en total); las de hilos, estables en 3 repeticiones.
+- Sin madre, el motor de hilos da exactamente el mismo resultado que el determinista. Con madre, los tiempos pueden variar entre corridas con hilos; por eso los experimentos usan el determinista.
+- El motor reproduce los tiempos del banco con el que se midieron F-009 y F-010. Sin commit todavía.
 
 ### 2026-11-17 02:45 -0500
 - Se retoma tras el corte por límite de la sesión anterior. Estado verificado: el artefacto 7 estaba sin commit y del artefacto 8 (motor) **no quedó nada en disco**; 170 pruebas en PASA. Se sincroniza el artefacto 7 (aprobado por el operador antes del corte).
