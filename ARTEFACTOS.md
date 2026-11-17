@@ -21,7 +21,7 @@ solo con esta definición.
 | 10 | Métricas (convergencia, calidad frente al BFS, conocimiento, bytes) | `gemelo/aco_gemelo/metricas/` | **Hecho** | 100 % (3/3) |
 | 11 | Visualización (PNG, GIF y MP4 con el estilo del plano) | `gemelo/aco_gemelo/visual/` | **Hecho** | 100 % (2/2) |
 | 12 | Oráculo del puente doble (a partir de los notebooks) | `oraculo/` | **Hecho** | 100 % (3/3) |
-| 13 | Pruebas automáticas (pytest) | `gemelo/tests/` | Por hacer | 0 % (0/1) |
+| 13 | Pruebas automáticas (pytest) | `gemelo/tests/` | **Hecho** | 100 % (1/1) |
 | 14 | Experimentos en lote → CSV (4 modos × 30 semillas) | `gemelo/experimentos/` | **Hecho** | 100 % (2/2) |
 | 15 | Notebook de análisis | `gemelo/notebooks/` | **Hecho** | 100 % (2/2) |
 | 16 | Demostración del mundo en NetLogo + puente Python | `gemelo/netlogo/` | Por hacer | 0 % (0/3) |
@@ -41,7 +41,7 @@ solo con esta definición.
 10. ✅ Mide la convergencia según G1 (también como serie tick a tick) · ✅ calidad = largo de la ruta / largo del BFS · ✅ cuenta bytes por familia de mensaje (`tests/test_metricas.py`: 15 PASA, 2026-11-17 03:02 -0500). Además: **conocimiento del mundo de la madre** (fracción de celdas que conoce y clasifica bien) y resumen de lote con intervalos de confianza de Wilson al 95 %.
 11. ✅ PNG del estado final (con la ruta de la verificadora) · ✅ animación GIF/MP4, un cuadro por tick (`tests/test_visual.py`: 11 PASA, 2026-11-17 03:10 -0500). Desde la línea de comandos: `run ... --png final.png --animacion ensayo.gif`. Ejemplo en `gemelo/docs/imagenes/`.
 12. ✅ Reproduce p1 (celda [5]; error ≤ 1e-12) · ✅ la dinámica (celda [7]; p_s final = 0,924 ≥ 0,9) · ✅ el histograma de r = 1 (extremos 70,7 % ≥ 70 %, **muy justo**) y r = 2 (80–100 %: 75,1 % ≥ 70 %), con las tolerancias de `oraculo/TOLERANCIAS.md` declaradas antes de correr (`oraculo/test_oraculo.py`: 7 PASA, 2026-11-17 03:17 -0500). La comparación del gemelo (C1–C5) está en `oraculo/RESULTADOS.md`.
-13. Todas las pruebas en PASA.
+13. ✅ Todas las pruebas en PASA: 259 del gemelo y 7 del oráculo, en una sola corrida (2026-11-17 05:05 -0500).
 14. ✅ Genera un CSV por condición (más `resumen.csv` con intervalos de confianza) · ✅ se puede reproducir con la semilla, sin importar el número de procesos (`tests/test_experimentos.py`: 11 PASA, 2026-11-17 04:49 -0500). Planes: `experimentos/modos.yaml` y `experimentos/rescate.yaml`; datos en `experimentos/datos/`.
 15. ✅ Gráficas comparativas (4 figuras en `notebooks/figuras/`) · ✅ prueba estadística de la varianza con y sin rescate (Brown-Forsythe, más Mann-Whitney y Fisher, con Bonferroni) (`tests/test_notebook.py`: 1 PASA, 2026-11-17 04:58 -0500). Conclusiones calculadas desde los datos.
 16. El mundo vive en los patches · `py:setup` usa el Python del entorno · un agente Python se mueve según el protocolo.

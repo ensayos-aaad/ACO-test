@@ -31,6 +31,7 @@ NetLogo y la guía de reproducción. El avance de cada artefacto está en [ARTEF
 | [CONTEXT.md](CONTEXT.md) | Contexto: referencia, NetLogo, agentes AIMA, propuesta de enjambre, enfoque del gemelo |
 | [DECISIONES-PRUEBA.md](DECISIONES-PRUEBA.md) | Decisiones de diseño, con las opciones elegidas y las descartadas |
 | [PROTOCOLO.md](PROTOCOLO.md) | Mensajes madre ↔ agentes ↔ mundo (campos y bits) |
+| [ESTADO-PREHARDWARE.md](ESTADO-PREHARDWARE.md) | **Estado antes de pasar al hardware:** avance, checklist de hallazgos, bloqueantes y cosas por explorar |
 | [ARTEFACTOS.md](ARTEFACTOS.md) | Software a generar, estado y requisitos de reproducción |
 | [CHECKLIST-ENTORNO.md](CHECKLIST-ENTORNO.md) | Software necesario |
 | [DECISIONS.md](DECISIONS.md) · [FAILURES.md](FAILURES.md) · [ASSUMPTIONS.md](ASSUMPTIONS.md) · [CHANGELOG.md](CHANGELOG.md) | Registros del método |

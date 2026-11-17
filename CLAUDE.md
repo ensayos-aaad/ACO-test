@@ -41,6 +41,7 @@ de antemano.
 | `PROTOCOLO.md`    | Borrador v0.2 de los mensajes del gemelo (campos, bits, frecuencias) |
 | `DECISIONES-PRUEBA.md` | Preguntas de diseño con todas las opciones: ✅ elegida / ❌ descartada |
 | `ARTEFACTOS.md`   | Los 17 artefactos de software (→ `gemelo/`), su estado, su avance y los requisitos de reproducción |
+| `ESTADO-PREHARDWARE.md` | Estado antes del hardware: avance, checklist de hallazgos, bloqueantes B1–B6 y exploraciones X1–X8 |
 | `oraculo/`        | El oráculo: ejecuta las celdas de los notebooks; `TOLERANCIAS.md` (declaradas antes) y `RESULTADOS.md` (C1–C5) |
 | `gemelo/`         | **El código**: `aco_gemelo/` (mundo, protocolo, canal, agente, madre, motor, métricas, visual, experimentos), `configs/`, `experimentos/` (planes y datos), `tests/`, `environment.yml` |
 | `bosquejo/`       | Plano de ensayo (a mano y en limpio)                         |
@@ -49,7 +50,7 @@ de antemano.
 
 **Dónde quedamos:** fase 1 del gemelo en construcción. Hechos los artefactos
 **1 (entorno), 3 (protocolo), 4 (mundo), 5 (canal), 6 (agente), 7 (madre), 8 (motor), 9 (configuración y
-línea de comandos), 10 (métricas), 11 (visualización), 12 (oráculo), 14 (experimentos) y 15 (notebook)**: 259 pruebas del gemelo + 7 del oráculo en PASA.
+línea de comandos), 10 (métricas), 11 (visualización), 12 (oráculo), 14 (experimentos) 13 (pruebas) y 15 (notebook)**: 259 pruebas del gemelo + 7 del oráculo en PASA.
 El detalle y el avance de los 17 artefactos están en `ARTEFACTOS.md`.
 
 **Cómo comprobar que todo sigue bien** (desde `gemelo/`):
@@ -80,8 +81,11 @@ la madre ya no reduce la varianza del tiempo.
 **Análisis (artefacto 15, F-019):** `gemelo/notebooks/analisis.ipynb` (4 figuras y pruebas con Bonferroni). La
 hipótesis de `resumen.pdf` (el rescate reduce la varianza) **no queda apoyada**; las pruebas son exploratorias.
 
-**Siguiente artefacto: 16, demostración con NetLogo** (`gemelo/netlogo/`): el mundo vive en los patches, `py:setup`
-usa el Python del entorno y un agente Python se mueve según el protocolo. Luego 17, guía de reproducción.
+**Estado antes del hardware:** ver `ESTADO-PREHARDWARE.md` (bloqueantes B1–B6: protocolo sin aprobar, transporte
+MQTT o ESP-NOW, MicroPython o C++, inventario de hardware, percepción de 4 bits, demostración NetLogo pendiente).
+
+**Siguiente sesión — artefacto 16, demostración con NetLogo** (`gemelo/netlogo/`): el mundo vive en los patches,
+`py:setup` usa el Python del entorno y un agente Python se mueve según el protocolo. Luego 17, guía de reproducción.
 
 **Siguiente artefacto: 14, experimentos en lote** (4 modos × 30 semillas → CSV), después 15 notebook, 16 NetLogo
 y 17 guía de reproducción. El 13 (pruebas automáticas) se cumple al tener todas las pruebas en PASA.
@@ -120,6 +124,11 @@ Criterios de PROMPT-ZERO (ver `oraculo/RESULTADOS.md`): **C1 PASA** · **C2 PASA
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-17 05:05 -0500
+- Artefacto 15 sincronizado (`3fb5375`). El operador deja el artefacto 16 para otra sesión.
+- **Artefacto 13 cerrado:** 259 pruebas del gemelo + 7 del oráculo en PASA en una sola corrida.
+- Se crea `ESTADO-PREHARDWARE.md`: resumen ejecutivo, avance de los 17 artefactos (14 hechos), criterios C1–C6, checklist de hallazgos (atendidos y abiertos), 6 bloqueantes para el hardware (B1–B6) y 8 cosas por explorar (X1–X8).
 
 ### 2026-11-17 04:58 -0500
 - El operador da la señal para seguir. **Artefacto 15 hecho** (Claude Opus 5.5): `gemelo/notebooks/analisis.ipynb`, ejecutado y guardado con sus salidas; 4 figuras en `notebooks/figuras/`; conclusiones calculadas desde los datos; prueba `tests/test_notebook.py` (259 en total).
