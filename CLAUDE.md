@@ -45,24 +45,28 @@ de antemano.
 | `gemelo/`         | **El código**: `aco_gemelo/` (mundo, protocolo, canal, agente), `tests/`, `environment.yml` |
 | `bosquejo/`       | Plano de ensayo (a mano y en limpio)                         |
 
-## Para retomar (estado al 2026-11-16 21:11 -0500)
+## Para retomar (estado al 2026-11-17 02:45 -0500)
 
-**Dónde quedamos:** fase 1 del gemelo en construcción. Hechos y sincronizados los artefactos
-**1 (entorno), 3 (protocolo), 4 (mundo), 5 (canal) y 6 (agente)**: 137 pruebas en PASA.
+**Dónde quedamos:** fase 1 del gemelo en construcción. Hechos los artefactos
+**1 (entorno), 3 (protocolo), 4 (mundo), 5 (canal), 6 (agente) y 7 (madre)**: 170 pruebas en PASA.
 El detalle y el avance de los 17 artefactos están en `ARTEFACTOS.md`.
 
 **Cómo comprobar que todo sigue bien** (desde `gemelo/`):
 `C:/Users/Usuario/anaconda3/envs/aco-gemelo/python.exe -I -X utf8 -m pytest -q -W ignore`
 (si el entorno no existe: `conda env create -f gemelo/environment.yml`).
 
-**Siguiente paso: artefacto 7, la madre** (`gemelo/aco_gemelo/madre/`). Debe:
-- tener 4 modos (ausente, pista de baile, rescate, difusión cada Δt), actuar solo cada Δt,
-  respetar un presupuesto de memoria en bytes (64 B) y detectar a la rezagada por umbral;
-- completar el agente: enviar `FRAGMENTO` y `BALIZA`, y usar `RECLUTA`, `RUTA`, `MAPA` y `STOP`;
-- mejorar la **línea base F-009** (sin madre, la verificadora llega en el 60–80 % de las semillas
-  y con rutas 1,7–2 veces la óptima).
+**Siguiente paso: artefacto 8, el motor** (`gemelo/aco_gemelo/motor/`): reemplaza el banco provisional
+`gemelo/tests/apoyo.py`; un motor determinista con semilla y otro con hilos que corren el mismo `paso()`;
+límite de pasos (I11); lanza la verificadora cuando todas se asientan y envía `FIN`.
 
-**Después:** 8 motor (reemplaza `gemelo/tests/apoyo.py`) → 9 configuración y CLI → 10 métricas →
+**Problemas abiertos que dejó la madre (F-010):**
+- La verificadora falla en ~1 de cada 4 semillas con cualquier modo (rastros cruzados + no puede volver
+  sobre sus pasos, I12). Es el principal obstáculo para el criterio de convergencia G1.
+- El modo rescate no llega a dispararse con el umbral del 50 % (I14): la hipótesis de `resumen.pdf`
+  sigue sin probarse.
+- Sin implementar: `BALIZA`, `ALERTA`, `SIGUEME` (comunicación entre agentes, E1), `STOP` y el envío de `FIN`.
+
+**Después:** 9 configuración y CLI → 10 métricas →
 11 visualización → 12 oráculo → 14 experimentos → 15 notebook → 16 demostración NetLogo → 17 guía de reproducción.
 
 **Pendiente de revisión por el operador** (aprobado "con bendición", ver ASSUMPTIONS.md):
@@ -87,6 +91,16 @@ Criterios de PROMPT-ZERO: **C1 PASA** a nivel del programa de agente (prueba en
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-17 02:45 -0500
+- Se retoma tras el corte por límite de la sesión anterior. Estado verificado: el artefacto 7 estaba sin commit y del artefacto 8 (motor) **no quedó nada en disco**; 170 pruebas en PASA. Se sincroniza el artefacto 7 (aprobado por el operador antes del corte).
+- Pregunta del operador: ¿los obstáculos pueden ser aleatorios siempre que haya camino entre inicio y fin? Sí, ya está: `mundo_aleatorio` (artefacto 4) regenera el mundo hasta que el BFS encuentra camino. Falta usarlo en las corridas (hasta ahora solo se midió en el mundo L) y aplicarle la distancia mínima I13.
+
+### 2026-11-16 21:27 -0500
+- **Artefacto 7 hecho** (Claude Fable 5.2): `gemelo/aco_gemelo/madre/` (4 modos, actúa cada Δt, memoria con presupuesto en bytes que olvida primero las rutas largas, detección de rezagadas, registro del resultado de la verificadora). El agente ahora informa su mapa (`FRAGMENTO`), se deja reclutar (`RECLUTA` → `PIDE_RUTA` → `RUTA`), hereda rutas (también de rescate) y explora lo que la colonia no conoce (`MAPA`). 33 pruebas nuevas en PASA (170 en total).
+- **F-010:** la pista de baile y la difusión bajan el tiempo (110 → 73 y 59 ticks), su dispersión y el largo de la ruta (1,96 → 1,34 veces la óptima). El rescate no se dispara. La verificadora sigue fallando en ~1 de cada 4 semillas.
+- **F-011:** defecto corregido en la memoria de la madre (pedidos sin límite).
+- Sin commit todavía.
 
 ### 2026-11-16 21:11 -0500
 - Cierre de sesión por límite del plan: se agrega la sección **"Para retomar"** con el estado, el siguiente paso (artefacto 7) y lo pendiente de revisión. Artefacto 6 sincronizado.

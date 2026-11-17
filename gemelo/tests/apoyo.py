@@ -18,6 +18,7 @@ class Banco:
         self.canal.registrar(ID_MUNDO)
         self.canal.registrar(ID_MADRE)
         self.agentes = []
+        self.madre = None  # si se asigna una Madre, ella lee su propio buzón
         self.tick = 0
 
     def agregar(self, agente):
@@ -42,13 +43,17 @@ class Banco:
             for a in self.agentes:
                 a.paso(t)
             for msg in self.canal.recibir(ID_MUNDO):
-                assert nombre_de(msg) == "ACCION"
+                if nombre_de(msg) != "ACCION":  # las difusiones de la madre también le llegan al mundo
+                    continue
                 i = msg["src"]
                 self.pos[i], self.ok[i] = self.mundo.aplicar_accion(
                     self.pos[i], msg["accion"], msg["dir"], msg["deposito"])
                 self.bloqueadas += not self.ok[i]
                 self.historial.append((t, i, self.pos[i]))
-            self.a_madre.extend(self.canal.recibir(ID_MADRE))
+            if self.madre is not None:
+                self.madre.paso(t)
+            else:
+                self.a_madre.extend(self.canal.recibir(ID_MADRE))
             self.mundo.evaporar(self.rho)
             self.tick += 1
         return self.tick

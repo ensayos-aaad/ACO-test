@@ -44,6 +44,32 @@ def byte_a_celda(valor: int) -> tuple[int, int]:
     return (valor & 0x0F, valor >> 4)
 
 
+def celdas_a_bloque(origen: tuple[int, int], celdas) -> int:
+    """Mapa de 16 bits de un bloque de 4 × 4 (campo de FRAGMENTO).
+
+    La celda ``(ox + dx, oy + dy)`` ocupa el bit ``15 − (4·dy + dx)``: se lee por filas, con
+    el bit más significativo primero.
+    """
+    ox, oy = origen
+    bits = 0
+    for dy in range(4):
+        for dx in range(4):
+            if (ox + dx, oy + dy) in celdas:
+                bits |= 1 << (15 - (4 * dy + dx))
+    return bits
+
+
+def bloque_a_celdas(origen: tuple[int, int], bits: int) -> set[tuple[int, int]]:
+    """Celdas marcadas en el mapa de 16 bits de un bloque de 4 × 4."""
+    ox, oy = origen
+    return {
+        (ox + dx, oy + dy)
+        for dy in range(4)
+        for dx in range(4)
+        if bits >> (15 - (4 * dy + dx)) & 1
+    }
+
+
 @dataclass(frozen=True)
 class Contexto:
     """Lo que ambos extremos deben saber para leer los campos de tamaño variable."""

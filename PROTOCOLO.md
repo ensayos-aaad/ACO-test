@@ -160,6 +160,7 @@ Carga: **32 bits (4 B)** · total **11 B**.
 | `obstaculos` | 16 | Mapa de bits: cuáles de ellas son obstáculo |
 
 Carga: **40 bits (5 B)** · total **12 B**. Un mundo de 8 × 8 son 4 bloques.
+En cada mapa de 16 bits, la celda (origen.x + dx, origen.y + dy) ocupa el bit 15 − (4·dy + dx): por filas, con el bit más significativo primero.
 
 **2.2 `DANZA`** (el agente encontró la meta y anuncia la ruta, como la danza del meneo)
 
