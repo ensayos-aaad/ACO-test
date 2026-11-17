@@ -65,7 +65,11 @@ que git ignora).
 puente doble (J1–J6, F-015: C2 y C4 pasan, C3 no) y, por decisión del operador, también en los mundos L y
 aleatorio (J7, F-016: la verificadora llega más veces, con ensayos ~6 veces más largos). Al activarla apareció
 un atasco en callejones; el agente ahora recuerda las celdas pisadas en cada viaje (S-ACO).
-**Decisión abierta:** ¿se investiga C3 (escala de niveles, depósito al llegar) o se acepta y documenta?
+**C3 investigado (F-017, `oraculo/INVESTIGACION-C3.md`) y cerrado (J8):** queda NO PASA con la causa documentada
+(pocas decisiones; con muchas, los 16 niveles lineales se saturan). El cambio de percepción (8 bits o logarítmica)
+se reconsidera al llegar al hardware.
+
+**Siguiente artefacto: 14, experimentos en lote** (4 modos de la madre × 30 semillas → CSV + resumen).
 
 **Siguiente artefacto: 14, experimentos en lote** (4 modos × 30 semillas → CSV), después 15 notebook, 16 NetLogo
 y 17 guía de reproducción. El 13 (pruebas automáticas) se cumple al tener todas las pruebas en PASA.
@@ -105,6 +109,13 @@ Criterios de PROMPT-ZERO (ver `oraculo/RESULTADOS.md`): **C1 PASA** · **C2 PASA
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-17 04:44 -0500
+- El operador elige la opción c (J8): C3 queda NO PASA documentado; no se cambia la percepción ni los viajes. Se sincroniza la investigación.
+
+### 2026-11-17 04:42 -0500
+- Cambios de J7 sincronizados (`2bfe35d`). El operador pide investigar C3.
+- **F-017:** 9 variantes exploratorias (sin tocar el producto ni los criterios), con hipótesis escritas antes de correr. Causa principal: pocas decisiones; secundaria: saturación de los 16 niveles lineales. Con ~1000 decisiones y 8 bits, C3 quedaría dentro de la tolerancia (0,62 frente a 0,75). Queda sin explicar por qué el gemelo converge a la rama larga en ~1/3 de los ensayos. Sin commit todavía.
 
 ### 2026-11-17 04:00 -0500
 - Opción c sincronizada (`b50d273`). El operador pide activar **salidas escalonadas y viajes repetidos** también en los mundos L y aleatorio (primero pidió solo las salidas e interrumpió para corregir). J7 declarada antes de medir (`viajes` = 10 es suposición de Claude).
