@@ -42,17 +42,42 @@ de antemano.
 | `DECISIONES-PRUEBA.md` | Preguntas de diseño con todas las opciones: ✅ elegida / ❌ descartada |
 | `ARTEFACTOS.md`   | Los 17 artefactos de software (→ `gemelo/`), su estado, su avance y los requisitos de reproducción |
 | `oraculo/`        | Reservada para el oráculo; solo README, sin código           |
+| `gemelo/`         | **El código**: `aco_gemelo/` (mundo, protocolo, canal, agente), `tests/`, `environment.yml` |
+| `bosquejo/`       | Plano de ensayo (a mano y en limpio)                         |
 
-**Sesión 0** (PROMPT-ZERO §9): pasos 1 y 2 hechos. Paso 3 (aprobar CONTEXT.md y hacer el
-commit) a la espera del operador. Paso 4 (pregunta sobre la representación física) pendiente.
-- Oráculos candidatos: `deneubourg_puente_doble.ipynb` [5], [7], [9] y `montecarlo_aco.ipynb` [4].
-- Hay que decidir el valor del offset k: el notebook usa 20 y 5 en distintas celdas (I2).
-- Python oficial: **Anaconda** (`C:\Users\Usuario\anaconda3\python.exe`). El `python` del PATH
-  es otro (`C:\Python311`). Lo pendiente del entorno está en `CHECKLIST-ENTORNO.md`.
-- Artefacto (§3) por definir: propósito, público, representación física, toolchain y presupuesto.
-  Antecedente en la referencia: PlatformIO + `nodemcu-32s` + Wokwi (`simulaciones/ejemplo3`).
+## Para retomar (estado al 2026-11-16 21:11 -0500)
 
-Criterios de aceptación C1–C6: todos **NO PROBADO** (son candidatos; el operador aún no los aprueba).
+**Dónde quedamos:** fase 1 del gemelo en construcción. Hechos y sincronizados los artefactos
+**1 (entorno), 3 (protocolo), 4 (mundo), 5 (canal) y 6 (agente)**: 137 pruebas en PASA.
+El detalle y el avance de los 17 artefactos están en `ARTEFACTOS.md`.
+
+**Cómo comprobar que todo sigue bien** (desde `gemelo/`):
+`C:/Users/Usuario/anaconda3/envs/aco-gemelo/python.exe -I -X utf8 -m pytest -q -W ignore`
+(si el entorno no existe: `conda env create -f gemelo/environment.yml`).
+
+**Siguiente paso: artefacto 7, la madre** (`gemelo/aco_gemelo/madre/`). Debe:
+- tener 4 modos (ausente, pista de baile, rescate, difusión cada Δt), actuar solo cada Δt,
+  respetar un presupuesto de memoria en bytes (64 B) y detectar a la rezagada por umbral;
+- completar el agente: enviar `FRAGMENTO` y `BALIZA`, y usar `RECLUTA`, `RUTA`, `MAPA` y `STOP`;
+- mejorar la **línea base F-009** (sin madre, la verificadora llega en el 60–80 % de las semillas
+  y con rutas 1,7–2 veces la óptima).
+
+**Después:** 8 motor (reemplaza `gemelo/tests/apoyo.py`) → 9 configuración y CLI → 10 métricas →
+11 visualización → 12 oráculo → 14 experimentos → 15 notebook → 16 demostración NetLogo → 17 guía de reproducción.
+
+**Pendiente de revisión por el operador** (aprobado "con bendición", ver ASSUMPTIONS.md):
+- `DECISIONES-PRUEBA.md`: ronda 1 (A–G) y ronda 2 (I1–I15, valores elegidos por Claude).
+  El cambio de fondo es I4/I5: el depósito es a la vuelta, no a la ida.
+- `PROTOCOLO.md` v0.2: sigue sin aprobación formal.
+- Se hicieron JSON y binario a la vez (desviación de B2).
+- ADR-001 y ADR-002 siguen como propuestas.
+
+**Forma de trabajo acordada:** un artefacto a la vez; al terminar cada uno, Claude da la seña y el
+operador decide si se sigue o se para. No se hace commit sin su aprobación. Respuestas ejecutivas.
+El modelo en uso se anota en los commits (los artefactos 1 y 3–6 son de Claude Fable 5.2).
+
+Criterios de PROMPT-ZERO: **C1 PASA** a nivel del programa de agente (prueba en
+`gemelo/tests/test_agente.py`); C2–C6 **NO PROBADO**.
 
 ## Convenciones
 
@@ -62,6 +87,15 @@ Criterios de aceptación C1–C6: todos **NO PROBADO** (son candidatos; el opera
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-16 21:11 -0500
+- Cierre de sesión por límite del plan: se agrega la sección **"Para retomar"** con el estado, el siguiente paso (artefacto 7) y lo pendiente de revisión. Artefacto 6 sincronizado.
+
+### 2026-11-16 21:10 -0500
+- **Artefacto 6 hecho** (Claude Fable 5.2): `gemelo/aco_gemelo/agente/` (programa de agente con `paso()` no bloqueante; ciclo IDA → DANZA → VOLVIENDO con depósito → SIGUIENDO → ASENTADA; memoria K con ruta sin bucles; rol por umbral; verificadora). El mundo ganó `percibir()` y `aplicar_accion()`. 25 pruebas nuevas en PASA (137 en total). `tests/apoyo.py` es un banco de pruebas provisional que hace de mundo hasta que exista el motor (artefacto 8).
+- **C1 en PASA** a nivel del programa de agente: la regla de decisión reproduce la fórmula 1.1 de Deneubourg en el puente doble.
+- **Hallazgo F-009 (línea base sin madre):** las agentes siempre se asientan, pero la verificadora solo llega en el 60–80 % de las semillas y con rutas 1,7–2 veces más largas que la óptima. No se ajustó; es lo que deben mejorar los modos de la madre.
+- Sin commit todavía. Siguiente: artefacto 7 (madre).
 
 ### 2026-11-16 21:03 -0500
 - Artefacto 5 sincronizado (`44d9deb`).

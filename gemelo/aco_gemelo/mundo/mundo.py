@@ -50,6 +50,7 @@ class Mundo:
         meta: celda objetivo.
         tau0: feromona inicial de cada celda libre.
         tau_max: tope de feromona; el depósito se satura en este valor.
+        unidad_deposito: feromona que suma cada unidad del campo ``deposito`` de una ACCION.
     """
 
     def __init__(
@@ -61,6 +62,7 @@ class Mundo:
         meta: Celda,
         tau0: float = 1.0,
         tau_max: float = 255.0,
+        unidad_deposito: float = 1.0,
     ) -> None:
         if not (1 <= ancho <= 16 and 1 <= alto <= 16):
             raise ValueError("El protocolo admite mundos de 1×1 a 16×16")
@@ -73,6 +75,7 @@ class Mundo:
         self.meta = meta
         self.tau0 = tau0
         self.tau_max = tau_max
+        self.unidad_deposito = unidad_deposito
         for nombre, celda in (("inicio", inicio), ("meta", meta)):
             if not self.es_libre(celda):
                 raise ValueError(f"La celda de {nombre} {celda} no está libre")
@@ -192,6 +195,45 @@ class Mundo:
     def feromona_q4(self, celda: Celda) -> int:
         """Feromona cuantizada a 16 niveles (0–15), como la percibe un agente (decisión E3)."""
         return round(15 * self.feromona(celda) / self.tau_max) if self.tau_max else 0
+
+    # ------------------------------------------------------------------ sensores y actuadores
+
+    def percibir(self, celda: Celda, ocupadas: Iterable[Celda] = ()) -> list[dict[str, int]]:
+        """Lo que un agente ve desde ``celda``: el campo ``vecinas`` del mensaje PERCEPCION.
+
+        Son 9 elementos en orden fijo: la celda propia y luego las 8 vecinas por código de
+        dirección. ``ocupadas`` son las celdas donde hay otros agentes.
+        """
+        ocupadas = set(ocupadas)
+        x, y = celda
+        celdas = [celda] + [(x + dx, y + dy) for dx, dy in DIRECCIONES]
+        return [
+            {
+                "clase": int(self.clase(c)),
+                "ocupada": int(c in ocupadas),
+                "nido": int(c == self.inicio),
+                "fero": self.feromona_q4(c),
+            }
+            for c in celdas
+        ]
+
+    def aplicar_accion(
+        self, celda: Celda, accion: int, direccion: int, deposito: int
+    ) -> tuple[Celda, bool]:
+        """Ejecuta una ACCION de un agente que está en ``celda``.
+
+        ``accion``: 0 = quieto · 1 = mover · 2 = depositar y mover · 3 = depositar sin mover.
+        El depósito se hace en la celda actual, antes de moverse. Devuelve la celda en la que
+        queda el agente y si el movimiento se pudo hacer (el mundo es la autoridad).
+        """
+        if accion in (2, 3) and deposito:
+            self.depositar(celda, deposito * self.unidad_deposito)
+        if accion in (1, 2):
+            destino = self.mover(celda, direccion)
+            if destino is None:
+                return celda, False
+            return destino, True
+        return celda, True
 
     # ------------------------------------------------------------------ texto
 

@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [Sesión 1] — 2026-11-16 (Claude Fable 5.2)
+### Añadido
+- `gemelo/`: entorno conda `aco-gemelo` (artefacto 1), protocolo con codificadores JSON y binario (3), mundo con BFS y escenarios (4), canal en memoria (5) y agente con verificadora (6). 137 pruebas en PASA.
+- `DECISIONES-PRUEBA.md`: ronda 2 (I1–I15), parámetros delegados según la literatura.
+- `PROTOCOLO.md` v0.2.
+### Hallazgos
+- C1 en PASA a nivel del programa de agente. F-009: línea base sin madre (la verificadora llega en el 60–80 % de las semillas).
+
 ## [Sesión 0] — 2026-11-16
 ### Añadido
 - `referencia/`: copia de solo lectura de `UdeA-IoT/ESP-ACO` @ `3c48648`, con `PROCEDENCIA.md`.

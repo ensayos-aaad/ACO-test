@@ -14,7 +14,7 @@ solo con esta definición.
 | 3 | Codificadores JSON ↔ binario | `gemelo/aco_gemelo/protocolo/` | **Hecho** | 100 % (3/3) |
 | 4 | Mundo + BFS + escenarios (L, aleatorio, puente doble) | `gemelo/aco_gemelo/mundo/` | **Hecho** | 100 % (4/4) |
 | 5 | Canal en memoria (con retardo y pérdida simulados) | `gemelo/aco_gemelo/canal/` | **Hecho** | 100 % (3/3) |
-| 6 | Agente (paso no bloqueante, roles, verificadora) | `gemelo/aco_gemelo/agente/` | Por hacer | 0 % (0/4) |
+| 6 | Agente (paso no bloqueante, roles, verificadora) | `gemelo/aco_gemelo/agente/` | **Hecho** (falta lo que depende de la madre) | 100 % (4/4) |
 | 7 | Madre (4 modos, memoria en bytes) | `gemelo/aco_gemelo/madre/` | Por hacer | 0 % (0/4) |
 | 8 | Motores (determinista con semilla + hilos) | `gemelo/aco_gemelo/motor/` | Por hacer | 0 % (0/3) |
 | 9 | Configuración YAML + línea de comandos | `gemelo/configs/` · `gemelo/aco_gemelo/` | Por hacer | 0 % (0/2) |
@@ -34,7 +34,7 @@ solo con esta definición.
 3. ✅ Lo que se codifica y decodifica vuelve igual (JSON y binario; 16 mensajes × 4 contextos × 100 casos) · ✅ los tamaños coinciden con la especificación · ✅ el JSON y el binario llevan la misma información (`tests/test_protocolo.py`: 74 PASA, 2026-11-16 20:58 -0500).
 4. ✅ La meta siempre es alcanzable (200 semillas por escenario) · ✅ el BFS con 8 vecinos no corta esquinas · ✅ la L coincide con el plano · ✅ el escenario de puente doble está parametrizado por r (`tests/test_mundo.py`: 18 PASA, 2026-11-16 20:54 -0500).
 5. ✅ Entrega dentro del radio r · ✅ las pérdidas y retardos son los mismos con la misma semilla · ✅ cuenta mensajes y bytes por familia (`tests/test_canal.py`: 18 PASA, 2026-11-16 21:00 -0500).
-6. Nunca entra en un obstáculo ni sale de la grilla · la memoria K se respeta · cambia de rol por umbral · la verificadora solo explota y detecta ciclos.
+6. ✅ Nunca entra en un obstáculo ni sale de la grilla (y nunca lo intenta) · ✅ la memoria K se respeta · ✅ cambia de rol por umbral · ✅ la verificadora solo explota y no vuelve sobre sus pasos (`tests/test_agente.py`: 25 PASA, 2026-11-16 21:10 -0500). Además: **C1 en PASA** a nivel del programa de agente (la regla reproduce la fórmula de Deneubourg en el puente doble, 6 casos, N = 20 000). **Queda para el artefacto 7:** que el agente envíe `FRAGMENTO` y `BALIZA` y que use `RECLUTA`, `RUTA`, `MAPA` y `STOP`.
 7. Los 4 modos son seleccionables · actúa solo cada Δt · no supera su presupuesto de bytes · detecta a la rezagada por umbral.
 8. Misma semilla ⇒ mismo resultado · el motor de hilos corre el mismo `paso()` · el ensayo tiene límite de pasos (H1).
 9. Toda la configuración sale del YAML · `run` y `batch` funcionan.

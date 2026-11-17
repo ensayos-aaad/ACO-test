@@ -12,8 +12,8 @@ en las abejas (danza y reclutamiento).
 
 ## Estado
 
-Sesión 0 cerrada: contexto, protocolo (borrador) y decisiones de diseño registrados. **Todavía no hay
-código**. El avance de cada artefacto está en [ARTEFACTOS.md](ARTEFACTOS.md).
+Fase 1 en construcción: ya existen el entorno, el protocolo, el mundo, el canal y el agente en [gemelo/](gemelo/), con
+137 pruebas automáticas que pasan. Falta la madre y lo que sigue. El avance de cada artefacto está en [ARTEFACTOS.md](ARTEFACTOS.md).
 
 | Fase | Contenido | Meta |
 |---|---|---|

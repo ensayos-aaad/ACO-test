@@ -100,6 +100,11 @@ Respaldo: **L** = literatura · **L?** = literatura citada de memoria, sin verif
 | I14 | Umbral de rescate | Experiencia **< 50 % del promedio** de la colonia | S | `resumen.pdf` dice "comparar con el promedio" sin dar valor. Es la variable que se barre en los experimentos |
 | I15 | Δt de la madre · radio r · memoria de la madre | **10 ticks** · **1 celda** · **64 B** | S | r = 1: prompt de Claude Design. Lo demás, sin valor canónico |
 
-> **Pendiente técnico para el artefacto 6:** la agente percibe la feromona en 16 niveles (E3). Con τ₀ = 1 todas las celdas
+> **Resuelto en el artefacto 6 (2026-11-16 21:10 -0500):** el mundo arranca con feromona 0 y el offset lo pone el agente: elige con peso (k + nivel)^α,
+> con k = 20 en el puente doble y k = 1 en la cuadrícula (k hace el papel de τ₀ de I2). Escalas: puente doble `tau_max` = 15 y 1 unidad por
+> depósito (los 16 niveles son exactos hasta 15 depósitos); cuadrícula `tau_max` = 1 y depósito de 255/L unidades de 1/255.
+> Otro ajuste: tras volver al nido, la agente regresa a la meta **por su ruta memorizada**, no siguiendo el rastro (afina I5).
+>
+> **Pendiente técnico original:** la agente percibe la feromona en 16 niveles (E3). Con τ₀ = 1 todas las celdas
 > se leen como nivel 0, así que la regla τ^α necesita un piso. Lo natural es el offset de Deneubourg, (k + nivel)^α. Se resuelve
 > y se documenta al construir el agente.
