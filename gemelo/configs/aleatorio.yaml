@@ -1,0 +1,14 @@
+# Mundo con obstáculos al azar. Se regenera hasta que haya camino entre el inicio y la meta
+# y la ruta óptima mida al menos "distancia_minima" movimientos.
+
+semilla: 2026
+
+mundo:
+  escenario: aleatorio
+  ancho: 8
+  alto: 8
+  densidad: 0.2          # probabilidad de que cada celda sea un obstáculo
+  distancia_minima: 4
+
+madre:
+  modo: pista_de_baile

@@ -1,0 +1,38 @@
+# Ensayo por defecto: el mundo "L" del plano, 6 agentes y la madre como pista de baile.
+# Los valores vienen de DECISIONES-PRUEBA.md (rondas 1 y 2). Todas las claves son opcionales:
+# la que falte toma el valor que se muestra aquí.
+
+semilla: 2026            # define el mundo (inicio y meta), las agentes y el canal
+
+mundo:
+  escenario: L           # L | aleatorio | puente_doble
+  distancia_minima: 4    # movimientos mínimos de la ruta óptima entre inicio y meta (I13)
+  tau_max: 1.0           # tope de feromona por celda; los 16 niveles percibidos van de 0 a este valor
+  unidad_deposito: 1/255 # feromona que suma cada unidad del campo "deposito" de una ACCION
+
+ensayo:
+  n_agentes: 6           # tamaño de la colonia (C4)
+  limite: 2000           # máximo de ticks, verificación incluida (I11)
+  rho: 0.01              # evaporación por tick (I3)
+
+agente:
+  alpha: 2.0             # exponente de la feromona (I1)
+  k: 1.0                 # atractivo de una celda sin feromona (I2)
+  theta: 8.0             # umbral de cambio de rol exploradora/explotadora (I8)
+  K: 64                  # memoria: movimientos de su ruta (I9)
+  deposito: calidad      # calidad (255 / largo de la ruta) | constante (I6)
+  deposito_valor: 1      # unidades por celda en el modo constante
+  delta_t: 10            # cada cuántos ticks informa su ESTADO a la madre
+
+madre:
+  modo: pista_de_baile   # ausente | pista_de_baile | rescate | difusion (F1)
+  delta_t: 10            # ticks entre dos actuaciones (I15)
+  memoria: 64            # presupuesto de memoria en bytes (F3, I15)
+  umbral_rescate: 0.5    # rezagada = experiencia menor que esta fracción del promedio (I14)
+  rutas_por_anuncio: 3   # rutas que anuncia cada RECLUTA (máximo 3)
+
+canal:
+  radio: 1               # alcance de los mensajes entre agentes, en celdas (I15)
+  p_perdida: 0.0         # probabilidad de perder un mensaje no garantizado
+  retardo: [0, 0]        # retardo mínimo y máximo, en ticks
+  formato: binario       # binario | json (define los bytes que se cuentan)

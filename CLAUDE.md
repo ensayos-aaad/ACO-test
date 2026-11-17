@@ -48,17 +48,22 @@ de antemano.
 ## Para retomar (estado al 2026-11-17 02:45 -0500)
 
 **Dónde quedamos:** fase 1 del gemelo en construcción. Hechos los artefactos
-**1 (entorno), 3 (protocolo), 4 (mundo), 5 (canal), 6 (agente), 7 (madre) y 8 (motor)**: 187 pruebas en PASA.
+**1 (entorno), 3 (protocolo), 4 (mundo), 5 (canal), 6 (agente), 7 (madre), 8 (motor) y 9 (configuración y
+línea de comandos)**: 215 pruebas en PASA.
 El detalle y el avance de los 17 artefactos están en `ARTEFACTOS.md`.
 
 **Cómo comprobar que todo sigue bien** (desde `gemelo/`):
 `C:/Users/Usuario/anaconda3/envs/aco-gemelo/python.exe -I -X utf8 -m pytest -q -W ignore`
 (si el entorno no existe: `conda env create -f gemelo/environment.yml`).
 
-**Siguiente paso: artefacto 9, configuración YAML y línea de comandos** (`gemelo/configs/`,
-`python -m aco_gemelo run|batch`): todo el ensayo sale de un YAML (escenario L, aleatorio o puente doble;
-distancia mínima I13; parámetros de `ConfigEnsayo`). Un ensayo ya se corre con
-`Simulacion(mundo, ConfigEnsayo(...)).correr("determinista" | "hilos")` y devuelve un `Resultado`.
+**Cómo correr un ensayo** (desde `gemelo/`, con el Python de `aco-gemelo`):
+`python -X utf8 -m aco_gemelo run --config configs/default.yaml [--semilla N] [--motor hilos]` y
+`python -X utf8 -m aco_gemelo batch --config configs/default.yaml --semillas 30` (deja un CSV en `resultados/`,
+que git ignora).
+
+**Siguiente paso: artefacto 10, métricas** (`gemelo/aco_gemelo/metricas/`): convergencia según G1, calidad
+frente al BFS, **conocimiento del mundo de la madre** (cuánto coincide su mapa con la verdad) y bytes por
+familia. Parte ya sale en el CSV de `batch`; falta el conocimiento del mundo y las series en el tiempo.
 
 **Problemas abiertos que dejó la madre (F-010):**
 - La verificadora falla en ~1 de cada 4 semillas con cualquier modo (rastros cruzados + no puede volver
@@ -68,7 +73,7 @@ distancia mínima I13; parámetros de `ConfigEnsayo`). Un ensayo ya se corre con
 - Sin implementar: `BALIZA`, `ALERTA`, `SIGUEME` (comunicación entre agentes, E1) y `STOP`.
 - `gemelo/tests/apoyo.py` (banco provisional) se conserva para las pruebas unitarias; el motor da los mismos tiempos.
 
-**Después:** 10 métricas →
+**Después:**
 11 visualización → 12 oráculo → 14 experimentos → 15 notebook → 16 demostración NetLogo → 17 guía de reproducción.
 
 **Pendiente de revisión por el operador** (aprobado "con bendición", ver ASSUMPTIONS.md):
@@ -93,6 +98,12 @@ Criterios de PROMPT-ZERO: **C1 PASA** a nivel del programa de agente (prueba en
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-17 02:55 -0500
+- Artefacto 8 sincronizado (`a29641c`).
+- **Artefacto 9 hecho** (Claude Fable 5.2): `gemelo/aco_gemelo/config.py` (YAML → mundo y `ConfigEnsayo`; clave desconocida = error), `gemelo/aco_gemelo/__main__.py` (`run` y `batch`, con CSV) y tres configuraciones comentadas en `gemelo/configs/`. 28 pruebas nuevas en PASA (215 en total).
+- **F-012:** primera medición con obstáculos aleatorios (se asientan 30/30; verificadas 20/30). En el puente doble la verificadora acaba en la rama larga la mitad de las veces: con un solo depósito por agente la colonia no llega a preferir la rama corta.
+- Sin commit todavía.
 
 ### 2026-11-17 02:49 -0500
 - **Artefacto 8 hecho** (Claude Fable 5.2): `gemelo/aco_gemelo/motor/` con `Simulacion` (fases colonia → verificadora → cierre con `FIN`), `ActorMundo`, `ConfigEnsayo` y `Resultado`. Motor determinista y motor de hilos (un hilo por agente y otro para la madre; el mundo espera la acción de cada agente, como en el ejemplo 5 de la referencia). 17 pruebas nuevas en PASA (187 en total); las de hilos, estables en 3 repeticiones.

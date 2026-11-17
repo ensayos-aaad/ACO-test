@@ -17,7 +17,7 @@ solo con esta definición.
 | 6 | Agente (paso no bloqueante, roles, verificadora) | `gemelo/aco_gemelo/agente/` | **Hecho** (falta lo que depende de la madre) | 100 % (4/4) |
 | 7 | Madre (4 modos, memoria en bytes) | `gemelo/aco_gemelo/madre/` | **Hecho** | 100 % (4/4) |
 | 8 | Motores (determinista con semilla + hilos) | `gemelo/aco_gemelo/motor/` | **Hecho** | 100 % (3/3) |
-| 9 | Configuración YAML + línea de comandos | `gemelo/configs/` · `gemelo/aco_gemelo/` | Por hacer | 0 % (0/2) |
+| 9 | Configuración YAML + línea de comandos | `gemelo/configs/` · `gemelo/aco_gemelo/` | **Hecho** | 100 % (2/2) |
 | 10 | Métricas (convergencia, calidad frente al BFS, conocimiento, bytes) | `gemelo/aco_gemelo/metricas/` | Por hacer | 0 % (0/3) |
 | 11 | Visualización (PNG, GIF y MP4 con el estilo del plano) | `gemelo/aco_gemelo/visual/` | Por hacer | 0 % (0/2) |
 | 12 | Oráculo del puente doble (a partir de los notebooks) | `oraculo/` | Borrador | 0 % (0/3) |
@@ -37,7 +37,7 @@ solo con esta definición.
 6. ✅ Nunca entra en un obstáculo ni sale de la grilla (y nunca lo intenta) · ✅ la memoria K se respeta · ✅ cambia de rol por umbral · ✅ la verificadora solo explota y no vuelve sobre sus pasos (`tests/test_agente.py`: 25 PASA, 2026-11-16 21:10 -0500). Además: **C1 en PASA** a nivel del programa de agente (la regla reproduce la fórmula de Deneubourg en el puente doble, 6 casos, N = 20 000). **Queda para el artefacto 7:** que el agente envíe `FRAGMENTO` y `BALIZA` y que use `RECLUTA`, `RUTA`, `MAPA` y `STOP`.
 7. ✅ Los 4 modos son seleccionables · ✅ actúa solo cada Δt · ✅ no supera su presupuesto de bytes · ✅ detecta a la rezagada por umbral (`tests/test_madre.py`: 33 PASA, 2026-11-16 21:27 -0500). El agente ya envía `FRAGMENTO` y usa `RECLUTA`, `RUTA` y `MAPA`. **No implementado:** `BALIZA`, `ALERTA`, `SIGUEME` (mensajes entre agentes, decisión E1) y `STOP`; tampoco el envío de `FIN`.
 8. ✅ Misma semilla ⇒ mismo resultado (los 4 modos; también con pérdidas, retardos y mundo aleatorio) · ✅ el motor de hilos corre el mismo `paso()` (sin madre da exactamente lo mismo que el determinista) · ✅ el ensayo tiene límite de pasos (H1) (`tests/test_motor.py`: 17 PASA, 2026-11-17 02:49 -0500). El motor también lanza la verificadora y difunde `FIN`.
-9. Toda la configuración sale del YAML · `run` y `batch` funcionan.
+9. ✅ Toda la configuración sale del YAML (cada parámetro se puede cambiar; una clave desconocida es un error) · ✅ `run` y `batch` funcionan, también como `python -m aco_gemelo` (`tests/test_cli.py`: 28 PASA, 2026-11-17 02:55 -0500). Configuraciones de ejemplo: `default.yaml`, `aleatorio.yaml` y `puente_doble.yaml`.
 10. Mide la convergencia según G1 · calidad = largo de la ruta / largo del BFS · cuenta bytes por familia de mensaje.
 11. PNG del estado final · animación GIF/MP4.
 12. Reproduce p1 (celda [5]) · la dinámica (celda [7]) · el histograma de r = 1 y r = 2 dentro de la tolerancia que se declare.

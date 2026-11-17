@@ -1,0 +1,26 @@
+# El puente doble de Deneubourg dibujado en la cuadrícula: valida la regla de feromona contra
+# los notebooks de referencia/ (Dorigo & Stützle, cap. 1). Sin madre, sin evaporación, depósito
+# constante y k = 20, alpha = 2: la regla de la agente es la fórmula 1.1.
+
+semilla: 2026
+
+mundo:
+  escenario: puente_doble
+  r: 2                   # razón de longitudes rama larga / rama corta
+  ancho_puente: 3        # con r = 2: rama corta de 4 movimientos y larga de 8
+  tau_max: 15            # así los 16 niveles percibidos cuentan depósitos enteros (0–15)
+  unidad_deposito: 1
+
+ensayo:
+  n_agentes: 6
+  rho: 0.0
+
+agente:
+  alpha: 2.0
+  k: 20.0
+  theta: 0.0             # siempre explota: sin rol de exploradora
+  deposito: constante
+  deposito_valor: 1
+
+madre:
+  modo: ausente
