@@ -42,14 +42,14 @@ de antemano.
 | `DECISIONES-PRUEBA.md` | Preguntas de diseño con todas las opciones: ✅ elegida / ❌ descartada |
 | `ARTEFACTOS.md`   | Los 17 artefactos de software (→ `gemelo/`), su estado, su avance y los requisitos de reproducción |
 | `oraculo/`        | El oráculo: ejecuta las celdas de los notebooks; `TOLERANCIAS.md` (declaradas antes) y `RESULTADOS.md` (C1–C5) |
-| `gemelo/`         | **El código**: `aco_gemelo/` (mundo, protocolo, canal, agente, madre, motor), `tests/`, `environment.yml` |
+| `gemelo/`         | **El código**: `aco_gemelo/` (mundo, protocolo, canal, agente, madre, motor, métricas, visual, experimentos), `configs/`, `experimentos/` (planes y datos), `tests/`, `environment.yml` |
 | `bosquejo/`       | Plano de ensayo (a mano y en limpio)                         |
 
-## Para retomar (estado al 2026-11-17 02:45 -0500)
+## Para retomar (estado al 2026-11-17 04:55 -0500)
 
 **Dónde quedamos:** fase 1 del gemelo en construcción. Hechos los artefactos
 **1 (entorno), 3 (protocolo), 4 (mundo), 5 (canal), 6 (agente), 7 (madre), 8 (motor), 9 (configuración y
-línea de comandos), 10 (métricas), 11 (visualización) y 12 (oráculo)**: 247 pruebas del gemelo + 7 del oráculo en PASA.
+línea de comandos), 10 (métricas), 11 (visualización), 12 (oráculo) y 14 (experimentos)**: 258 pruebas del gemelo + 7 del oráculo en PASA.
 El detalle y el avance de los 17 artefactos están en `ARTEFACTOS.md`.
 
 **Cómo comprobar que todo sigue bien** (desde `gemelo/`):
@@ -69,7 +69,16 @@ un atasco en callejones; el agente ahora recuerda las celdas pisadas en cada via
 (pocas decisiones; con muchas, los 16 niveles lineales se saturan). El cambio de percepción (8 bits o logarítmica)
 se reconsidera al llegar al hardware.
 
-**Siguiente artefacto: 14, experimentos en lote** (4 modos de la madre × 30 semillas → CSV + resumen).
+**Experimentos (artefacto 14, F-018):** `python -X utf8 -m aco_gemelo experimentos --plan experimentos/modos.yaml`
+(y `rescate.yaml`). Con umbral ≥ 0,8 el rescate se dispara; en el mundo aleatorio la madre tiende a mejorar la
+verificación (18 → 25–27/30), pero nada es significativo tras corregir por comparaciones múltiples, y con 10 viajes
+la madre ya no reduce la varianza del tiempo.
+
+**Aviso del operador:** el límite de 5 horas del plan está al **90 %** (2026-11-17 04:55 -0500). La sesión se pausa aquí y
+**se espera su señal** para seguir.
+
+**Siguiente artefacto: 15, notebook de análisis** (`gemelo/notebooks/`): gráficas comparativas a partir de
+`experimentos/datos/` y la prueba estadística de la varianza con y sin rescate.
 
 **Siguiente artefacto: 14, experimentos en lote** (4 modos × 30 semillas → CSV), después 15 notebook, 16 NetLogo
 y 17 guía de reproducción. El 13 (pruebas automáticas) se cumple al tener todas las pruebas en PASA.
@@ -84,8 +93,7 @@ y 17 guía de reproducción. El 13 (pruebas automáticas) se cumple al tener tod
 - Sin implementar: `BALIZA`, `ALERTA`, `SIGUEME` (comunicación entre agentes, E1) y `STOP`.
 - `gemelo/tests/apoyo.py` (banco provisional) se conserva para las pruebas unitarias; el motor da los mismos tiempos.
 
-**Después:**
-11 visualización → 12 oráculo → 14 experimentos → 15 notebook → 16 demostración NetLogo → 17 guía de reproducción.
+**Después:** 16 demostración NetLogo → 17 guía de reproducción.
 
 **Pendiente de revisión por el operador** (aprobado "con bendición", ver ASSUMPTIONS.md):
 - `DECISIONES-PRUEBA.md`: ronda 1 (A–G) y ronda 2 (I1–I15, valores elegidos por Claude).
@@ -109,6 +117,13 @@ Criterios de PROMPT-ZERO (ver `oraculo/RESULTADOS.md`): **C1 PASA** · **C2 PASA
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-17 04:55 -0500
+- Cierre por límite del plan: el operador avisa que el límite de 5 horas está al 90 %. Se actualiza "Para retomar", el README y el CHANGELOG, se sincroniza y se espera su señal para el artefacto 15.
+
+### 2026-11-17 04:49 -0500
+- **Artefacto 14 hecho** (Claude Opus 5.5): `gemelo/aco_gemelo/experimentos.py` (plan YAML = base + factores + semillas; combinaciones en paralelo; un CSV por condición y `resumen.csv` con IC de Wilson), orden `experimentos` en la línea de comandos, planes `modos.yaml` y `rescate.yaml`, y sus datos (480 ensayos en ~2,5 min con 8 procesos). 11 pruebas nuevas (258 en total).
+- **F-018:** el rescate se dispara con umbral ≥ 0,8; tendencia de mejora en el mundo aleatorio, no significativa tras corregir; con 10 viajes la madre ya no reduce la varianza. Sin commit todavía.
 
 ### 2026-11-17 04:44 -0500
 - El operador elige la opción c (J8): C3 queda NO PASA documentado; no se cambia la percepción ni los viajes. Se sincroniza la investigación.

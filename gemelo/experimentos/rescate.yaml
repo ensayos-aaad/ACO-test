@@ -1,0 +1,9 @@
+# Experimento 2: la hipótesis de resumen.pdf (el rescate reduce la varianza del tiempo de convergencia).
+# Con el umbral por defecto (0,5) el rescate nunca se disparó (F-010, F-013); aquí se barre el umbral (I14).
+nombre: rescate
+base: ../configs/default.yaml
+semillas: 30
+factores:
+  mundo.escenario: [L, aleatorio]
+  madre.modo: [rescate]
+  madre.umbral_rescate: [0.5, 0.8, 0.95, 1.0]

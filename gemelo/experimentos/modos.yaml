@@ -1,0 +1,8 @@
+# Experimento 1: los 4 modos de la madre en los dos mundos (F1, G2).
+# Configuración base: configs/default.yaml (opción c: salida cada tick, 10 viajes; J7).
+nombre: modos
+base: ../configs/default.yaml
+semillas: 30
+factores:
+  mundo.escenario: [L, aleatorio]
+  madre.modo: [ausente, pista_de_baile, rescate, difusion]

@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## [Sesión 2] — 2026-11-17 (Claude Fable 5.2 y, desde el artefacto 10, Claude Opus 5.5)
+### Añadido
+- `gemelo/`: madre (artefacto 7), motores determinista y de hilos (8), configuración YAML y línea de comandos (9), métricas (10), visualización PNG/GIF/MP4 (11), experimentos en lote (14).
+- `oraculo/`: el oráculo ejecuta las celdas de los notebooks tal cual (12); tolerancias declaradas antes de correr; comparación C1–C5; investigación de C3.
+- Opción c: salidas escalonadas y viajes repetidos (puente doble, mundo L y aleatorio); el agente recuerda las celdas pisadas en cada viaje.
+### Resultados
+- Criterios de PROMPT-ZERO: C1, C2, C4 y C5 PASA; C3 NO PASA (causa documentada, J8); C6 NO PROBADO.
+- 258 pruebas del gemelo y 7 del oráculo en PASA. Hallazgos F-010 a F-018.
+
 ## [Sesión 1] — 2026-11-16 (Claude Fable 5.2)
 ### Añadido
 - `gemelo/`: entorno conda `aco-gemelo` (artefacto 1), protocolo con codificadores JSON y binario (3), mundo con BFS y escenarios (4), canal en memoria (5) y agente con verificadora (6). 137 pruebas en PASA.

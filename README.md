@@ -12,8 +12,10 @@ en las abejas (danza y reclutamiento).
 
 ## Estado
 
-Fase 1 en construcción: ya existen el entorno, el protocolo, el mundo, el canal y el agente en [gemelo/](gemelo/), con
-137 pruebas automáticas que pasan. Falta la madre y lo que sigue. El avance de cada artefacto está en [ARTEFACTOS.md](ARTEFACTOS.md).
+Fase 1 casi completa: el gemelo en [gemelo/](gemelo/) (agentes, madre, motores, métricas, visualización y experimentos)
+y el oráculo en [oraculo/](oraculo/), con 265 pruebas automáticas que pasan. Frente a los notebooks de referencia,
+los criterios C1, C2, C4 y C5 pasan y C3 no (causa documentada). Faltan el notebook de análisis, la demostración con
+NetLogo y la guía de reproducción. El avance de cada artefacto está en [ARTEFACTOS.md](ARTEFACTOS.md).
 
 | Fase | Contenido | Meta |
 |---|---|---|

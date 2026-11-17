@@ -5,6 +5,7 @@ Desde la carpeta ``gemelo/``::
     python -m aco_gemelo run   --config configs/default.yaml
     python -m aco_gemelo run   --config configs/default.yaml --png final.png --animacion ensayo.gif
     python -m aco_gemelo batch --config configs/default.yaml --semillas 30
+    python -m aco_gemelo experimentos --plan experimentos/modos.yaml
 """
 
 from __future__ import annotations
@@ -83,6 +84,19 @@ def _batch(args: argparse.Namespace) -> int:
     return 0
 
 
+def _experimentos(args: argparse.Namespace) -> int:
+    from .experimentos import correr_plan
+
+    carpeta = correr_plan(args.plan, args.salida, args.procesos)
+    print(f"Resultados en {carpeta}")
+    with open(carpeta / "resumen.csv", newline="", encoding="utf-8") as archivo:
+        for f in csv.DictReader(archivo):
+            print(f"{f['condicion']:45} verificadas {f['verificadas']:>3}/{f['n']}  "
+                  f"ticks {float(f['ticks_media'] or 0):7.1f}  "
+                  f"bytes madre {float(f['bytes_agente_madre_media']) + float(f['bytes_madre_agente_media']):8.0f}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     """Punto de entrada. Devuelve el código de salida."""
     parser = argparse.ArgumentParser(prog="python -m aco_gemelo",
@@ -102,6 +116,11 @@ def main(argv: list[str] | None = None) -> int:
     batch.add_argument("--semilla-inicial", type=int, default=0)
     batch.add_argument("--salida", help="CSV de salida (por defecto resultados/<config>.csv)")
     batch.set_defaults(func=_batch)
+    exp = sub.add_parser("experimentos", help="corre un plan de experimentos (varias condiciones)")
+    exp.add_argument("--plan", required=True, help="archivo YAML del plan")
+    exp.add_argument("--salida", help="carpeta de salida (por defecto experimentos/datos/<nombre>)")
+    exp.add_argument("--procesos", type=int, help="procesos en paralelo (por defecto, todos los núcleos)")
+    exp.set_defaults(func=_experimentos)
     args = parser.parse_args(argv)
     try:
         return args.func(args)
