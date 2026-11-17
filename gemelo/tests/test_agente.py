@@ -252,3 +252,30 @@ def test_viajes_repetidos_en_un_corredor():
 
 def test_con_un_viaje_se_comporta_como_antes():
     assert ConfigAgente().viajes == 1
+
+
+def test_la_explotadora_no_vuelve_a_celdas_de_su_ruta_si_puede_evitarlo():
+    """Un ciclo de feromona fuerte no la atrapa: prefiere la celda nueva aunque tenga menos rastro."""
+    mundo = Mundo(3, 3, [], inicio=(0, 0), meta=(2, 2), tau0=0.0, tau_max=1.0)
+    mundo.depositar((0, 1), 1.0)  # mucho rastro en una celda ya visitada
+    agente = Agente(1, CanalMemoria(), ConfigAgente(theta=0))
+    agente.ruta = [(0, 1), (0, 0), (1, 0)]
+    agente.visitadas = set(agente.ruta)
+    agente.pos, agente._previa = (1, 0), (0, 0)
+    vecinas = mundo.percibir((1, 0))
+    vecinas[1 + 5]["clase"] = 0  # oculta la meta (está en diagonal)
+    elegidas = {agente.elegir(vecinas) for _ in range(200)}
+    assert agente._hacia((0, 1)) not in elegidas  # la del rastro fuerte ya está en su ruta
+    assert elegidas <= {agente._hacia(c) for c in [(2, 0), (1, 1), (2, 1)]}
+
+
+def test_no_queda_atrapada_en_un_callejon():
+    """Regresión (F-016): en el mundo aleatorio de la semilla 1 una agente oscilaba para siempre
+    entre la esquina (0, 7) y el callejón (1, 7). Con 10 viajes, la colonia debe asentarse."""
+    from aco_gemelo.config import config_ensayo, crear_mundo
+    from aco_gemelo.motor import Simulacion
+
+    datos = {"mundo": {"escenario": "aleatorio"}, "ensayo": {"limite": 6000, "salida_cada": 1},
+             "agente": {"viajes": 10}}
+    resultado = Simulacion(crear_mundo(datos, 1), config_ensayo(datos, 1)).correr()
+    assert resultado.asentadas

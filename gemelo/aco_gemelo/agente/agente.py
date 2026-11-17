@@ -133,6 +133,8 @@ class Agente:
         self.rol = 0  #: 0 = exploradora · 1 = explotadora (el del último paso)
         self.pos: Celda | None = None
         self.ruta: list[Celda] = []  #: del nido a la celda actual, sin bucles
+        self.visitadas: set[Celda] = set()  #: celdas pisadas en este viaje (un mapa de bits en el micro)
+        self._previa: Celda | None = None  #: celda de la que viene
         self.indice = 0  #: posición dentro de la ruta al volver o al seguirla
         self.llegadas = 0
         self.reinicios = 0  #: veces que se le llenó la memoria
@@ -230,6 +232,8 @@ class Agente:
                 self.viajes_hechos += 1
                 if self.viajes_hechos < self.config.viajes:  # otro viaje: explora de nuevo
                     self.ruta = [self.pos]
+                    self.visitadas = {self.pos}
+                    self._previa = None
                     self.estado = Estado.IDA
                 else:
                     self.estado = Estado.SIGUIENDO
@@ -259,10 +263,11 @@ class Agente:
     def elegir(self, vecinas: list[dict[str, int]]) -> int | None:
         """Regla de decisión de la hormiga en la IDA. Devuelve una dirección.
 
-        Si ve la meta al lado, va a ella. Si no, descarta volver a la celda de la que viene
-        (salvo que no haya otra salida), sortea su rol con el umbral de respuesta y elige:
-        la explotadora con probabilidad proporcional a ``(k + nivel)^alpha``; la exploradora
-        al azar, prefiriendo celdas que la colonia no conoce y que no están en su ruta.
+        Si ve la meta al lado, va a ella. Si no, como en S-ACO, prefiere las celdas que no ha
+        pisado en este viaje; si ya las pisó todas, evita solo la celda de la que acaba de llegar
+        (así sale de un callejón por donde entró). Entre esas candidatas sortea su rol con el
+        umbral de respuesta y elige: la explotadora con probabilidad proporcional a
+        ``(k + nivel)^alpha``; la exploradora al azar, prefiriendo celdas que la colonia no conoce.
         """
         validos = self.movimientos_validos(vecinas)
         if not validos:
@@ -270,19 +275,18 @@ class Agente:
         for d in validos:
             if vecinas[1 + d]["clase"] == Clase.META:
                 return d
-        if len(self.ruta) >= 2 and len(validos) > 1:
-            atras = self._hacia(self.ruta[-2])
-            validos = [d for d in validos if d != atras]
+        nuevos = [d for d in validos
+                  if self._destino(d) not in self.visitadas and self._destino(d) not in self.ruta]
+        candidatos = nuevos or [d for d in validos if self._destino(d) != self._previa] or validos
         cfg = self.config
-        niveles = [vecinas[1 + d]["fero"] for d in validos]
+        niveles = [vecinas[1 + d]["fero"] for d in candidatos]
         self.rol = int(self.rng.random() < prob_explotar(max(niveles), cfg.theta))
         if self.rol:
             pesos = [(cfg.k + nivel) ** cfg.alpha for nivel in niveles]
             if sum(pesos) > 0:
-                return self.rng.choices(validos, weights=pesos)[0]
-        nuevos = [d for d in validos if self._destino(d) not in self.ruta]
-        sin_explorar = [d for d in nuevos if self._destino(d) not in self.mapa_colonia]
-        return self.rng.choice(sin_explorar or nuevos or validos)
+                return self.rng.choices(candidatos, weights=pesos)[0]
+        sin_explorar = [d for d in candidatos if self._destino(d) not in self.mapa_colonia]
+        return self.rng.choice(sin_explorar or candidatos)
 
     def _elegir_verificadora(self, vecinas: list[dict[str, int]]) -> int | None:
         """La verificadora solo explota: va a la vecina no visitada con más feromona.
@@ -304,6 +308,8 @@ class Agente:
 
     def _actualizar_posicion(self, pos: Celda, vecinas: list[dict[str, int]]) -> None:
         """Registra dónde está (el mundo es la autoridad) y lo que ve."""
+        if self.pos is not None and self.pos != pos:
+            self._previa = self.pos
         self.pos = pos
         self.conocidas.add(pos)
         for d, (dx, dy) in enumerate(DIRECCIONES):
@@ -312,6 +318,7 @@ class Agente:
             if vecinas[1 + d]["clase"] == Clase.OBSTACULO:
                 self.obstaculos.add((pos[0] + dx, pos[1] + dy))
         if self.estado is Estado.IDA:
+            self.visitadas.add(pos)
             if pos in self.ruta:
                 del self.ruta[self.ruta.index(pos) + 1:]  # cierra el bucle: la ruta sigue sin repetir
             else:
@@ -332,6 +339,8 @@ class Agente:
             self.estado = Estado.SIGUIENDO
             return self.decidir(percepto, ahora)
         self.ruta = [self.pos]
+        self.visitadas = {self.pos}
+        self._previa = None
         if motivo == "pedir" and self._ruta_pedida is not None:
             self._enviar("PIDE_RUTA", ID_MADRE, ahora, flags=FLAG_ACK, ruta_id=self._ruta_pedida)
             self._espera_desde = ahora

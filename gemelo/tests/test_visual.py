@@ -129,7 +129,9 @@ def test_formato_de_animacion_no_valido(tmp_path):
 
 def test_la_linea_de_comandos_genera_png_y_gif(tmp_path, capsys):
     png, gif = tmp_path / "f.png", tmp_path / "e.gif"
-    assert main(["run", "--config", "configs/default.yaml", "--semilla", "3",
+    config = tmp_path / "c.yaml"  # un ensayo corto (1 viaje) para que la animación sea rápida
+    config.write_text("ensayo: {rho: 0.0}\n", encoding="utf-8")
+    assert main(["run", "--config", str(config), "--semilla", "3",
                  "--png", str(png), "--animacion", str(gif), "--fps", "12"]) == 0
     salida = capsys.readouterr().out
     assert f"PNG: {png}" in salida and f"Animación: {gif}" in salida

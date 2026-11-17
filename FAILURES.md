@@ -21,6 +21,16 @@ Formato: fecha · qué se intentó · qué pasó · evidencia · qué se aprendi
   | Difusión | 59 ± 24, máx. 135 | 31/40 | 1,33 | 1171 |
 
   Las 6 agentes se asientan en 40/40 con todos los modos · Script de comparación (scratchpad); la prueba `test_con_cualquier_modo_la_colonia_se_asienta_y_la_madre_acelera` fija lo esencial con 20 semillas · Lecturas: (1) la pista de baile y la difusión **bajan el tiempo, su dispersión y el largo de la ruta**; (2) **el rescate no cambia nada**: con el umbral del 50 % ninguna agente llega a contar como rezagada antes de asentarse, así que la hipótesis de `resumen.pdf` **no se pudo poner a prueba todavía** (hay que barrer el umbral o cambiar la métrica de experiencia); (3) **la verificadora sigue fallando en ~1 de cada 4 semillas** con cualquier modo: los rastros cruzados la llevan a callejones (I12 le prohíbe volver sobre sus pasos). Nada de esto se ajustó.
+- **F-016** · 2026-11-17 04:00 -0500 · Activar la opción c en los mundos L y aleatorio (J7: salida cada tick, 10 viajes, límite 6000) · **Primera medición: en el mundo aleatorio solo 10/30 colonias se asentaban**, y el tráfico con la madre se disparaba (34 941 B frente a 749) · Diagnóstico con la semilla 1: una agente oscilaba durante miles de ticks entre la esquina (0, 7) y un callejón de una celda (1, 7). Al salir del callejón volvía a una celda de su ruta, la ruta se recortaba, y la regla de "no volver atrás" apuntaba a la celda equivocada y le prohibía la única salida. Un primer arreglo (que la explotadora evite las celdas de su ruta) **no atacó la causa y empeoró el resultado (1/30)** · **Arreglo final, fiel a S-ACO:** cada agente recuerda las **celdas pisadas en el viaje** (un mapa de bits de 8 B en 8 × 8), prefiere las no pisadas y, si ya pisó todas, solo evita la celda de la que acaba de llegar. Prueba de regresión: `test_no_queda_atrapada_en_un_callejon` · Resultado (30 semillas, pista de baile, ρ = 0,01):
+
+  | Mundo | Asentadas | Verificadas (IC 95 %) | Ticks hasta asentarse (media) | Ruta / óptima | Bytes madre ↔ agentes |
+  |---|---|---|---|---|---|
+  | L, 1 viaje | 30/30 | 19/30 (46–78 %) | 75 | 1,31 | 828 |
+  | L, opción c | 30/30 | 24/30 (63–90 %) | 433 | 1,67 | 4665 |
+  | Aleatorio, 1 viaje | 30/30 | 19/30 (46–78 %) | 62 | 1,28 | 713 |
+  | Aleatorio, opción c | 30/30 | 25/30 (66–93 %) | 390 | 1,42 | 4226 |
+
+  Lecturas: la verificadora llega más veces (los intervalos todavía se solapan), a cambio de ensayos unas 6 veces más largos, unas 6 veces más tráfico y, en el mundo L, rutas verificadas más largas. El arreglo del callejón también cambió levemente las cifras de 1 viaje (la regla de elección cambió).
 - **F-015** · 2026-11-17 03:37 -0500 · Opción c de F-014 (salidas escalonadas + 50 viajes por agente, escala de 1 nivel = 20 depósitos, k = 1; parámetros J1–J6 declarados a las 03:21, **antes** de implementar y correr) y nueva comparación con el oráculo (mismas tolerancias) · **C1 PASA · C2 PASA · C3 NO PASA · C4 PASA · C5 PASA** · `oraculo/RESULTADOS.md` (el anterior queda en el commit `87262a3`) · Histogramas (0–20 · … · 80–100):
 
   | | r = 1 | r = 2 |

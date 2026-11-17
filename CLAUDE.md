@@ -49,7 +49,7 @@ de antemano.
 
 **Dónde quedamos:** fase 1 del gemelo en construcción. Hechos los artefactos
 **1 (entorno), 3 (protocolo), 4 (mundo), 5 (canal), 6 (agente), 7 (madre), 8 (motor), 9 (configuración y
-línea de comandos), 10 (métricas), 11 (visualización) y 12 (oráculo)**: 245 pruebas del gemelo + 7 del oráculo en PASA.
+línea de comandos), 10 (métricas), 11 (visualización) y 12 (oráculo)**: 247 pruebas del gemelo + 7 del oráculo en PASA.
 El detalle y el avance de los 17 artefactos están en `ARTEFACTOS.md`.
 
 **Cómo comprobar que todo sigue bien** (desde `gemelo/`):
@@ -61,10 +61,11 @@ El detalle y el avance de los 17 artefactos están en `ARTEFACTOS.md`.
 `python -X utf8 -m aco_gemelo batch --config configs/default.yaml --semillas 30` (deja un CSV en `resultados/`,
 que git ignora).
 
-**Opción c aplicada (F-015):** salidas escalonadas (`ensayo.salida_cada`) y viajes repetidos (`agente.viajes`),
-activas solo en `configs/puente_doble.yaml` (J1–J6). Con eso **C2 y C4 pasan**; C3 no (la rama corta gana en el
-48 % frente al 75 % del oráculo). **Decisiones abiertas:** (1) ¿se activa la opción c también en los mundos L y
-aleatorio (J5)? (2) ¿se investiga C3 (escala de niveles, depósito al llegar) o se acepta y documenta?
+**Opción c aplicada** (salidas escalonadas `ensayo.salida_cada` y viajes repetidos `agente.viajes`): en el
+puente doble (J1–J6, F-015: C2 y C4 pasan, C3 no) y, por decisión del operador, también en los mundos L y
+aleatorio (J7, F-016: la verificadora llega más veces, con ensayos ~6 veces más largos). Al activarla apareció
+un atasco en callejones; el agente ahora recuerda las celdas pisadas en cada viaje (S-ACO).
+**Decisión abierta:** ¿se investiga C3 (escala de niveles, depósito al llegar) o se acepta y documenta?
 
 **Siguiente artefacto: 14, experimentos en lote** (4 modos × 30 semillas → CSV), después 15 notebook, 16 NetLogo
 y 17 guía de reproducción. El 13 (pruebas automáticas) se cumple al tener todas las pruebas en PASA.
@@ -104,6 +105,12 @@ Criterios de PROMPT-ZERO (ver `oraculo/RESULTADOS.md`): **C1 PASA** · **C2 PASA
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-17 04:00 -0500
+- Opción c sincronizada (`b50d273`). El operador pide activar **salidas escalonadas y viajes repetidos** también en los mundos L y aleatorio (primero pidió solo las salidas e interrumpió para corregir). J7 declarada antes de medir (`viajes` = 10 es suposición de Claude).
+- **F-016:** al activarla, en el mundo aleatorio solo 10/30 colonias se asentaban: una agente quedaba atrapada en un callejón. Un primer arreglo falló (1/30); el definitivo, fiel a S-ACO, hace que la agente recuerde las celdas pisadas en el viaje. Ahora 30/30 en ambos mundos y la verificadora llega en 24–25/30 (antes 19/30).
+- `configs/default.yaml` y `configs/aleatorio.yaml` usan `salida_cada: 1`, `viajes: 10`, `limite: 6000`. 247 pruebas en PASA.
+- Se volvió a correr `oraculo/comparar.py` tras el cambio del agente: `RESULTADOS.md` sale **idéntico** al de F-015 (C1, C2, C4, C5 PASA; C3 NO PASA). Sin commit todavía.
 
 ### 2026-11-17 03:37 -0500
 - Artefacto 12 sincronizado (`87262a3`). El operador eligió la **opción c** de F-014.

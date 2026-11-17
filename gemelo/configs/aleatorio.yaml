@@ -10,5 +10,12 @@ mundo:
   densidad: 0.2          # probabilidad de que cada celda sea un obstáculo
   distancia_minima: 4
 
+ensayo:
+  limite: 6000           # J7
+  salida_cada: 1         # salen del nido de a una, cada tick (J1, J7)
+
+agente:
+  viajes: 10             # idas y vueltas con depósito antes de asentarse (J2, J7)
+
 madre:
   modo: pista_de_baile

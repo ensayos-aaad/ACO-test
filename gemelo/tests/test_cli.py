@@ -36,7 +36,9 @@ def test_hay_tres_configuraciones_de_ejemplo():
 def test_default_yaml_muestra_todos_los_valores_por_defecto():
     """El archivo por defecto documenta cada parámetro y coincide con los valores del código."""
     datos = cargar(CONFIGS / "default.yaml")
-    assert config_ensayo(datos) == ConfigEnsayo(semilla=2026)
+    # Valores del código, salvo los tres que J7 cambia en el archivo.
+    assert config_ensayo(datos) == ConfigEnsayo(semilla=2026, limite=6000, salida_cada=1,
+                                                agente=ConfigAgente(viajes=10))
     assert set(datos["agente"]) == {f.name for f in fields(ConfigAgente)} - {
         "con_madre", "verificadora", "informa_mapa"}
     assert set(datos["madre"]) == {f.name for f in fields(ConfigMadre)}
