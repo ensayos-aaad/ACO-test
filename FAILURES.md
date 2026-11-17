@@ -1,0 +1,13 @@
+# FAILURES — registro de fallas
+
+Toda prueba fallida, montaje que no funcionó o error encontrado se registra aquí. **Nunca se borra.**
+Formato: fecha · qué se intentó · qué pasó · evidencia · qué se aprendió / acción.
+
+## 2026-11-16 — Sesión 0
+- **F-001** · Se intentó leer `referencia/PROCEDENCIA.md` (PROMPT-ZERO §9.1) · No existía: ni `referencia/` estaba en el repositorio ni el fuente trae PROCEDENCIA.md · `git status` y el listado del fuente · Se copió el fuente y Claude Code creó PROCEDENCIA.md (ADR-001).
+- **F-002** · Se intentó volcar los notebooks con `python -I` · `UnicodeEncodeError` (la consola usa cp1252) · traceback · En Windows, los scripts del oráculo deben usar `python -X utf8` o escribir a archivo en UTF-8.
+- **F-003** · Se comprobó el entorno para el oráculo · `sympy` no está instalado · `ModuleNotFoundError` · Instalarlo antes de usar deneubourg [9] y [15] (pendiente de aprobación).
+- **F-004** · Se ejecutó la Sesión 0 · Claude pasó directo a construir y omitió la apertura (PROMPT-ZERO §6.1): no presentó el resumen del estado en 5 líneas ni pidió al operador que declarara sesgos y suposiciones · Lo señaló el operador ("Revisa lo que llamamos resumen") · Cada sesión empieza con el resumen de 5 líneas y la declaración de sesgos, antes de cualquier construcción.
+- **F-005** · Se verificó el entorno de Python (F-003) · Claude usó el `python` del PATH (`C:\Python311`, 3.11.5) en lugar del de Anaconda, que es el oficial del proyecto. Por eso F-003 dijo que faltaba sympy, cuando Anaconda tiene sympy 1.13.1 · `where python` y la prueba de import con `C:\Users\Usuario\anaconda3\python.exe` · F-003 queda **invalidado**. Toda ejecución de Python del proyecto usa la ruta completa de Anaconda (ver CHECKLIST-ENTORNO.md).
+- **F-006** · Se registraron marcas de tiempo en el historial · La entrada de las "19:50" se escribió con una hora estimada, sin consultar el reloj. La hora real era anterior: a las 19:46 todavía no se había terminado · `date` a las 19:46 · Se corrige a 19:45. Las marcas de tiempo se toman siempre con `date`.
+- **F-007** · Se hizo el inventario de `referencia/` para CONTEXT.md · No se detectó `referencia/resumen.pdf`, que no viene del fuente (el fuente tiene 172 archivos y la carpeta 174). Por eso se revisó el "cronograma tentativo" sin haber leído el PDF que lo contiene · El operador preguntó "¿lo revisaste del pdf resumen?" · Al inventariar se compara la lista de archivos de la carpeta con la del fuente (`git ls-files`) y se reporta todo lo que sobre.
