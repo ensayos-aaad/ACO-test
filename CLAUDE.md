@@ -63,6 +63,11 @@ Criterios de aceptación C1–C6: todos **NO PROBADO** (son candidatos; el opera
 
 ## Historial
 
+### 2026-11-16 21:00 -0500
+- **Artefacto 5 hecho** (Claude Fable 5.2): `gemelo/aco_gemelo/canal/` con la interfaz `Canal` (lista para una versión MQTT) y `CanalMemoria`: difusión por radio r (distancia de 8 vecinos), destino directo o difusión general, retardo y pérdida con semilla, mensajes que viajan serializados (binario o JSON) y contadores de tráfico por familia. 18 pruebas en PASA (112 en total).
+- Límites declarados: la familia 0 (sensor/actuador) no se pierde ni se retrasa; los mensajes con `FLAG_ACK` se entregan siempre, pero el tráfico de las confirmaciones no se cuenta todavía.
+- Hechos: artefactos 1, 3, 4 y 5. Siguiente: 6 (agente), que necesita cerrar antes H1, H2, H5 y los parámetros numéricos (α, ρ, τ0, depósito, K, umbral de rol).
+
 ### 2026-11-16 20:58 -0500
 - **Artefacto 3 hecho** (Claude Fable 5.2): `gemelo/aco_gemelo/protocolo/` con los 16 mensajes declarados una sola vez (`MENSAJES`) y los codificadores JSON y binario derivados de esa tabla. 74 pruebas en PASA (94 en total).
 - `PROTOCOLO.md` pasa a **v0.2**: 8 vecinos, verificadora (H4 resuelto), `SIGUEME` con `n`, orden de bits MSB primero. Sigue sin la aprobación del operador.

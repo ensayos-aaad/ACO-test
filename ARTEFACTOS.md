@@ -13,7 +13,7 @@ solo con esta definición.
 | 2 | Especificación del protocolo | `gemelo/docs/` (hoy `PROTOCOLO.md`) | Borrador v0.2 | 67 % (2/3) |
 | 3 | Codificadores JSON ↔ binario | `gemelo/aco_gemelo/protocolo/` | **Hecho** | 100 % (3/3) |
 | 4 | Mundo + BFS + escenarios (L, aleatorio, puente doble) | `gemelo/aco_gemelo/mundo/` | **Hecho** | 100 % (4/4) |
-| 5 | Canal en memoria (con retardo y pérdida simulados) | `gemelo/aco_gemelo/canal/` | Por hacer | 0 % (0/3) |
+| 5 | Canal en memoria (con retardo y pérdida simulados) | `gemelo/aco_gemelo/canal/` | **Hecho** | 100 % (3/3) |
 | 6 | Agente (paso no bloqueante, roles, verificadora) | `gemelo/aco_gemelo/agente/` | Por hacer | 0 % (0/4) |
 | 7 | Madre (4 modos, memoria en bytes) | `gemelo/aco_gemelo/madre/` | Por hacer | 0 % (0/4) |
 | 8 | Motores (determinista con semilla + hilos) | `gemelo/aco_gemelo/motor/` | Por hacer | 0 % (0/3) |
@@ -33,7 +33,7 @@ solo con esta definición.
 2. ✅ Ejemplo binario verificado · el operador lo aprueba (pendiente) · ✅ incluye la verificadora (H4, v0.2).
 3. ✅ Lo que se codifica y decodifica vuelve igual (JSON y binario; 16 mensajes × 4 contextos × 100 casos) · ✅ los tamaños coinciden con la especificación · ✅ el JSON y el binario llevan la misma información (`tests/test_protocolo.py`: 74 PASA, 2026-11-16 20:58 -0500).
 4. ✅ La meta siempre es alcanzable (200 semillas por escenario) · ✅ el BFS con 8 vecinos no corta esquinas · ✅ la L coincide con el plano · ✅ el escenario de puente doble está parametrizado por r (`tests/test_mundo.py`: 18 PASA, 2026-11-16 20:54 -0500).
-5. Entrega dentro del radio r · las pérdidas y retardos son los mismos con la misma semilla · cuenta mensajes y bytes.
+5. ✅ Entrega dentro del radio r · ✅ las pérdidas y retardos son los mismos con la misma semilla · ✅ cuenta mensajes y bytes por familia (`tests/test_canal.py`: 18 PASA, 2026-11-16 21:00 -0500).
 6. Nunca entra en un obstáculo ni sale de la grilla · la memoria K se respeta · cambia de rol por umbral · la verificadora solo explota y detecta ciclos.
 7. Los 4 modos son seleccionables · actúa solo cada Δt · no supera su presupuesto de bytes · detecta a la rezagada por umbral.
 8. Misma semilla ⇒ mismo resultado · el motor de hilos corre el mismo `paso()` · el ensayo tiene límite de pasos (H1).
