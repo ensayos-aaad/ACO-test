@@ -5,6 +5,11 @@ cambió nada.
 - `[x]` instalado y verificado.
 - `[ ]` falta, o falta configurarlo o probarlo.
 
+**Actualización 2026-11-16 20:50 -0500:** se creó el entorno conda `aco-gemelo` (artefacto 1). El código
+del gemelo corre con `C:/Users/Usuario/anaconda3/envs/aco-gemelo/python.exe`; las versiones de ese
+entorno están en `gemelo/environment.yml` (sympy es 1.13.2 allí, no 1.13.1). La lista de la sección 1
+describe el entorno `base`.
+
 **Intérprete oficial del proyecto:** el Python de Anaconda, `C:\Users\Usuario\anaconda3\python.exe`
 (Anaconda3 2024.10-1, Python 3.12.7, conda 25.1.1, entorno `base`).
 
@@ -28,8 +33,8 @@ cambió nada.
 - [ ] **El `python` del PATH no es Anaconda**: `where python` devuelve primero `C:\Python311\python.exe`.
       Hay que llamar a Anaconda por su ruta completa, usar el *Anaconda Prompt* o corregir el PATH.
       (Hay además Python 3.8.8 y 2.7.15 instalados.)
-- [ ] Decidir si se usa el entorno `base` o un entorno conda propio del proyecto, con
-      `environment.yml` para fijar las versiones (C5, reproducibilidad).
+- [x] Entorno conda propio **`aco-gemelo`** creado desde `gemelo/environment.yml` (2026-11-16 20:50 -0500).
+      Intérprete: `C:/Users/Usuario/anaconda3/envs/aco-gemelo/python.exe`.
 
 ## 2. NetLogo — entorno simulado
 

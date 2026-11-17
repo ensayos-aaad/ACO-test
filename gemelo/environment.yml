@@ -1,0 +1,22 @@
+# Entorno reproducible del gemelo ACO (artefacto 1).
+# Crear:    conda env create -f environment.yml
+# Activar:  conda activate aco-gemelo
+# Versiones iguales a las verificadas en la máquina de desarrollo (2026-11-16).
+name: aco-gemelo
+channels:
+  - defaults
+dependencies:
+  - python=3.12.7
+  - numpy=1.26.4
+  - scipy=1.13.1
+  - matplotlib=3.9.2
+  - pandas=2.2.3
+  - statsmodels=0.14.2
+  - sympy=1.13.2
+  - networkx=3.3
+  - pyyaml=6.0.1
+  - pillow=10.4.0
+  - pytest=7.4.4
+  - nbconvert=7.16.4
+  - ipykernel=6.28.0
+  - jupyterlab=4.2.5

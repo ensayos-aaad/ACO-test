@@ -63,6 +63,10 @@ Criterios de aceptación C1–C6: todos **NO PROBADO** (son candidatos; el opera
 
 ## Historial
 
+### 2026-11-16 20:50 -0500
+- **Artefacto 1 hecho** (modelo: Claude Fable 5.2): `gemelo/environment.yml` + entorno conda `aco-gemelo` + `gemelo/tests/test_entorno.py` (2 pruebas en PASA). sympy quedó en 1.13.2 (F-008). El código del gemelo se ejecuta con `C:/Users/Usuario/anaconda3/envs/aco-gemelo/python.exe`.
+- Siguiente: artefacto 4 (mundo + BFS + escenarios). Sin commit todavía.
+
 ### 2026-11-16 20:31 -0500
 - `README.md` raíz actualizado: insignia "Built with AI" (la misma de la referencia) + insignia del modelo **Claude Opus 5.5**, estado por fases, mapa de documentos y una sección de uso de IA.
 
