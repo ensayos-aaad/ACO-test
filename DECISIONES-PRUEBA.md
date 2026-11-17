@@ -72,6 +72,34 @@ Creado el 2026-11-16. El operador pidió responderlas por bloques, no de a una.
 |---|---|---|
 | H1 | **Hace falta un límite de pasos por ensayo.** Si se acaba sin converger, se registra NO PASA | Con G1 = "todas", una sola rezagada bloquea el ensayo para siempre. Aquí encaja el **modo rescate** de la madre: es justo el remedio para la rezagada |
 | H2 | **La verificadora necesita una regla para empates y detección de ciclos** | Con D3.1 = solo explotar y E3 = q4, varias vecinas pueden empatar (16 niveles) o puede haber máximos locales. Si cae en un ciclo, el rastro no basta: es NO PASA, y es un resultado informativo |
-| H3 | **El depósito se hace a la ida** | Con D3 = d, las agentes no regresan; el refuerzo lo dan la ida y la DANZA → RECLUTA de la madre |
+| H3 ❌ | (Reemplazado por I4) **El depósito se hace a la ida** | Con D3 = d, las agentes no regresan; el refuerzo lo dan la ida y la DANZA → RECLUTA de la madre |
 | H5 | **¿Distancia mínima entre inicio y meta?** Hoy pueden salir casi pegados (con la semilla 2026 el óptimo es de 2 movimientos), y ese ensayo es trivial | Detectado al construir el artefacto 4. Opciones: sin mínimo · mínimo fijo (p. ej. óptimo ≥ 5) · mínimo relativo al tamaño del mundo. ⏳ |
 | H4 ✅ | (Resuelto en PROTOCOLO v0.2) **Hay que agregar al protocolo** un tipo de agente "verificadora" en `INICIO` y la confirmación final | `DANZA` con una flag de verificación + `FIN` con el motivo "verificada" |
+
+## I. Ronda 2 — parámetros delegados "según la literatura"
+
+2026-11-16 21:03 -0500. El operador declaró que **"se echó la bendición"** y delegó: *"usa algo según la literatura"*.
+Los eligió Claude (Fable 5.2). **Todos son valores por defecto configurables y quedan a revisión del operador.**
+Respaldo: **L** = literatura · **L?** = literatura citada de memoria, sin verificar contra el texto · **S** = sin valor canónico: suposición de Claude.
+
+| ID | Parámetro | Valor elegido | Respaldo | Fuente / alternativas descartadas |
+|---|---|---|---|---|
+| I1 | Exponente α | **2** | L | Deneubourg et al. (1990) y Dorigo & Stützle §1.1–1.2 (`referencia/ACO/`). Lo exige el puente doble. ❌ α = 1 (Ant System, 1996): queda como alternativa para comparar |
+| I2 | Feromona inicial τ₀ | **20 en el puente doble** (= k de Deneubourg) · **1 en la cuadrícula** | L / L? | k ≈ 20: notebooks de la referencia. τ₀ pequeño y constante en S-ACO: de memoria |
+| I3 | Evaporación ρ | **0 en el puente doble** · **0,01 en la cuadrícula** | L / L? | Sin evaporación en §1.1–1.2 (referencia). 0,01 es uno de los valores de los experimentos de S-ACO (§1.3.2), de memoria. ❌ 0,5 (Ant System): pensado para TSP por iteraciones, no por pasos |
+| I4 | **Cuándo se deposita (reemplaza a H3)** | **A la vuelta, no a la ida**: la agente explora sin depositar, al llegar a la meta elimina los bucles de su ruta y la recorre de regreso depositando (S-ACO) | L | Dorigo & Stützle §1.3: depositar a la ida crea bucles que se refuerzan solos (`referencia/ACO/s-aco/README.md` §4.1–4.2). ❌ H3 (depósito a la ida) |
+| I5 | Ajuste de D3 por I4 | La agente llega a la meta → `DANZA` → **regresa al nido depositando** → vuelve a la meta siguiendo el rastro y **ahí se queda**. Cuando todas se quedaron, sale la verificadora | S | Concilia la idea del operador (D3) con S-ACO. ❌ Quedarse en la meta en la primera llegada: no habría rastro que verificar |
+| I6 | Cantidad depositada Δτ | **1 por celda en el puente doble** · **1/L en la cuadrícula** (L = largo de la ruta sin bucles) | L | Depósito constante: Deneubourg. Depósito según la calidad: variante de S-ACO (§1.3). ❌ Q/L con Q = 100 (Ant System) |
+| I7 | Heurística β | **0** (η = 1, decisión D2) | L | S-ACO no usa heurística |
+| I8 | Cambio de rol exploradora ↔ explotadora | Umbral de respuesta: P = s² / (s² + θ²), con s = feromona percibida (q4) y **θ = 8** (mitad de la escala) | L / S | La forma con n = 2 es de Bonabeau, Theraulaz & Deneubourg (1996). θ no tiene valor canónico |
+| I9 | Memoria de la agente | Su ruta de ida, hasta **K = 64 movimientos**; si se llena, vuelve al nido y empieza de nuevo (queda rezagada: candidata a rescate) | S | S-ACO supone memoria de toda la ruta; el tope es la "memoria limitada" que pide el operador |
+| I10 | Abandono de una ruta (madre) | Tras **12 intentos** sin mejorar | L | Parámetro *limit* = SN · D del algoritmo ABC (Karaboga, 2005): 6 agentes × 2 dimensiones |
+| I11 | H1 · Límite de pasos | **2000 ticks**; si se acaba, el ensayo es NO PASA | S | Sin valor canónico. Se ajusta tras la primera calibración |
+| I12 | H2 · Empates de la verificadora | Desempata **al azar** (con semilla). Si vuelve a una celda ya visitada: **NO PASA** | L / S | Desempate aleatorio: práctica estándar. La regla de ciclo es propia |
+| I13 | H5 · Distancia mínima inicio–meta | Ruta óptima **≥ 4 movimientos** en 8 × 8 (la mitad del lado) | S | Sin valor canónico |
+| I14 | Umbral de rescate | Experiencia **< 50 % del promedio** de la colonia | S | `resumen.pdf` dice "comparar con el promedio" sin dar valor. Es la variable que se barre en los experimentos |
+| I15 | Δt de la madre · radio r · memoria de la madre | **10 ticks** · **1 celda** · **64 B** | S | r = 1: prompt de Claude Design. Lo demás, sin valor canónico |
+
+> **Pendiente técnico para el artefacto 6:** la agente percibe la feromona en 16 niveles (E3). Con τ₀ = 1 todas las celdas
+> se leen como nivel 0, así que la regla τ^α necesita un piso. Lo natural es el offset de Deneubourg, (k + nivel)^α. Se resuelve
+> y se documenta al construir el agente.

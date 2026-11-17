@@ -63,6 +63,12 @@ Criterios de aceptación C1–C6: todos **NO PROBADO** (son candidatos; el opera
 
 ## Historial
 
+### 2026-11-16 21:03 -0500
+- Artefacto 5 sincronizado (`44d9deb`).
+- El operador vuelve a "echar la bendición" y delega los parámetros: **ronda 2 en DECISIONES-PRUEBA.md, sección I** (I1–I15), con el respaldo de cada valor (literatura, literatura de memoria o suposición).
+- Cambio de fondo: **el depósito de feromona es a la vuelta, sin bucles (S-ACO), no a la ida** (I4), y D3 se ajusta (I5): llegar → DANZA → volver al nido depositando → ir de nuevo a la meta y quedarse → verificadora.
+- Con esto el artefacto 6 (agente) ya no está bloqueado.
+
 ### 2026-11-16 21:00 -0500
 - **Artefacto 5 hecho** (Claude Fable 5.2): `gemelo/aco_gemelo/canal/` con la interfaz `Canal` (lista para una versión MQTT) y `CanalMemoria`: difusión por radio r (distancia de 8 vecinos), destino directo o difusión general, retardo y pérdida con semilla, mensajes que viajan serializados (binario o JSON) y contadores de tráfico por familia. 18 pruebas en PASA (112 en total).
 - Límites declarados: la familia 0 (sensor/actuador) no se pierde ni se retrasa; los mensajes con `FLAG_ACK` se entregan siempre, pero el tráfico de las confirmaciones no se cuenta todavía.
