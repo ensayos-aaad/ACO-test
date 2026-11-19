@@ -61,11 +61,14 @@ visión de conjunto en `ESTADO-PREHARDWARE.md`. Todo sincronizado (último commi
 **Criterios de PROMPT-ZERO** (`oraculo/RESULTADOS.md`): C1 PASA · C2 PASA · **C3 NO PASA** (causa documentada,
 `oraculo/INVESTIGACION-C3.md`, decisión J8) · C4 PASA · C5 PASA · C6 NO PROBADO (lo evalúa el operador).
 
-**AL RETOMAR (2026-11-18 23:55 -0500, sesión cortada al 95 % del plan):** el bloque B + C está **hecho** (281 pruebas en PASA;
-480 ensayos sin cambios de convergencia), pero el **informe del revisor no alcanzó a llegar**. Primero: volver a pedir
-la revisión de B + C al agente `revisor` (encargo: los objetivos B1–B7, C2 y C3 de `PLAN-MEJORAS.md`; vigilar que
-`hilos_sincronos` sea determinista con madre y que el nuevo orden de lectura de la madre no cambie resultados con
-retardos o pérdidas). Luego marcar B y C en el plan y seguir con D.
+**AL RETOMAR (2026-11-18 23:58 -0500):** el revisor dio **NO PASA** al bloque B + C (ver **F-023** en `FAILURES.md`). Primero corregir,
+en este orden: (1) que el canal no dependa del orden de los envíos concurrentes (un generador por emisor, o encolar
+los envíos del tick y pasarlos en orden de id), para que `hilos_sincronos` sea determinista también con pérdidas y
+retardo; (2) que `INICIO` no gaste números del generador del canal (o documentar el cambio y repetir F-022 con
+pérdidas); (3) `"abortado"` en `visual.py` y en el docstring de `Resultado.motivo`; (4) rechazar inicio = meta en el
+escenario personalizado (y avisar si se dan obstáculos/inicio/meta en otros escenarios); (5) reforzar `test_b3`,
+`test_b5` y `test_b7` (con pérdidas y varias semillas); (6) documentar el efecto de la lectura final (B4) sobre
+`conocimiento`; (7) validar `delta_t` ≤ 255. Luego volver a pedir la revisión, marcar B y C en el plan y seguir con D.
 
 **Siguiente paso (ya hecho, falta la revisión): bloque B + C de `PLAN-MEJORAS.md`.**
 - B: en el motor, enviar `INICIO`, cerrar como abortado, memoria máxima de la madre, vaciar mensajes pendientes,
@@ -120,6 +123,9 @@ sesión empieza con el resumen de 5 líneas (PROMPT-ZERO §6). El modelo en uso 
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-18 23:58 -0500
+- El revisor entregó su informe de B + C: **NO PASA** (F-023). Por límite de la sesión (95 %) no se corrigió; queda como primer paso en "Para retomar".
 
 ### 2026-11-18 23:54 -0500
 - El operador teme que la verificación y la ruta de aprendizaje apaguen la intuición ("asociación libre", "función impulso"). Se crea `IDEAS.md`, cuaderno sin filtro, con 8 intuiciones suyas ya dichas, anotadas con sus palabras y con lo que derivaron. Regla nueva arriba en este archivo.
