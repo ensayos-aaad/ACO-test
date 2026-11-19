@@ -7,6 +7,7 @@ import pytest
 from apoyo import Banco
 
 from aco_gemelo.agente import Agente, ConfigAgente, Estado
+from aco_gemelo.agente.agente import MOTIVOS_RUTA
 from aco_gemelo.canal import CanalMemoria
 from aco_gemelo.madre import ConfigMadre, Madre, Modo
 from aco_gemelo.mundo import Mundo, mundo_l
@@ -328,3 +329,83 @@ def test_con_cualquier_modo_la_colonia_se_asienta_y_la_madre_acelera():
         assert statistics.mean(ticks) < statistics.mean(base)
         assert statistics.pstdev(ticks) < statistics.pstdev(base)
     _ticks_por_modo(Modo.RESCATE, semillas)
+
+
+# ---------------------------------------------------------------- F-020 y contadores de mecanismos (C4)
+
+
+def test_la_madre_no_cuenta_a_la_verificadora_como_rezagada():
+    """F-020: la verificadora marca su ESTADO; la madre no la registra ni la rescata."""
+    canal, madre = madre_sola(Modo.RESCATE)
+    canal.enviar(danza(1, [1, 1, 2]))
+    for src, experiencia in [(1, 40), (2, 40), (3, 40)]:
+        canal.enviar(estado(src, experiencia, llegadas=1))
+    canal.enviar(crear("ESTADO", src=4, dst=ID_MADRE, flags=FLAG_VERIFICACION, pos=0, estado=0,
+                       rol=1, experiencia=1, llegadas=0))  # la verificadora, recién salida
+    madre.paso(0)
+    assert 4 not in madre.agentes
+    assert madre.rezagadas() == [] and madre.rescates_enviados == 0
+    assert canal.recibir(4) == []
+
+
+def test_ningun_rescate_va_a_la_verificadora_y_los_contadores_cuadran():
+    from aco_gemelo.motor import ConfigEnsayo, Simulacion
+
+    for semilla in range(10):
+        mundo = mundo_l(random.Random(semilla), **CUADRICULA)
+        while mundo.largo_optimo() < 4:
+            mundo = mundo_l(random.Random(semilla + 100), **CUADRICULA)
+        cfg = ConfigEnsayo(semilla=semilla, rho=0.0,
+                           madre=ConfigMadre(modo=Modo.RESCATE, umbral_rescate=0.95))
+        r = Simulacion(mundo, cfg).correr()
+        m = r.mecanismos
+        assert m["rescate_verificadora"] == 0
+        # Cada rescate enviado se clasifica (usado o ignorado con su motivo) o queda "sin
+        # clasificar" si el ensayo se cerró con él en camino. Los rescates no se pierden: van con ACK.
+        clasificados = sum(v for k, v in m.items() if k.startswith("rescate_"))
+        assert clasificados == m["rescates_enviados"]
+        assert m["rescate_sin_clasificar"] == 0  # aquí los ensayos terminan con todo entregado
+        assert m["rescate_usado"] <= m["rutas_heredadas"]
+
+
+def test_contadores_de_reclutamiento_en_la_pista_de_baile():
+    from aco_gemelo.motor import ConfigEnsayo, Simulacion
+
+    mundo = mundo_l(random.Random(3), **CUADRICULA)
+    r = Simulacion(mundo, ConfigEnsayo(semilla=3, rho=0.0,
+                                       madre=ConfigMadre(modo=Modo.PISTA_DE_BAILE))).correr()
+    m = r.mecanismos
+    assert m["recluta_enviados"] > 0 and m["rescates_enviados"] == 0
+    assert 0 < m["rutas_enviadas"] <= m["rutas_pedidas"]  # la madre solo responde lo que le piden
+    # Cada RUTA enviada a pedido se adopta o se ignora (con motivo); ninguna queda sin cuenta.
+    assert m["rutas_heredadas"] + m["rutas_ignoradas"] == m["rutas_enviadas"]
+
+
+def test_contadores_en_la_difusion():
+    from aco_gemelo.motor import ConfigEnsayo, Simulacion
+
+    mundo = mundo_l(random.Random(3), **CUADRICULA)
+    r = Simulacion(mundo, ConfigEnsayo(semilla=3, rho=0.0,
+                                       madre=ConfigMadre(modo=Modo.DIFUSION))).correr()
+    m = r.mecanismos
+    assert m["mapas_difundidos"] > 0 and m["rutas_difundidas"] > 0 and m["rutas_enviadas"] == 0
+    assert m["rutas_heredadas"] > 0  # antes salía > 0 con rutas_enviadas = 0 (observación del revisor)
+
+
+def test_rescates_en_camino_al_cortar_el_ensayo():
+    """Si el límite corta el ensayo con rescates en camino, se cuentan como sin clasificar."""
+    from aco_gemelo.motor import ConfigEnsayo, Simulacion
+
+    mundo = mundo_l(random.Random(0), **CUADRICULA)
+    while mundo.largo_optimo() < 4:
+        mundo = mundo_l(random.Random(100), **CUADRICULA)
+    vistos = 0
+    for limite in range(5, 60):
+        cfg = ConfigEnsayo(semilla=0, rho=0.0, limite=limite,
+                           madre=ConfigMadre(modo=Modo.RESCATE, umbral_rescate=1.0))
+        m = Simulacion(mundo, cfg).correr().mecanismos
+        clasificados = sum(m[f"rescate_{x}"] for x in MOTIVOS_RUTA)
+        assert clasificados + m["rescate_sin_clasificar"] == m["rescates_enviados"]
+        assert m["rescate_sin_clasificar"] >= 0
+        vistos += m["rescate_sin_clasificar"] > 0
+    assert vistos > 0  # el caso existe y queda contado

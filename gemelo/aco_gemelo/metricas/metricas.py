@@ -61,9 +61,12 @@ def fila(semilla: int, escenario: str, resultado) -> dict[str, Any]:
         "bloqueadas": resultado.bloqueadas,
         "memoria_madre": resultado.memoria_madre,
     }
+    salida["ticks_verificacion"] = resultado.ticks_verificacion
     for familia in FAMILIAS:
         salida[f"mensajes_{familia}"] = resultado.trafico[familia]["enviados"]
         salida[f"bytes_{familia}"] = resultado.trafico[familia]["bytes"]
+    salida["bytes_totales"] = sum(resultado.trafico[f]["bytes"] for f in FAMILIAS)
+    salida.update(resultado.mecanismos)  # C4: lo que realmente pasó
     return salida
 
 

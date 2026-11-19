@@ -1,0 +1,9 @@
+condicion,escenario,modo,umbral_rescate,n,asentadas,asentadas_tasa,asentadas_ic95_bajo,asentadas_ic95_alto,verificadas,verificadas_tasa,verificadas_ic95_bajo,verificadas_ic95_alto,ticks_media,ticks_varianza,ticks_min,ticks_max,razon_media,conocimiento_medio,bytes_agente_madre_media,bytes_madre_agente_media
+escenario-L__modo-rescate__umbral_rescate-0.5,L,rescate,0.5,30,30,1.0,0.8865,1.0,21,0.7,0.5212,0.8334,465.4667,20369.3156,284.0,910.0,1.4415,1.0,4861.2333,20.1
+escenario-L__modo-rescate__umbral_rescate-0.8,L,rescate,0.8,30,30,1.0,0.8865,1.0,24,0.8,0.6269,0.9049,435.2,17442.16,273.0,800.0,1.4381,0.9995,4599.1,54.3
+escenario-L__modo-rescate__umbral_rescate-0.95,L,rescate,0.95,30,30,1.0,0.8865,1.0,22,0.7333,0.5555,0.8582,430.5667,21076.1789,273.0,789.0,1.4937,0.9995,4558.3333,76.0333
+escenario-L__modo-rescate__umbral_rescate-1.0,L,rescate,1.0,30,30,1.0,0.8865,1.0,23,0.7667,0.5907,0.8821,424.0,17030.2,273.0,779.0,1.5136,0.9995,4514.2667,79.0333
+escenario-aleatorio__modo-rescate__umbral_rescate-0.5,aleatorio,rescate,0.5,30,30,1.0,0.8865,1.0,18,0.6,0.4232,0.7541,427.5667,18925.1789,169.0,810.0,1.2813,0.9307,4466.1,18.5333
+escenario-aleatorio__modo-rescate__umbral_rescate-0.8,aleatorio,rescate,0.8,30,30,1.0,0.8865,1.0,25,0.8333,0.6644,0.9266,397.5667,18884.1122,181.0,810.0,1.1888,0.9318,4229.6,59.0667
+escenario-aleatorio__modo-rescate__umbral_rescate-0.95,aleatorio,rescate,0.95,30,30,1.0,0.8865,1.0,27,0.9,0.7438,0.9654,401.5667,17924.5789,181.0,747.0,1.3875,0.9318,4264.7,72.7
+escenario-aleatorio__modo-rescate__umbral_rescate-1.0,aleatorio,rescate,1.0,30,30,1.0,0.8865,1.0,27,0.9,0.7438,0.9654,401.4,17724.7733,181.0,747.0,1.3198,0.9318,4258.4333,75.3667

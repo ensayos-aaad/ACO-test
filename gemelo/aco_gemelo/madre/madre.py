@@ -83,6 +83,11 @@ class Madre:
         self.pedidos: dict[int, int] = {}  #: agente → ruta_id por atender (uno por agente)
         self.descartadas = 0  #: rutas que no cupieron en la memoria
         self.verificacion: str | None = None  #: "ok", "fallo" o None
+        self.rescates_enviados = 0  #: contador de mecanismo (C4)
+        self.recluta_enviados = 0  #: RECLUTA difundidos (C4)
+        self.rutas_enviadas = 0  #: RUTA enviadas a pedido (C4)
+        self.rutas_difundidas = 0  #: RUTA difundidas a todas en el modo difusión (C4)
+        self.mapas_difundidos = 0  #: MAPA difundidos (C4)
         self.largo_verificado: int | None = None
         self.actuaciones: list[int] = []  #: ticks en los que actuó
         self._ultima: int | None = None
@@ -149,6 +154,8 @@ class Madre:
         nombre, src = nombre_de(msg), msg["src"]
         verificadora = bool(msg["flags"] & FLAG_VERIFICACION)
         if nombre == "ESTADO":
+            if verificadora:  # la verificadora no es parte de la colonia (F-020)
+                return
             self.agentes[src] = {"pos": msg["pos"], "experiencia": msg["experiencia"],
                                  "llegadas": msg["llegadas"]}
         elif nombre == "DANZA":
@@ -179,6 +186,7 @@ class Madre:
         anunciadas = self.rutas[: min(3, self.config.rutas_por_anuncio)]
         if anunciadas:
             total = sum(1 / len(r["movs"]) for r in anunciadas)
+            self.recluta_enviados += 1
             self._enviar("RECLUTA", ID_DIFUSION, ahora, n=len(anunciadas), rutas=[
                 {"ruta_id": r["id"], "largo": len(r["movs"]),
                  "peso": max(1, round(255 * (1 / len(r["movs"])) / total))}
@@ -187,6 +195,7 @@ class Madre:
             ruta = next((r for r in self.rutas if r["id"] == ruta_id), self.mejor_ruta)
             if ruta is not None:
                 self._enviar_ruta(ruta, agente, ahora, FLAG_ACK)
+                self.rutas_enviadas += 1
         self.pedidos.clear()
 
     def rezagadas(self) -> list[int]:
@@ -207,16 +216,19 @@ class Madre:
         for agente in self.rezagadas():
             self._enviar_ruta(self.mejor_ruta, agente, ahora, FLAG_ACK | FLAG_RESCATE)
             self.rescatadas.add(agente)
+            self.rescates_enviados += 1
         self._ajustar_memoria()
 
     def _difundir(self, ahora: int) -> None:
         """Difunde a todos el mapa consolidado y, si la hay, la mejor ruta."""
         celdas = [(x, y) for y in range(self.ctx.alto) for x in range(self.ctx.ancho)]
+        self.mapas_difundidos += 1
         self._enviar("MAPA", ID_DIFUSION, ahora, incluye_fero=0,
                      conocidas=[int(c in self.conocidas) for c in celdas],
                      obstaculos=[int(c in self.obstaculos) for c in celdas], fero=[])
         if self.mejor_ruta is not None:
             self._enviar_ruta(self.mejor_ruta, ID_DIFUSION, ahora, 0)
+            self.rutas_difundidas += 1
 
     # ------------------------------------------------------------------ interno
 

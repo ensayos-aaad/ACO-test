@@ -58,6 +58,11 @@ _ORTOGONALES = {4: (0, 1), 5: (1, 2), 6: (2, 3), 7: (3, 0)}
 _DIRECCION_DE = {d: i for i, d in enumerate(DIRECCIONES)}
 
 
+#: Qué hace una agente con una RUTA de la madre ("usado" o el motivo para ignorarla).
+MOTIVOS_RUTA = ("usado", "ya_llego", "ya_tiene_ruta", "fallida", "ocupada", "no_cabe",
+                "otro_nido", "verificadora")
+
+
 class Estado(Enum):
     """Estado interno del agente. El valor es el código ``estado`` que viaja en el protocolo."""
 
@@ -139,6 +144,11 @@ class Agente:
         self.llegadas = 0
         self.reinicios = 0  #: veces que se le llenó la memoria
         self.viajes_hechos = 0  #: idas y vueltas completas (con depósito)
+        #: Contadores de mecanismos (C4): lo que realmente pasó, no lo que se infiere del resultado.
+        self.rescates: dict[str, int] = {}  #: rescates recibidos, por lo que se hizo con ellos
+        self.rutas_pedidas = 0  #: PIDE_RUTA enviados (reclutamiento aceptado)
+        self.rutas_heredadas = 0  #: rutas de la madre adoptadas (pedidas o de rescate)
+        self.rutas_ignoradas: dict[str, int] = {}  #: RUTA que no son de rescate y no se usaron, por motivo
         self.entradas: list[Celda] = []  #: primera celda tras el nido de cada ruta que llegó a la meta
         self.conocidas: set[Celda] = set()  #: celdas observadas (un mapa de bits en el micro)
         self.obstaculos: set[Celda] = set()  #: obstáculos observados
@@ -183,7 +193,10 @@ class Agente:
         cfg = self.config
         if cfg.con_madre and (self._ultimo_estado is None or ahora - self._ultimo_estado >= cfg.delta_t):
             self._ultimo_estado = ahora
-            self._enviar("ESTADO", ID_MADRE, ahora, pos=celda_a_byte(self.pos),
+            # La verificadora marca su ESTADO para que la madre no la cuente como parte de la
+            # colonia (F-020: la tomaba por rezagada y la rescataba).
+            self._enviar("ESTADO", ID_MADRE, ahora,
+                         flags=FLAG_VERIFICACION if cfg.verificadora else 0, pos=celda_a_byte(self.pos),
                          estado=self.codigo_estado, rol=self.rol,
                          experiencia=min(255, len(self.conocidas)), llegadas=min(255, self.llegadas))
             if cfg.informa_mapa:
@@ -343,6 +356,7 @@ class Agente:
         self._previa = None
         if motivo == "pedir" and self._ruta_pedida is not None:
             self._enviar("PIDE_RUTA", ID_MADRE, ahora, flags=FLAG_ACK, ruta_id=self._ruta_pedida)
+            self.rutas_pedidas += 1
             self._espera_desde = ahora
             self.estado = Estado.ESPERANDO
             return _quieto()
@@ -373,16 +387,39 @@ class Agente:
 
     def _heredar(self, msg: dict[str, Any]) -> None:
         """RUTA de la madre: la guarda y vuelve al nido para recorrerla."""
-        if not self._disponible() or msg["largo"] > self.config.K or not self.ruta:
+        rescate = bool(msg["flags"] & FLAG_RESCATE)
+        motivo = self._motivo_para_ignorar(msg)
+        if rescate:
+            self.rescates[motivo or "usado"] = self.rescates.get(motivo or "usado", 0) + 1
+        if motivo:
+            if not rescate:
+                self.rutas_ignoradas[motivo] = self.rutas_ignoradas.get(motivo, 0) + 1
             return
         celdas = [byte_a_celda(msg["inicio"])]
         for d in msg["movs"]:
             celdas.append((celdas[-1][0] + DIRECCIONES[d][0], celdas[-1][1] + DIRECCIONES[d][1]))
-        if celdas[0] != self.ruta[0]:
-            return
+        self.rutas_heredadas += 1
         self._ruta_heredada = celdas
         self.rescatada = bool(msg["flags"] & FLAG_RESCATE)
         self._volver_al_nido("adoptar")
+
+    def _motivo_para_ignorar(self, msg: dict[str, Any]) -> str | None:
+        """Por qué no se puede usar una RUTA de la madre, o ``None`` si se puede."""
+        if self.config.verificadora:
+            return "verificadora"
+        if self.llegadas > 0:
+            return "ya_llego"
+        if self._ruta_heredada is not None:
+            return "ya_tiene_ruta"
+        if self.estado is Estado.FALLIDA:
+            return "fallida"
+        if not self._disponible():
+            return "ocupada"
+        if msg["largo"] > self.config.K or not self.ruta:
+            return "no_cabe"
+        if byte_a_celda(msg["inicio"]) != self.ruta[0]:
+            return "otro_nido"
+        return None
 
     def _informar_mapa(self, ahora: int) -> None:
         """Envía a la madre un bloque de 4 × 4 con celdas que aún no le había informado."""

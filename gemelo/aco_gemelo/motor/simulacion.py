@@ -28,6 +28,7 @@ import time
 from dataclasses import dataclass, field, replace
 
 from ..agente import Agente, ConfigAgente, Estado
+from ..agente.agente import MOTIVOS_RUTA
 from ..canal import CanalMemoria
 from ..madre import ConfigMadre, Madre, Modo
 from ..mundo import Mundo
@@ -88,6 +89,14 @@ class Resultado:
     #: feromona de cada celda (por filas) al cerrar cada tick; solo con ``registrar``
     feromona: list[list[float]] = field(default_factory=list)
     ruta_verificada: list[Celda] | None = None  #: celdas de la ruta de la verificadora
+    #: Contadores de mecanismos (C4): rescates enviados por la madre y qué hizo cada agente con ellos,
+    #: reclutamientos y rutas heredadas.
+    mecanismos: dict[str, int] = field(default_factory=dict)
+
+    @property
+    def ticks_verificacion(self) -> int | None:
+        """Ticks de la fase de verificación (desde que sale la verificadora hasta el cierre)."""
+        return None if self.ticks_asentadas is None else self.ticks_total - self.ticks_asentadas
 
     @property
     def razon(self) -> float | None:
@@ -226,6 +235,27 @@ class Simulacion:
         self.feromona.append([round(m.feromona((x, y)), 6)
                               for y in range(m.alto) for x in range(m.ancho)])
 
+    def _mecanismos(self) -> dict[str, int]:
+        """Suma los contadores de mecanismos de la madre y de todas las agentes."""
+        todas = self._actores()
+        m = {
+            "rescates_enviados": self.madre.rescates_enviados,
+            "recluta_enviados": self.madre.recluta_enviados,
+            "rutas_enviadas": self.madre.rutas_enviadas,
+            "rutas_difundidas": self.madre.rutas_difundidas,
+            "mapas_difundidos": self.madre.mapas_difundidos,
+            "rutas_pedidas": sum(a.rutas_pedidas for a in todas),
+            "rutas_heredadas": sum(a.rutas_heredadas for a in todas),
+            "rutas_ignoradas": sum(sum(a.rutas_ignoradas.values()) for a in todas),
+        }
+        for motivo in MOTIVOS_RUTA:
+            m[f"rescate_{motivo}"] = sum(a.rescates.get(motivo, 0) for a in todas)
+        # Rescates enviados que nadie alcanzó a leer porque el ensayo se cerró con ellos en
+        # camino (la madre actúa al final del tick y la agente lee en el siguiente).
+        m["rescate_sin_clasificar"] = m["rescates_enviados"] - sum(
+            m[f"rescate_{motivo}"] for motivo in MOTIVOS_RUTA)
+        return m
+
     def _resultado(self) -> Resultado:
         v = self.verificadora
         verificada = v is not None and v.estado is Estado.ASENTADA
@@ -257,6 +287,7 @@ class Simulacion:
             serie=self.serie,
             feromona=self.feromona,
             ruta_verificada=list(v.ruta) if verificada else None,
+            mecanismos=self._mecanismos(),
         )
 
     # ------------------------------------------------------------------ motores
@@ -333,12 +364,15 @@ class Simulacion:
                 self.actor_mundo.cerrar_tick()
                 self._registrar_tick()
                 self.tick += 1
-            resultado = self._resultado()
-            time.sleep(20 * self.config.pausa)  # da tiempo a que lean el FIN
         finally:
             parar.set()
             for hilo in hilos:
                 hilo.join(timeout=5)
         if errores:
             raise errores[0]
+        # Con los hilos ya detenidos, los contadores de mecanismos no cambian mientras se leen
+        # (observación del revisor sobre F-020).
+        resultado = self._resultado()
+        for agente in self._actores():  # entrega el FIN
+            agente.paso(self.tick)
         return resultado

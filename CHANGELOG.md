@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [Sesión 3] — 2026-11-18 (Claude Opus 5.5 con su equipo de agentes)
+### Añadido
+- `otras/`: trabajo de Gemini (en la nube) y su análisis; `PLAN-MEJORAS.md`.
+- Equipo de agentes en `.claude/agents/`: revisor, experimentador y divulgador.
+- Contadores de mecanismos (C4) en cada ensayo; informe `gemelo/docs/informes/rescate_tras_F020.md`; texto de divulgación `gemelo/docs/divulgacion/01_la_colonia_y_la_madre.md`.
+### Corregido
+- F-020: la madre rescataba a la verificadora (F-021: falla de método; F-022: corrección verificada). `PROTOCOLO.md` v0.3.
+
 ## [Sesión 2] — 2026-11-17 (Claude Fable 5.2 y, desde el artefacto 10, Claude Opus 5.5)
 ### Añadido
 - `gemelo/`: madre (artefacto 7), motores determinista y de hilos (8), configuración YAML y línea de comandos (9), métricas (10), visualización PNG/GIF/MP4 (11), experimentos en lote (14).

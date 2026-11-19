@@ -38,10 +38,13 @@ de antemano.
 | `ASSUMPTIONS.md`  | Suposiciones y sesgos declarados (A-001 a A-004)             |
 | `CHANGELOG.md`    | Cambios por sesión                                           |
 | `CHECKLIST-ENTORNO.md` | Software necesario: instalado `[x]` / falta `[ ]`       |
-| `PROTOCOLO.md`    | Borrador v0.2 de los mensajes del gemelo (campos, bits, frecuencias) |
+| `PROTOCOLO.md`    | Borrador v0.3 de los mensajes del gemelo (campos, bits, frecuencias) |
 | `DECISIONES-PRUEBA.md` | Preguntas de diseño con todas las opciones: ✅ elegida / ❌ descartada |
 | `ARTEFACTOS.md`   | Los 17 artefactos de software (→ `gemelo/`), su estado, su avance y los requisitos de reproducción |
 | `ESTADO-PREHARDWARE.md` | Estado antes del hardware: avance, checklist de hallazgos, bloqueantes B1–B6 y exploraciones X1–X8 |
+| `PLAN-MEJORAS.md` | Plan de correcciones y mejoras (bloques A–E) tras el análisis de Gemini; A1–A3 y C4 hechos |
+| `.claude/agents/` | Agentes del equipo: `revisor` (solo lee), `experimentador` (experimentos y docs), `divulgador` (textos para no especialistas) |
+| `otras/`          | Trabajo de terceros: `gemini/` (Gemini, en la nube) y su análisis `ANALISIS-gemini-artefacto9.md` |
 | `oraculo/`        | El oráculo: ejecuta las celdas de los notebooks; `TOLERANCIAS.md` (declaradas antes) y `RESULTADOS.md` (C1–C5) |
 | `gemelo/`         | **El código**: `aco_gemelo/` (mundo, protocolo, canal, agente, madre, motor, métricas, visual, experimentos), `configs/`, `experimentos/` (planes y datos), `tests/`, `environment.yml` |
 | `bosquejo/`       | Plano de ensayo (a mano y en limpio)                         |
@@ -50,7 +53,7 @@ de antemano.
 
 **Dónde quedamos:** fase 1 del gemelo en construcción. Hechos los artefactos
 **1 (entorno), 3 (protocolo), 4 (mundo), 5 (canal), 6 (agente), 7 (madre), 8 (motor), 9 (configuración y
-línea de comandos), 10 (métricas), 11 (visualización), 12 (oráculo), 13 (pruebas), 14 (experimentos) y 15 (notebook)**: 259 pruebas del gemelo + 7 del oráculo en PASA.
+línea de comandos), 10 (métricas), 11 (visualización), 12 (oráculo), 13 (pruebas), 14 (experimentos) y 15 (notebook)**: 264 pruebas del gemelo + 7 del oráculo en PASA.
 El detalle y el avance de los 17 artefactos están en `ARTEFACTOS.md`.
 
 **Cómo comprobar que todo sigue bien** (desde `gemelo/`):
@@ -109,6 +112,11 @@ y 17 guía de reproducción. El 13 (pruebas automáticas) se cumple al tener tod
 - Se hicieron JSON y binario a la vez (desviación de B2).
 - ADR-001 y ADR-002 siguen como propuestas.
 
+**Equipo de agentes** (desde 2026-11-18): el orquestador (Claude) implementa e integra; el `revisor` verifica sin
+conocer el razonamiento; el `experimentador` corre y analiza experimentos con pruebas declaradas antes; el
+`divulgador` cuenta los resultados para no especialistas. Ninguno hace commit. Se cargan por nombre al iniciar la
+sesión (en la primera se lanzaron como agentes generales con las instrucciones de su archivo).
+
 **Forma de trabajo acordada:** un artefacto a la vez; al terminar cada uno, Claude da la seña y el
 operador decide si se sigue o se para. No se hace commit sin su aprobación. Respuestas ejecutivas.
 El modelo en uso se anota en los commits (los artefactos 1 y 3–6 son de Claude Fable 5.2).
@@ -124,6 +132,20 @@ Criterios de PROMPT-ZERO (ver `oraculo/RESULTADOS.md`): **C1 PASA** · **C2 PASA
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-18 23:25 -0500
+- El operador aprueba el bloque A con el equipo de agentes ("Procede entonces"). Se crean `.claude/agents/revisor.md`, `experimentador.md` y, a pedido del operador, `divulgador.md`.
+- **F-020 corregido (F-022):** la madre ya no rescata a la verificadora; contadores de mecanismos (C4). El experimentador repitió los 480 ensayos (informe en `gemelo/docs/informes/`); el revisor dio PASA con 4 observaciones, todas atendidas. Ningún resultado de convergencia cambió; F-018 y F-019 se sostienen. `PROTOCOLO.md` v0.3. 264 pruebas en PASA.
+- El divulgador escribió `gemelo/docs/divulgacion/01_la_colonia_y_la_madre.md` (verificado por el orquestador y ya sincronizado, `a860e98`). El resto, sin commit.
+
+### 2026-11-18 22:51 -0500
+- Plan de correcciones y mejoras en `PLAN-MEJORAS.md` (bloques A–E), a partir del análisis de Gemini y del pedido de mejorar la explicabilidad del notebook (mapas de feromona con trazos, fotogramas del conocimiento de la madre). Nota: Gemini trabajó en la nube.
+- Lo que Gemini hizo mejor: medir los mecanismos (F-021, falla de método de Claude), pensar el costo de operar el hardware, comunicar resultados por informe y figura, y un motor de hilos verificable con madre. Agregado al plan (B7, C4, D8). Sin commit todavía.
+
+### 2026-11-18 22:46 -0500
+- Apertura de sesión con el resumen de 5 líneas. El operador agregó `otras/gemini/aco_gemelo_hasta_artefacto9/` (trabajo de Gemini a partir de nuestro artefacto 7) y pidió analizarlo.
+- Análisis en `otras/ANALISIS-gemini-artefacto9.md`: Gemini no cambió lógica de lo existente (solo borró la documentación); aportó motor y configuración; 1 de sus 190 pruebas falla siempre; resultados sin script. Aportes a tomar: escenario personalizado, bytes totales, JSON que no cabe en ESP-NOW, `INICIO`, cierre `ABORTADO`, memoria máxima.
+- **F-020:** la madre rescataba a la verificadora; corrige F-010, F-013 y F-018 y deja contaminado el experimento del rescate. Sin corregir ni commit todavía.
 
 ### 2026-11-17 05:05 -0500
 - Artefacto 15 sincronizado (`3fb5375`). El operador deja el artefacto 16 para otra sesión.

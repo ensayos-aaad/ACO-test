@@ -1,7 +1,9 @@
-# PROTOCOLO — mensajes del gemelo ACO (borrador v0.2)
+# PROTOCOLO — mensajes del gemelo ACO (borrador v0.3)
 
 **Estado:** propuesta de Claude, **sin aprobar** por el operador · v0.2 del 2026-11-16 20:58 -0500
 **Implementación:** `gemelo/aco_gemelo/protocolo/codec.py` (la tabla `MENSAJES` es la fuente de verdad; las pruebas comprueban los tamaños de este documento).
+
+**Cambios de la v0.3** (2026-11-18 23:25 -0500): la flag `verificacion` también va en el `ESTADO` de la verificadora, para que la madre no la cuente como parte de la colonia (F-020). Sin cambios de tamaño.
 
 **Cambios de la v0.2** (por las decisiones de DECISIONES-PRUEBA.md):
 - Vecindad de 8 por defecto (C2): `mov` de 3 bits, `PERCEPCION` con 9 celdas.
@@ -59,7 +61,7 @@ de 16 bits va con el byte alto primero. Las listas de tamaño variable se rellen
 | 0 `ack` | Se pide confirmación (`ACK` con el mismo `seq`) |
 | 1 `rescate` | El contenido es la **condición inicial** de un rescate |
 | 2 `ultimo` | Último fragmento de una serie |
-| 3 `verificacion` | Lo envía la agente verificadora (en `DANZA`: "llegué siguiendo solo el rastro") |
+| 3 `verificacion` | Lo envía la agente verificadora: en `DANZA` ("llegué siguiendo solo el rastro"), en `PIDE_RESCATE` (falló) y en `ESTADO` (para que la madre no la cuente como parte de la colonia; F-020) |
 | 4–7 | Reservados |
 
 `seq`: contador de 8 bits por emisor, que vuelve a 0. Sirve para detectar pérdidas y duplicados.
