@@ -105,7 +105,7 @@ def main(argv: list[str] | None = None) -> int:
     run = sub.add_parser("run", help="corre un ensayo y muestra el resultado")
     run.add_argument("--config", required=True, help="archivo YAML de configuración")
     run.add_argument("--semilla", type=int, help="reemplaza la semilla del archivo")
-    run.add_argument("--motor", choices=("determinista", "hilos"), default="determinista")
+    run.add_argument("--motor", choices=("determinista", "hilos", "hilos_sincronos"), default="determinista")
     run.add_argument("--png", help="guarda una imagen del estado final (por ejemplo final.png)")
     run.add_argument("--animacion", help="guarda la animación del ensayo (.gif o .mp4)")
     run.add_argument("--fps", type=int, default=8, help="cuadros por segundo de la animación")

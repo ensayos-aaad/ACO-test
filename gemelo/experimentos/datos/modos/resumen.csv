@@ -1,9 +1,9 @@
 condicion,escenario,modo,n,asentadas,asentadas_tasa,asentadas_ic95_bajo,asentadas_ic95_alto,verificadas,verificadas_tasa,verificadas_ic95_bajo,verificadas_ic95_alto,ticks_media,ticks_varianza,ticks_min,ticks_max,razon_media,conocimiento_medio,bytes_agente_madre_media,bytes_madre_agente_media
 escenario-L__modo-ausente,L,ausente,30,30,1.0,0.8865,1.0,21,0.7,0.5212,0.8334,465.4667,20369.3156,284.0,910.0,1.4415,,0.0,0.0
-escenario-L__modo-pista_de_baile,L,pista_de_baile,30,30,1.0,0.8865,1.0,24,0.8,0.6269,0.9049,433.3,13984.41,289.0,806.0,1.6701,,3883.7333,781.2333
-escenario-L__modo-rescate,L,rescate,30,30,1.0,0.8865,1.0,21,0.7,0.5212,0.8334,465.4667,20369.3156,284.0,910.0,1.4415,1.0,4861.2333,8.0
-escenario-L__modo-difusion,L,difusion,30,30,1.0,0.8865,1.0,25,0.8333,0.6644,0.9266,441.3,27752.41,265.0,1099.0,1.585,0.9984,4629.9333,1694.8667
+escenario-L__modo-pista_de_baile,L,pista_de_baile,30,30,1.0,0.8865,1.0,24,0.8,0.6269,0.9049,433.3,13984.41,289.0,806.0,1.6701,,3883.7333,795.2333
+escenario-L__modo-rescate,L,rescate,30,30,1.0,0.8865,1.0,21,0.7,0.5212,0.8334,465.4667,20369.3156,284.0,910.0,1.4415,1.0,4861.2333,22.0
+escenario-L__modo-difusion,L,difusion,30,30,1.0,0.8865,1.0,25,0.8333,0.6644,0.9266,441.3,27752.41,265.0,1099.0,1.585,0.9984,4629.9333,1708.8667
 escenario-aleatorio__modo-ausente,aleatorio,ausente,30,30,1.0,0.8865,1.0,18,0.6,0.4232,0.7541,427.5667,18925.1789,169.0,810.0,1.2813,,0.0,0.0
-escenario-aleatorio__modo-pista_de_baile,aleatorio,pista_de_baile,30,30,1.0,0.8865,1.0,25,0.8333,0.6644,0.9266,390.3333,12108.1556,190.0,617.0,1.419,,3514.4333,711.4333
-escenario-aleatorio__modo-rescate,aleatorio,rescate,30,30,1.0,0.8865,1.0,18,0.6,0.4232,0.7541,427.5667,18925.1789,169.0,810.0,1.2813,0.9307,4466.1,8.0
-escenario-aleatorio__modo-difusion,aleatorio,difusion,30,30,1.0,0.8865,1.0,25,0.8333,0.6644,0.9266,417.2333,25092.7122,176.0,1005.0,1.258,0.937,4364.5,1570.8
+escenario-aleatorio__modo-pista_de_baile,aleatorio,pista_de_baile,30,30,1.0,0.8865,1.0,25,0.8333,0.6644,0.9266,390.3333,12108.1556,190.0,617.0,1.419,,3514.4333,725.4333
+escenario-aleatorio__modo-rescate,aleatorio,rescate,30,30,1.0,0.8865,1.0,18,0.6,0.4232,0.7541,427.5667,18925.1789,169.0,810.0,1.2813,0.9307,4466.1,22.0
+escenario-aleatorio__modo-difusion,aleatorio,difusion,30,30,1.0,0.8865,1.0,25,0.8333,0.6644,0.9266,417.2333,25092.7122,176.0,1005.0,1.258,0.937,4364.5,1584.8

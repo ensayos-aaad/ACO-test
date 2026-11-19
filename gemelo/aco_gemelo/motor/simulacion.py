@@ -6,15 +6,21 @@ Fases de un ensayo (decisiones D3, G1 e I11):
 2. **Verificación**: sale la verificadora desde el nido y sigue solo el rastro.
 3. **Cierre**: se difunde FIN con el motivo.
 
-Si se agota el límite de ticks antes de terminar, el ensayo se cierra como no convergido.
+Si se agota el límite de ticks antes de terminar, el ensayo se cierra como no convergido. Si
+todas las agentes terminan asentadas o fallidas sin que todas se asienten, se cierra como
+**abortado** (``FIN`` motivo 3): ninguna puede seguir y no tiene sentido esperar al límite.
 
-Hay dos motores que ejecutan **el mismo** ``paso()`` de cada actor:
+Hay tres motores que ejecutan **el mismo** ``paso()`` de cada actor:
 
 - ``"determinista"``: un solo hilo, los actores en orden fijo. Con la misma semilla da siempre
   el mismo resultado. Es el de las pruebas y los experimentos.
 - ``"hilos"``: un hilo por agente y otro para la madre, como si cada uno fuera un micro. El
   mundo espera la acción de cada agente antes de avanzar el tick (pregunta-respuesta, como en
   ``referencia/simulaciones/ejemplo5``). Es el de la demostración.
+- ``"hilos_sincronos"``: un hilo por agente, pero todos dan su paso a la vez en cada tick
+  (barreras) y la madre corre después, en el hilo principal. No es asíncrono; sirve para
+  **probar** que repartir las agentes en hilos no cambia el resultado, también con madre
+  (B7 de ``PLAN-MEJORAS.md``, idea tomada del trabajo de Gemini).
 
 El motor mira el estado de las agentes directamente para saber cuándo cambiar de fase: es el
 punto de vista del gemelo, que conoce la verdad. En el sistema real eso lo sabría la madre por
@@ -33,7 +39,16 @@ from ..canal import CanalMemoria
 from ..madre import ConfigMadre, Madre, Modo
 from ..mundo import Mundo
 from ..mundo.mundo import Celda
-from ..protocolo import ID_DIFUSION, ID_MADRE, ID_MUNDO, Contexto, celda_a_byte, crear, nombre_de
+from ..protocolo import (
+    FLAG_ACK,
+    ID_DIFUSION,
+    ID_MADRE,
+    ID_MUNDO,
+    Contexto,
+    celda_a_byte,
+    crear,
+    nombre_de,
+)
 
 
 @dataclass
@@ -92,6 +107,11 @@ class Resultado:
     #: Contadores de mecanismos (C4): rescates enviados por la madre y qué hizo cada agente con ellos,
     #: reclutamientos y rutas heredadas.
     mecanismos: dict[str, int] = field(default_factory=dict)
+    memoria_madre_max: int = 0  #: memoria máxima de la madre durante el ensayo (B3)
+    madre_verificacion: str | None = None  #: lo que la madre supo de la verificadora: "ok", "fallo" o None
+    #: Lo que la madre sabe del mundo al cerrar cada tick (C3): pares de mapas de bits
+    #: (celdas conocidas, obstáculos), con la celda (x, y) en el bit ``y * ancho + x``.
+    mapa_madre: list[tuple[int, int]] = field(default_factory=list)
 
     @property
     def ticks_verificacion(self) -> int | None:
@@ -140,9 +160,8 @@ class ActorMundo:
     def aplicar_acciones(self, ahora: int) -> set[int]:
         """Ejecuta las ACCION que hayan llegado. Devuelve los agentes atendidos."""
         atendidos = set()
-        for msg in self.canal.recibir(ID_MUNDO):
-            if nombre_de(msg) != "ACCION":  # las difusiones de la madre también le llegan
-                continue
+        acciones = [m for m in self.canal.recibir(ID_MUNDO) if nombre_de(m) == "ACCION"]
+        for msg in sorted(acciones, key=lambda m: m["src"]):  # orden fijo, por agente (B5)
             i = msg["src"]
             self.pos[i], self.ok[i] = self.mundo.aplicar_accion(
                 self.pos[i], msg["accion"], msg["dir"], msg["deposito"])
@@ -182,7 +201,15 @@ class Simulacion:
         self.ticks_asentadas: int | None = None
         self.serie: list[dict[str, float]] = []
         self.feromona: list[list[float]] = []
+        self.mapa_madre: list[tuple[int, int]] = []
+        self.abortado = False
         self.tick = 0
+        if self.con_madre:  # B1: la madre anuncia el ensayo (el mensaje ya existía en el protocolo)
+            self.canal.enviar(crear(
+                "INICIO", src=ID_MADRE, dst=ID_DIFUSION, tick=0, flags=FLAG_ACK,
+                ancho_m1=mundo.ancho - 1, alto_m1=mundo.alto - 1, nido=celda_a_byte(mundo.inicio),
+                vecindad=1, modo_com=0, modo_madre=int(cfg.madre.modo), verificadora=0,
+                semilla=cfg.semilla & 0xFFFF, delta_t=cfg.madre.delta_t, K=cfg.agente.K))
 
     # ------------------------------------------------------------------ fases
 
@@ -211,6 +238,9 @@ class Simulacion:
             if self._todas_asentadas():
                 self.ticks_asentadas = self.tick
                 return False, self._lanzar_verificadora()
+            if all(a.estado in (Estado.ASENTADA, Estado.FALLIDA) for a in self.agentes):
+                self.abortado = True  # B2: ninguna puede seguir
+                return True, None
             return False, None
         return self.verificadora.estado in (Estado.ASENTADA, Estado.FALLIDA), None
 
@@ -234,6 +264,11 @@ class Simulacion:
         m = self.mundo
         self.feromona.append([round(m.feromona((x, y)), 6)
                               for y in range(m.alto) for x in range(m.ancho)])
+
+        def bits(celdas) -> int:
+            return sum(1 << (y * m.ancho + x) for x, y in celdas)
+
+        self.mapa_madre.append((bits(self.madre.conocidas), bits(self.madre.obstaculos)))
 
     def _mecanismos(self) -> dict[str, int]:
         """Suma los contadores de mecanismos de la madre y de todas las agentes."""
@@ -263,9 +298,19 @@ class Simulacion:
             motivo = "verificada"
         elif v is not None and v.estado is Estado.FALLIDA:
             motivo = "verificadora_fallo"
+        elif self.abortado:
+            motivo = "abortado"
         else:
             motivo = "limite"
-        codigo = {"verificada": 0, "limite": 1, "verificadora_fallo": 2}[motivo]
+        codigo = {"verificada": 0, "limite": 1, "verificadora_fallo": 2, "abortado": 3}[motivo]
+        if self.con_madre and v is not None:
+            # B4: la madre lee lo que aún venga en camino (con retardo), sin actuar, para que
+            # registre el resultado de la verificadora. No cuenta como ticks del ensayo.
+            for extra in range(self.config.retardo[1] + 1):
+                if self.madre.verificacion is not None:
+                    break
+                self.canal.avanzar(self.tick + extra)
+                self.madre.leer()
         # Sin madre, el FIN es solo un aviso del motor: no cuenta como tráfico de la colonia.
         trafico = None if self.con_madre else self.canal.resumen()
         self.canal.enviar(crear("FIN", src=ID_MADRE, dst=ID_DIFUSION, tick=self.tick % 65536,
@@ -288,6 +333,9 @@ class Simulacion:
             feromona=self.feromona,
             ruta_verificada=list(v.ruta) if verificada else None,
             mecanismos=self._mecanismos(),
+            memoria_madre_max=self.madre.memoria_max if self.con_madre else 0,
+            madre_verificacion=self.madre.verificacion if self.con_madre else None,
+            mapa_madre=self.mapa_madre,
         )
 
     # ------------------------------------------------------------------ motores
@@ -298,7 +346,34 @@ class Simulacion:
             return self._correr_determinista()
         if motor == "hilos":
             return self._correr_hilos()
-        raise ValueError("El motor es 'determinista' o 'hilos'")
+        if motor == "hilos_sincronos":
+            return self._correr_hilos_sincronos()
+        raise ValueError("El motor es 'determinista', 'hilos' o 'hilos_sincronos'")
+
+    def _correr_hilos_sincronos(self) -> Resultado:
+        grupo = _GrupoSincrono(self.agentes)
+        try:
+            while self.tick < self.config.limite:
+                termino, nueva = self._avanzar_fase()
+                if termino:
+                    break
+                if nueva is not None:
+                    grupo.agregar(nueva)
+                t = self.tick
+                self.canal.avanzar(t)
+                self.actor_mundo.enviar_percepciones(t)
+                grupo.paso(t)  # todas las agentes, cada una en su hilo, a la vez
+                self.actor_mundo.aplicar_acciones(t)
+                self.madre.paso(t)
+                self.actor_mundo.cerrar_tick()
+                self._registrar_tick()
+                self.tick += 1
+        finally:
+            grupo.cerrar()
+        resultado = self._resultado()
+        for agente in self._actores():  # entrega el FIN
+            agente.paso(self.tick)
+        return resultado
 
     def _actores(self) -> list[Agente]:
         return self.agentes + ([self.verificadora] if self.verificadora else [])
@@ -376,3 +451,58 @@ class Simulacion:
         for agente in self._actores():  # entrega el FIN
             agente.paso(self.tick)
         return resultado
+
+
+class _GrupoSincrono:
+    """Un hilo por agente; en cada tick todas dan su paso a la vez y el tick espera a todas (B7)."""
+
+    def __init__(self, agentes: list[Agente]) -> None:
+        self._tick = 0
+        self._parar = False
+        self._errores: list[BaseException] = []
+        self._hilos: list[threading.Thread] = []
+        self._agentes: list[Agente] = []
+        self._inicio = self._fin = None
+        self._arrancar(agentes)
+
+    def _arrancar(self, agentes: list[Agente]) -> None:
+        self._agentes = list(agentes)
+        self._parar = False
+        self._inicio = threading.Barrier(len(self._agentes) + 1)
+        self._fin = threading.Barrier(len(self._agentes) + 1)
+        self._hilos = [threading.Thread(target=self._bucle, args=(a,), daemon=True)
+                       for a in self._agentes]
+        for hilo in self._hilos:
+            hilo.start()
+
+    def _bucle(self, agente: Agente) -> None:
+        inicio, fin = self._inicio, self._fin
+        while True:
+            inicio.wait()
+            if self._parar:
+                return
+            try:
+                agente.paso(self._tick)
+            except BaseException as error:  # se vuelve a lanzar en el hilo principal
+                self._errores.append(error)
+            finally:
+                fin.wait()
+
+    def paso(self, tick: int) -> None:
+        self._tick = tick
+        self._inicio.wait()
+        self._fin.wait()
+        if self._errores:
+            raise self._errores[0]
+
+    def agregar(self, agente: Agente) -> None:
+        """Suma una agente (la verificadora): se cierran los hilos y se arrancan de nuevo."""
+        agentes = self._agentes + [agente]
+        self.cerrar()
+        self._arrancar(agentes)
+
+    def cerrar(self) -> None:
+        self._parar = True
+        self._inicio.wait()
+        for hilo in self._hilos:
+            hilo.join(timeout=5)

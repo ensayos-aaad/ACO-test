@@ -61,5 +61,9 @@ Notación: **(G#)** = idea tomada de Gemini · ⚠ = toca el comportamiento del 
 
 ## Orden propuesto
 
-**A → B + C → D → E.** A va primero porque cambia resultados que el notebook muestra; C3 debe existir antes que D3.
-Después sigue el **artefacto 16** (demostración con NetLogo).
+**A → B + C → D → artefacto 17 → E → artefacto 16.** A va primero porque cambia resultados que el notebook muestra;
+C3 debe existir antes que D3; D va antes del 17 porque la guía muestra las figuras del notebook.
+
+**Cambio de orden aprobado por el operador (2026-11-18 23:46 -0500):** la guía de reproducción (artefacto 17) va **antes** de la
+demostración con NetLogo (16). El 17 no depende del 16 (documenta la fase 1, que ya existe), cierra la fase 1 con algo
+entregable y el revisor puede verificarla siguiéndola desde cero. Al hacer el 16 se le agrega su sección a la guía.

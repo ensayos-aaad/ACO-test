@@ -20,10 +20,11 @@ from .madre import ConfigMadre, Modo
 from .motor import ConfigEnsayo
 from .mundo import Mundo, mundo_aleatorio, mundo_l, puente_doble
 
-ESCENARIOS = ("L", "aleatorio", "puente_doble")
+ESCENARIOS = ("L", "aleatorio", "puente_doble", "personalizado")
 
 _MUNDO = {"escenario": "L", "ancho": 8, "alto": 8, "densidad": 0.2, "distancia_minima": 4,
-          "r": 2, "ancho_puente": 3, "tau_max": 1.0, "unidad_deposito": "1/255"}
+          "r": 2, "ancho_puente": 3, "tau_max": 1.0, "unidad_deposito": "1/255",
+          "obstaculos": [], "inicio": None, "meta": None}
 _SECCIONES = ("semilla", "mundo", "ensayo", "agente", "madre", "canal")
 _CANAL = ("radio", "p_perdida", "retardo", "formato")
 _DERIVADOS = ("con_madre", "verificadora", "informa_mapa")  # los fija el motor según el modo
@@ -81,6 +82,31 @@ def config_ensayo(datos: dict[str, Any], semilla: int | None = None) -> ConfigEn
         agente=ConfigAgente(**agente), madre=ConfigMadre(**madre), **ensayo, **canal)
 
 
+def _celda(valor: Any, nombre: str) -> tuple[int, int]:
+    if not (isinstance(valor, (list, tuple)) and len(valor) == 2
+            and all(isinstance(v, int) and not isinstance(v, bool) for v in valor)):
+        raise ValueError(f"'{nombre}' debe ser una celda [x, y] con dos enteros, no {valor!r}")
+    return (valor[0], valor[1])
+
+
+def _mundo_personalizado(mundo: dict[str, Any], escalas: dict[str, float]) -> Mundo:
+    """Mundo escrito a mano en el YAML: obstáculos, inicio y meta fijos (B6, idea de Gemini).
+
+    No usa la semilla ni ``distancia_minima``: el mundo es exactamente el que se escribe. Debe
+    haber camino entre el inicio y la meta.
+    """
+    if mundo["inicio"] is None or mundo["meta"] is None:
+        raise ValueError("El escenario personalizado necesita 'inicio' y 'meta'")
+    if not isinstance(mundo["obstaculos"], list):
+        raise ValueError("'obstaculos' debe ser una lista de celdas [x, y]")
+    obstaculos = [_celda(c, "obstaculos") for c in mundo["obstaculos"]]
+    resultado = Mundo(mundo["ancho"], mundo["alto"], obstaculos, _celda(mundo["inicio"], "inicio"),
+                      _celda(mundo["meta"], "meta"), **escalas)
+    if resultado.bfs() is None:
+        raise ValueError("En el escenario personalizado no hay camino entre el inicio y la meta")
+    return resultado
+
+
 def crear_mundo(datos: dict[str, Any], semilla: int | None = None) -> Mundo:
     """Crea el mundo del ensayo. La misma semilla da siempre el mismo mundo.
 
@@ -93,6 +119,8 @@ def crear_mundo(datos: dict[str, Any], semilla: int | None = None) -> Mundo:
     escalas = dict(tau0=0.0, tau_max=_numero(mundo["tau_max"]),
                    unidad_deposito=_numero(mundo["unidad_deposito"]))
     escenario = mundo["escenario"]
+    if escenario == "personalizado":
+        return _mundo_personalizado(mundo, escalas)
     if escenario == "puente_doble":
         return puente_doble(Fraction(str(mundo["r"])), mundo["ancho_puente"], **escalas).mundo
     if escenario not in ESCENARIOS:

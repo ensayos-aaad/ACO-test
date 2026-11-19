@@ -60,6 +60,8 @@ def fila(semilla: int, escenario: str, resultado) -> dict[str, Any]:
         "conocimiento": None if resultado.conocimiento is None else round(resultado.conocimiento, 4),
         "bloqueadas": resultado.bloqueadas,
         "memoria_madre": resultado.memoria_madre,
+        "memoria_madre_max": resultado.memoria_madre_max,
+        "madre_verificacion": resultado.madre_verificacion,
     }
     salida["ticks_verificacion"] = resultado.ticks_verificacion
     for familia in FAMILIAS:

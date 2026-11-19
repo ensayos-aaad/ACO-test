@@ -154,3 +154,78 @@ def test_salidas_escalonadas_con_hilos():
     determinista = ensayo(2, salida_cada=2)
     assert sorted(con_hilos.historial) == sorted(determinista.historial)
     assert replace(con_hilos, historial=[]) == replace(determinista, historial=[])
+
+
+# ---------------------------------------------------------------- bloque B de PLAN-MEJORAS (ideas de Gemini)
+
+
+def test_b1_la_madre_anuncia_el_ensayo_con_inicio():
+    con_madre = ensayo(0, Modo.PISTA_DE_BAILE)
+    sin_madre = ensayo(0, Modo.AUSENTE)
+    # INICIO (14 B) se cuenta como tráfico madre → agentes; sin madre no se envía.
+    assert con_madre.trafico["madre_agente"]["enviados"] >= 1
+    sim = Simulacion(mundo(0), ConfigEnsayo(rho=0.0, madre=ConfigMadre(modo=Modo.DIFUSION)))
+    assert sim.canal.trafico[3].enviados == 1 and sim.canal.trafico[3].bytes == 14  # antes de correr
+    assert sin_madre.trafico["madre_agente"]["enviados"] == 0
+
+
+def test_b2_cierre_abortado_si_ninguna_puede_seguir():
+    from aco_gemelo.mundo import Mundo
+
+    # Una sola celda libre además del nido... y la meta encerrada no es posible (el BFS lo impide),
+    # así que forzamos el caso: la agente queda FALLIDA porque no tiene a dónde moverse.
+    m = Mundo(2, 1, [], inicio=(0, 0), meta=(1, 0), tau0=0.0, tau_max=1.0)
+    sim = Simulacion(m, ConfigEnsayo(n_agentes=1, rho=0.0, madre=ConfigMadre(modo=Modo.AUSENTE)))
+    sim.agentes[0].estado = Estado.FALLIDA
+    r = sim.correr()
+    assert r.motivo == "abortado" and r.ticks_total == 0 and not r.asentadas
+
+
+def test_b3_memoria_maxima_de_la_madre():
+    sim = Simulacion(mundo(1), ConfigEnsayo(semilla=1, rho=0.0, madre=ConfigMadre(modo=Modo.DIFUSION)))
+    maxima = 0
+    original = sim.madre.paso
+
+    def espia(t):
+        nonlocal maxima
+        original(t)
+        maxima = max(maxima, sim.madre.memoria_usada())
+
+    sim.madre.paso = espia
+    r = sim.correr()
+    assert r.memoria_madre_max == maxima >= r.memoria_madre and r.memoria_madre_max <= 64
+
+
+def test_b4_la_madre_registra_la_verificacion_aun_con_retardo():
+    for semilla in range(4):
+        r = ensayo(semilla, Modo.PISTA_DE_BAILE, retardo=(2, 4))
+        if r.motivo == "verificada":
+            assert r.madre_verificacion == "ok"
+        elif r.motivo == "verificadora_fallo":
+            assert r.madre_verificacion == "fallo"
+
+
+def test_b5_acciones_en_orden_fijo():
+    r = ensayo(2)
+    for t in {t for t, _, _ in r.historial}:
+        ids = [i for tt, i, _ in r.historial if tt == t]
+        assert ids == sorted(ids)
+
+
+@pytest.mark.parametrize("modo", list(Modo))
+def test_b7_hilos_sincronos_dan_lo_mismo_que_el_determinista_tambien_con_madre(modo):
+    sincronos = ensayo(1, modo, motor="hilos_sincronos")
+    determinista = ensayo(1, modo)
+    assert sincronos == determinista
+
+
+def test_c3_mapa_de_la_madre_tick_a_tick():
+    r = ensayo(1, Modo.DIFUSION)
+    assert len(r.mapa_madre) == r.ticks_total
+    conocidas = [bin(c).count("1") for c, _ in r.mapa_madre]
+    assert conocidas == sorted(conocidas) and conocidas[-1] > 0  # el mapa de la madre solo crece
+    ancho = 8
+    final = {(i % ancho, i // ancho) for i in range(64) if r.mapa_madre[-1][0] >> i & 1}
+    assert len(final) == conocidas[-1]
+    sin_mapa = ensayo(1, Modo.PISTA_DE_BAILE)  # la pista de baile no guarda mapa
+    assert all(c == 0 and o == 0 for c, o in sin_mapa.mapa_madre)

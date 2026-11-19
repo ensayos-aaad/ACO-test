@@ -9,6 +9,7 @@ Reglas que no se negocian:
 - Ningún commit sin que el operador lo apruebe.
 - Estados de requisitos: PASA / NO PASA / NO PROBADO. Sin porcentajes de avance "a ojo": el único porcentaje permitido es el de `ARTEFACTOS.md` (criterios en PASA ÷ total).
 - El operador declaró sobrecarga de información (ASSUMPTIONS): respuestas ejecutivas, el detalle en los archivos.
+- `IDEAS.md` es el cuaderno de asociación libre del operador: **nadie corrige, resume ni juzga lo que escribe**. Las ideas que dicte se anotan tal cual; solo se agrega aparte "→ Qué pasó". Explorar y verificar son momentos distintos: la verificación nunca es filtro de entrada para una idea.
 
 ## Descripción del proyecto
 
@@ -43,6 +44,7 @@ colonia de agentes y una "madre" en el edge) que extiende ese método.
 | `DECISIONES-PRUEBA.md` | Preguntas de diseño con todas las opciones: ✅ elegida / ❌ descartada |
 | `ARTEFACTOS.md`   | Los 17 artefactos de software (→ `gemelo/`), su estado, su avance y los requisitos de reproducción |
 | `ESTADO-PREHARDWARE.md` | Estado antes del hardware: avance, checklist de hallazgos, bloqueantes B1–B6 y exploraciones X1–X8 |
+| `IDEAS.md`        | Cuaderno de asociación libre del operador (sin filtro; las ideas no se corrigen) |
 | `PLAN-MEJORAS.md` | Plan de correcciones y mejoras (bloques A–E) tras el análisis de Gemini; A1–A3 y C4 hechos |
 | `.claude/agents/` | Agentes del equipo: `revisor` (solo lee), `experimentador` (experimentos y docs), `divulgador` (textos para no especialistas) |
 | `otras/`          | Trabajo de terceros: `gemini/` (Gemini, en la nube) y su análisis `ANALISIS-gemini-artefacto9.md` |
@@ -59,14 +61,21 @@ visión de conjunto en `ESTADO-PREHARDWARE.md`. Todo sincronizado (último commi
 **Criterios de PROMPT-ZERO** (`oraculo/RESULTADOS.md`): C1 PASA · C2 PASA · **C3 NO PASA** (causa documentada,
 `oraculo/INVESTIGACION-C3.md`, decisión J8) · C4 PASA · C5 PASA · C6 NO PROBADO (lo evalúa el operador).
 
-**Siguiente paso: bloque B + C de `PLAN-MEJORAS.md`.**
+**AL RETOMAR (2026-11-18 23:55 -0500, sesión cortada al 95 % del plan):** el bloque B + C está **hecho** (281 pruebas en PASA;
+480 ensayos sin cambios de convergencia), pero el **informe del revisor no alcanzó a llegar**. Primero: volver a pedir
+la revisión de B + C al agente `revisor` (encargo: los objetivos B1–B7, C2 y C3 de `PLAN-MEJORAS.md`; vigilar que
+`hilos_sincronos` sea determinista con madre y que el nuevo orden de lectura de la madre no cambie resultados con
+retardos o pérdidas). Luego marcar B y C en el plan y seguir con D.
+
+**Siguiente paso (ya hecho, falta la revisión): bloque B + C de `PLAN-MEJORAS.md`.**
 - B: en el motor, enviar `INICIO`, cerrar como abortado, memoria máxima de la madre, vaciar mensajes pendientes,
   orden canónico de acciones, hilos en paso fijo como tercer motor (para pruebas), y **escenario personalizado**
   en el YAML.
 - C: bytes totales (C1, ya en el CSV), tabla JSON frente a binario (C2) y **registro tick a tick de lo que la madre
   sabe del mundo** (C3, base de los fotogramas del notebook).
-- Después: bloque D (notebook más explicable: mapas de feromona con trazos y fotogramas del conocimiento de la
-  madre) y E (registros). Luego el artefacto 16 (demostración con NetLogo) y el 17 (guía de reproducción).
+- Orden aprobado (2026-11-18 23:46 -0500): **B + C → D** (notebook más explicable: mapas de feromona con trazos y fotogramas del
+  conocimiento de la madre) **→ artefacto 17** (guía de reproducción, verificada por el revisor siguiéndola desde
+  cero) **→ E** (registros) **→ artefacto 16** (demostración con NetLogo, y su sección en la guía).
 
 **Equipo de agentes** (`.claude/agents/`): `revisor` (verifica sin conocer el razonamiento; solo lee y ejecuta
 pruebas), `experimentador` (corre y analiza experimentos con pruebas declaradas antes; escribe en
@@ -111,6 +120,12 @@ sesión empieza con el resumen de 5 líneas (PROMPT-ZERO §6). El modelo en uso 
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-18 23:54 -0500
+- El operador teme que la verificación y la ruta de aprendizaje apaguen la intuición ("asociación libre", "función impulso"). Se crea `IDEAS.md`, cuaderno sin filtro, con 8 intuiciones suyas ya dichas, anotadas con sus palabras y con lo que derivaron. Regla nueva arriba en este archivo.
+
+### 2026-11-18 23:46 -0500
+- El operador aprueba cambiar el orden: el artefacto 17 (guía de reproducción) va antes que el 16 (NetLogo). Nuevo orden: B + C → D → 17 → E → 16. Bloque B + C hecho (281 pruebas en PASA, convergencia sin cambios en 480 ensayos), a la espera del revisor; sin commit.
 
 ### 2026-11-18 23:28 -0500
 - Se reescribe "Para retomar": quedaban pasos viejos (siguiente artefacto 14), problemas ya resueltos ("el rescate no se dispara") y avisos ya atendidos. Se corrigen en "Estado actual" los rangos de `CONTEXT.md`, `DECISIONS.md` y `FAILURES.md`. Se anota que los agentes solo se cargan al iniciar sesión (`/agents` ya no existe).

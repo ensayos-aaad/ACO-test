@@ -188,3 +188,18 @@ def test_celda_ida_y_vuelta():
     assert celda_a_byte((2, 5)) == 0x52
     with pytest.raises(ValueError):
         celda_a_byte((16, 0))
+
+
+# ---------------------------------------------------------------- C2: tamaños binario frente a JSON
+
+
+def test_tabla_de_tamanos_binario_frente_a_json():
+    from aco_gemelo.protocolo.tamanos import LIMITE_ESP_NOW, tamanos
+
+    filas = {f["mensaje"]: f for f in tamanos()}
+    assert set(filas) == set(MENSAJES)
+    assert filas["PERCEPCION"]["binario"] == 18 and filas["MAPA"]["binario"] == 24
+    assert all(f["json"] > f["binario"] for f in filas.values())
+    assert all(f["binario"] <= LIMITE_ESP_NOW for f in filas.values())
+    # En JSON, la percepción y el mapa no caben en un paquete ESP-NOW.
+    assert not filas["PERCEPCION"]["json_cabe_en_esp_now"] and not filas["MAPA"]["json_cabe_en_esp_now"]

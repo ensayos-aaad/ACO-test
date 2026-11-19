@@ -84,6 +84,7 @@ class Madre:
         self.descartadas = 0  #: rutas que no cupieron en la memoria
         self.verificacion: str | None = None  #: "ok", "fallo" o None
         self.rescates_enviados = 0  #: contador de mecanismo (C4)
+        self.memoria_max = 0  #: memoria máxima usada durante el ensayo, en bytes (B3)
         self.recluta_enviados = 0  #: RECLUTA difundidos (C4)
         self.rutas_enviadas = 0  #: RUTA enviadas a pedido (C4)
         self.rutas_difundidas = 0  #: RUTA difundidas a todas en el modo difusión (C4)
@@ -131,14 +132,26 @@ class Madre:
 
     # ------------------------------------------------------------------ ciclo no bloqueante
 
-    def paso(self, ahora: int) -> None:
-        """Un ciclo: lee lo que llegó y, si ya pasó Δt desde la última vez, actúa."""
+    def leer(self) -> None:
+        """Lee y registra lo que llegó, sin actuar.
+
+        Los mensajes se procesan en un orden fijo (tick en que se enviaron y emisor), no en el
+        orden de llegada. Así, si las agentes corren en hilos y sus mensajes llegan intercalados,
+        la madre llega al mismo estado que con un solo hilo (motor ``hilos_sincronos``).
+        """
         mensajes = self.canal.recibir(ID_MADRE)
         if self.config.modo is Modo.AUSENTE:
             return
-        for msg in mensajes:
+        for msg in sorted(mensajes, key=lambda m: (m.get("tick", 0), m["src"])):
             self._escuchar(msg)
         self._ajustar_memoria()
+        self.memoria_max = max(self.memoria_max, self.memoria_usada())
+
+    def paso(self, ahora: int) -> None:
+        """Un ciclo: lee lo que llegó y, si ya pasó Δt desde la última vez, actúa."""
+        self.leer()
+        if self.config.modo is Modo.AUSENTE:
+            return
         if self._ultima is not None and ahora - self._ultima < self.config.delta_t:
             return
         self._ultima = ahora
@@ -218,6 +231,7 @@ class Madre:
             self.rescatadas.add(agente)
             self.rescates_enviados += 1
         self._ajustar_memoria()
+        self.memoria_max = max(self.memoria_max, self.memoria_usada())
 
     def _difundir(self, ahora: int) -> None:
         """Difunde a todos el mapa consolidado y, si la hay, la mejor ruta."""

@@ -180,3 +180,34 @@ def test_python_m_aco_gemelo_desde_la_carpeta_gemelo():
         cwd=GEMELO, capture_output=True, text=True, encoding="utf-8", timeout=120)
     assert proceso.returncode == 0, proceso.stderr
     assert "motivo" in proceso.stdout
+
+
+# ---------------------------------------------------------------- B6: escenario personalizado
+
+
+def test_escenario_personalizado():
+    datos = {"mundo": {"escenario": "personalizado", "ancho": 5, "alto": 4,
+                       "obstaculos": [[1, 0], [1, 1], [1, 2], [3, 1], [3, 2], [3, 3]],
+                       "inicio": [0, 0], "meta": [4, 0]}}
+    mundo = crear_mundo(datos, semilla=123)
+    assert mundo.obstaculos == {(1, 0), (1, 1), (1, 2), (3, 1), (3, 2), (3, 3)}
+    assert (mundo.inicio, mundo.meta) == ((0, 0), (4, 0))
+    assert crear_mundo(datos, semilla=7).obstaculos == mundo.obstaculos  # no depende de la semilla
+    assert mundo.largo_optimo() == 10  # bordea las dos paredes; sin cortar esquinas no hay atajo
+
+
+@pytest.mark.parametrize("mundo", [
+    {"escenario": "personalizado", "inicio": [0, 0]},  # falta la meta
+    {"escenario": "personalizado", "inicio": [0, 0], "meta": [2, 0], "obstaculos": [[1, 0], [1, 1], [1, 2], [1, 3], [1, 4], [1, 5], [1, 6], [1, 7]]},  # sin camino
+    {"escenario": "personalizado", "inicio": "0,0", "meta": [2, 0]},  # celda mal escrita
+    {"escenario": "personalizado", "inicio": [0, 0], "meta": [1, 0], "obstaculos": [[1, 0]]},  # meta en obstáculo
+])
+def test_escenario_personalizado_invalido(mundo):
+    with pytest.raises(ValueError):
+        crear_mundo({"mundo": mundo})
+
+
+def test_motor_hilos_sincronos_desde_la_linea_de_comandos(capsys):
+    assert main(["run", "--config", str(CONFIGS / "default.yaml"), "--semilla", "1",
+                 "--motor", "hilos_sincronos"]) == 0
+    assert "motivo" in capsys.readouterr().out
