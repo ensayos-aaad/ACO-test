@@ -16,7 +16,8 @@ Reglas que no se negocian:
 Deneubourg et al., *Ant Colony Optimization*, Dorigo & Stützle, cap. 1) bajo el método
 PACHE/HITL-KE en modo ingeniería. El notebook de Jupyter de `referencia/` es el oráculo:
 el firmware es correcto solo si reproduce el notebook dentro de tolerancias declaradas
-de antemano.
+de antemano. Desde la ADR-003, el artefacto es un **gemelo de software** del plano de ensayo (cuadrícula,
+colonia de agentes y una "madre" en el edge) que extiende ese método.
 
 - Repositorio de trabajo: `ensayos-aaad/ACO-test` (rama `main`).
 - Repositorio fuente (solo lectura): `UdeA-IoT/ESP-ACO`, a copiar en `referencia/`.
@@ -32,9 +33,9 @@ de antemano.
 | `CLAUDE.md`       | Este archivo: reglas permanentes, contexto e historial       |
 | `PROMPT-ZERO.md`  | Método de trabajo, criterios C1–C6 y tarea de la Sesión 0    |
 | `referencia/`     | Copia de solo lectura de `UdeA-IoT/ESP-ACO` @ `3c48648` (ver `PROCEDENCIA.md`) |
-| `CONTEXT.md`      | Inventario de la referencia, parámetros, oráculos, vacíos (I1–I13), NetLogo/hormigas (§5), agentes AIMA (§6) |
-| `DECISIONS.md`    | Decisiones en formato ADR (ADR-001, ADR-002: propuestas)     |
-| `FAILURES.md`     | Registro de fallas (F-001 a F-006); nunca se borra           |
+| `CONTEXT.md`      | Inventario de la referencia, parámetros, oráculos, vacíos (I1–I16), NetLogo/hormigas (§5), agentes AIMA (§6), `resumen.pdf` (§7), enfoque del gemelo (§8) |
+| `DECISIONS.md`    | Decisiones en formato ADR (ADR-001 y ADR-002 propuestas; ADR-003 aprobada) |
+| `FAILURES.md`     | Registro de fallas y hallazgos (F-001 a F-022); nunca se borra |
 | `ASSUMPTIONS.md`  | Suposiciones y sesgos declarados (A-001 a A-004)             |
 | `CHANGELOG.md`    | Cambios por sesión                                           |
 | `CHECKLIST-ENTORNO.md` | Software necesario: instalado `[x]` / falta `[ ]`       |
@@ -49,80 +50,58 @@ de antemano.
 | `gemelo/`         | **El código**: `aco_gemelo/` (mundo, protocolo, canal, agente, madre, motor, métricas, visual, experimentos), `configs/`, `experimentos/` (planes y datos), `tests/`, `environment.yml` |
 | `bosquejo/`       | Plano de ensayo (a mano y en limpio)                         |
 
-## Para retomar (estado al 2026-11-17 04:55 -0500)
+## Para retomar (estado al 2026-11-18 23:28 -0500)
 
-**Dónde quedamos:** fase 1 del gemelo en construcción. Hechos los artefactos
-**1 (entorno), 3 (protocolo), 4 (mundo), 5 (canal), 6 (agente), 7 (madre), 8 (motor), 9 (configuración y
-línea de comandos), 10 (métricas), 11 (visualización), 12 (oráculo), 13 (pruebas), 14 (experimentos) y 15 (notebook)**: 264 pruebas del gemelo + 7 del oráculo en PASA.
-El detalle y el avance de los 17 artefactos están en `ARTEFACTOS.md`.
+**Dónde quedamos.** Fase 1 del gemelo de software casi completa: 14 de 17 artefactos hechos (1, 3–15; el 2,
+protocolo, en borrador v0.3). **264 pruebas del gemelo + 7 del oráculo en PASA.** Detalle en `ARTEFACTOS.md`;
+visión de conjunto en `ESTADO-PREHARDWARE.md`. Todo sincronizado (último commit de código: `7bec4f2`).
 
-**Cómo comprobar que todo sigue bien** (desde `gemelo/`):
-`C:/Users/Usuario/anaconda3/envs/aco-gemelo/python.exe -I -X utf8 -m pytest -q -W ignore`
-(si el entorno no existe: `conda env create -f gemelo/environment.yml`).
+**Criterios de PROMPT-ZERO** (`oraculo/RESULTADOS.md`): C1 PASA · C2 PASA · **C3 NO PASA** (causa documentada,
+`oraculo/INVESTIGACION-C3.md`, decisión J8) · C4 PASA · C5 PASA · C6 NO PROBADO (lo evalúa el operador).
 
-**Cómo correr un ensayo** (desde `gemelo/`, con el Python de `aco-gemelo`):
-`python -X utf8 -m aco_gemelo run --config configs/default.yaml [--semilla N] [--motor hilos]` y
-`python -X utf8 -m aco_gemelo batch --config configs/default.yaml --semillas 30` (deja un CSV en `resultados/`,
-que git ignora).
+**Siguiente paso: bloque B + C de `PLAN-MEJORAS.md`.**
+- B: en el motor, enviar `INICIO`, cerrar como abortado, memoria máxima de la madre, vaciar mensajes pendientes,
+  orden canónico de acciones, hilos en paso fijo como tercer motor (para pruebas), y **escenario personalizado**
+  en el YAML.
+- C: bytes totales (C1, ya en el CSV), tabla JSON frente a binario (C2) y **registro tick a tick de lo que la madre
+  sabe del mundo** (C3, base de los fotogramas del notebook).
+- Después: bloque D (notebook más explicable: mapas de feromona con trazos y fotogramas del conocimiento de la
+  madre) y E (registros). Luego el artefacto 16 (demostración con NetLogo) y el 17 (guía de reproducción).
 
-**Opción c aplicada** (salidas escalonadas `ensayo.salida_cada` y viajes repetidos `agente.viajes`): en el
-puente doble (J1–J6, F-015: C2 y C4 pasan, C3 no) y, por decisión del operador, también en los mundos L y
-aleatorio (J7, F-016: la verificadora llega más veces, con ensayos ~6 veces más largos). Al activarla apareció
-un atasco en callejones; el agente ahora recuerda las celdas pisadas en cada viaje (S-ACO).
-**C3 investigado (F-017, `oraculo/INVESTIGACION-C3.md`) y cerrado (J8):** queda NO PASA con la causa documentada
-(pocas decisiones; con muchas, los 16 niveles lineales se saturan). El cambio de percepción (8 bits o logarítmica)
-se reconsidera al llegar al hardware.
+**Equipo de agentes** (`.claude/agents/`): `revisor` (verifica sin conocer el razonamiento; solo lee y ejecuta
+pruebas), `experimentador` (corre y analiza experimentos con pruebas declaradas antes; escribe en
+`gemelo/experimentos/` y `gemelo/docs/`) y `divulgador` (textos para no especialistas en
+`gemelo/docs/divulgacion/`). **Se cargan solo al iniciar una sesión** (el comando `/agents` ya no existe en esta
+versión). Si no aparecen por nombre, lanzarlos como agentes generales que leen su archivo de rol. Ninguno hace
+commit; el orquestador verifica lo que entregan.
 
-**Experimentos (artefacto 14, F-018):** `python -X utf8 -m aco_gemelo experimentos --plan experimentos/modos.yaml`
-(y `rescate.yaml`). Con umbral ≥ 0,8 el rescate se dispara; en el mundo aleatorio la madre tiende a mejorar la
-verificación (18 → 25–27/30), pero nada es significativo tras corregir por comparaciones múltiples, y con 10 viajes
-la madre ya no reduce la varianza del tiempo.
+**Comandos** (desde `gemelo/`, con `C:/Users/Usuario/anaconda3/envs/aco-gemelo/python.exe`, siempre `-X utf8`):
+- Pruebas: `python -I -X utf8 -m pytest -q -W ignore` (si falta el entorno: `conda env create -f gemelo/environment.yml`).
+  Oráculo, desde la raíz: `python -X utf8 -m pytest oraculo -q`; comparación: `python -X utf8 oraculo/comparar.py`.
+- Un ensayo: `python -X utf8 -m aco_gemelo run --config configs/default.yaml [--semilla N] [--motor hilos] [--png f.png] [--animacion e.gif]`.
+- Lote: `python -X utf8 -m aco_gemelo batch --config configs/default.yaml --semillas 30` (CSV en `resultados/`, ignorado por git).
+- Experimentos: `python -X utf8 -m aco_gemelo experimentos --plan experimentos/modos.yaml` (y `rescate.yaml`).
+- Notebook: desde `gemelo/notebooks/`, `python -X utf8 -m jupyter nbconvert --to notebook --execute --inplace analisis.ipynb`.
 
-**Aviso del operador (ya atendido):** el límite de 5 horas del plan estuvo al **90 %** (2026-11-17 04:55 -0500). La sesión se pausa aquí y
-**se espera su señal** para seguir.
+**Resultados vigentes que conviene recordar:**
+- Opción c (salidas escalonadas y viajes repetidos) activa en el puente doble y en los mundos L y aleatorio.
+- La madre (pista de baile, difusión, rescate con umbral ≥ 0,8) tiende a mejorar la convergencia en mundos
+  aleatorios, pero **nada es significativo** tras corregir por comparaciones múltiples (F-018, F-022); el rescate
+  **no** reduce la varianza del tiempo (F-019). Falta un experimento confirmatorio con ~100 semillas.
+- F-020 corregido (F-022): la madre ya no rescata a la verificadora; cada ensayo mide sus mecanismos (C4).
 
-**Análisis (artefacto 15, F-019):** `gemelo/notebooks/analisis.ipynb` (4 figuras y pruebas con Bonferroni). La
-hipótesis de `resumen.pdf` (el rescate reduce la varianza) **no queda apoyada**; las pruebas son exploratorias.
-
-**Estado antes del hardware:** ver `ESTADO-PREHARDWARE.md` (bloqueantes B1–B6: protocolo sin aprobar, transporte
-MQTT o ESP-NOW, MicroPython o C++, inventario de hardware, percepción de 4 bits, demostración NetLogo pendiente).
-
-**Siguiente sesión — artefacto 16, demostración con NetLogo** (`gemelo/netlogo/`): el mundo vive en los patches,
-`py:setup` usa el Python del entorno y un agente Python se mueve según el protocolo. Luego 17, guía de reproducción.
-
-**Siguiente artefacto: 14, experimentos en lote** (4 modos × 30 semillas → CSV), después 15 notebook, 16 NetLogo
-y 17 guía de reproducción. El 13 (pruebas automáticas) se cumple al tener todas las pruebas en PASA.
-
-**Ver un ensayo:** `python -X utf8 -m aco_gemelo run --config configs/default.yaml --png final.png --animacion ensayo.gif`.
-
-**Problemas abiertos que dejó la madre (F-010):**
-- La verificadora falla en ~1 de cada 4 semillas con cualquier modo (rastros cruzados + no puede volver
-  sobre sus pasos, I12). Es el principal obstáculo para el criterio de convergencia G1.
-- El modo rescate no llega a dispararse con el umbral del 50 % (I14): la hipótesis de `resumen.pdf`
-  sigue sin probarse.
+**Abierto o pendiente:**
+- Bloqueantes para el hardware B1–B6 (`ESTADO-PREHARDWARE.md`): protocolo sin aprobar, transporte (MQTT o
+  ESP-NOW; en JSON la percepción no cabe en ESP-NOW), MicroPython o C++, inventario de hardware, percepción de 4 bits,
+  demostración con NetLogo.
 - Sin implementar: `BALIZA`, `ALERTA`, `SIGUEME` (comunicación entre agentes, E1) y `STOP`.
-- `gemelo/tests/apoyo.py` (banco provisional) se conserva para las pruebas unitarias; el motor da los mismos tiempos.
+- La verificadora falla en 3 a 12 de cada 30 ensayos según modo y mundo (rastros cruzados y callejones).
+- **Pendiente de revisión por el operador** (aprobado "con bendición", `ASSUMPTIONS.md`): rondas de decisiones
+  A–G, I1–I15 y J1–J8 de `DECISIONES-PRUEBA.md`; `PROTOCOLO.md` v0.3; ADR-001 y ADR-002 (propuestas).
 
-**Después:** 17 guía de reproducción (y el 13, pruebas automáticas, se cierra con todo en PASA).
-
-**Pendiente de revisión por el operador** (aprobado "con bendición", ver ASSUMPTIONS.md):
-- `DECISIONES-PRUEBA.md`: ronda 1 (A–G) y ronda 2 (I1–I15, valores elegidos por Claude).
-  El cambio de fondo es I4/I5: el depósito es a la vuelta, no a la ida.
-- `PROTOCOLO.md` v0.2: sigue sin aprobación formal.
-- Se hicieron JSON y binario a la vez (desviación de B2).
-- ADR-001 y ADR-002 siguen como propuestas.
-
-**Equipo de agentes** (desde 2026-11-18): el orquestador (Claude) implementa e integra; el `revisor` verifica sin
-conocer el razonamiento; el `experimentador` corre y analiza experimentos con pruebas declaradas antes; el
-`divulgador` cuenta los resultados para no especialistas. Ninguno hace commit. Se cargan por nombre al iniciar la
-sesión (en la primera se lanzaron como agentes generales con las instrucciones de su archivo).
-
-**Forma de trabajo acordada:** un artefacto a la vez; al terminar cada uno, Claude da la seña y el
-operador decide si se sigue o se para. No se hace commit sin su aprobación. Respuestas ejecutivas.
-El modelo en uso se anota en los commits (los artefactos 1 y 3–6 son de Claude Fable 5.2).
-
-Criterios de PROMPT-ZERO (ver `oraculo/RESULTADOS.md`): **C1 PASA** · **C2 PASA** · **C3 NO PASA** · **C4 PASA** ·
-**C5 PASA** · C6 NO PROBADO (lo evalúa el operador).
+**Forma de trabajo acordada:** un bloque o artefacto a la vez; al terminar, Claude da la seña y el operador decide
+si se sigue o se para. Ningún commit sin su aprobación. Respuestas ejecutivas, el detalle en los archivos. Cada
+sesión empieza con el resumen de 5 líneas (PROMPT-ZERO §6). El modelo en uso se anota en los commits.
 
 ## Convenciones
 
@@ -132,6 +111,9 @@ Criterios de PROMPT-ZERO (ver `oraculo/RESULTADOS.md`): **C1 PASA** · **C2 PASA
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-18 23:28 -0500
+- Se reescribe "Para retomar": quedaban pasos viejos (siguiente artefacto 14), problemas ya resueltos ("el rescate no se dispara") y avisos ya atendidos. Se corrigen en "Estado actual" los rangos de `CONTEXT.md`, `DECISIONS.md` y `FAILURES.md`. Se anota que los agentes solo se cargan al iniciar sesión (`/agents` ya no existe).
 
 ### 2026-11-18 23:25 -0500
 - El operador aprueba el bloque A con el equipo de agentes ("Procede entonces"). Se crean `.claude/agents/revisor.md`, `experimentador.md` y, a pedido del operador, `divulgador.md`.
