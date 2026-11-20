@@ -52,11 +52,12 @@ colonia de agentes y una "madre" en el edge) que extiende ese método.
 | `gemelo/`         | **El código**: `aco_gemelo/` (mundo, protocolo, canal, agente, madre, motor, métricas, visual, experimentos), `configs/`, `experimentos/` (planes y datos), `tests/`, `environment.yml` |
 | `bosquejo/`       | Plano de ensayo (a mano y en limpio)                         |
 
-## Para retomar (estado al 2026-11-18 23:28 -0500)
+## Para retomar (estado al 2026-11-19 21:00 -0500)
 
 **Dónde quedamos.** Fase 1 del gemelo de software casi completa: 14 de 17 artefactos hechos (1, 3–15; el 2,
-protocolo, en borrador v0.3). **264 pruebas del gemelo + 7 del oráculo en PASA.** Detalle en `ARTEFACTOS.md`;
-visión de conjunto en `ESTADO-PREHARDWARE.md`. Todo sincronizado (último commit de código: `7bec4f2`).
+protocolo, en borrador v0.3). **281 pruebas del gemelo + 7 del oráculo en PASA** (2026-11-19 20:58), pero el bloque
+B + C tiene NO PASA del revisor (F-023). Detalle y checklist del plan vigente en `ARTEFACTOS.md` ("Orden de trabajo
+vigente"); visión de conjunto en `ESTADO-PREHARDWARE.md`. Último commit: `42e0943`.
 
 **Criterios de PROMPT-ZERO** (`oraculo/RESULTADOS.md`): C1 PASA · C2 PASA · **C3 NO PASA** (causa documentada,
 `oraculo/INVESTIGACION-C3.md`, decisión J8) · C4 PASA · C5 PASA · C6 NO PROBADO (lo evalúa el operador).
@@ -123,6 +124,9 @@ sesión empieza con el resumen de 5 líneas (PROMPT-ZERO §6). El modelo en uso 
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-19 21:00 -0500
+- Apertura de sesión. A pedido del operador, `ARTEFACTOS.md` se pone al día: sección "Orden de trabajo vigente" (checklist A → B + C → D → 17 → E → 16), artefactos 8–11 marcados con el NO PASA de F-023, protocolo v0.3 y última corrida de pruebas (281 + 7 en PASA). Se invoca a los agentes antes de corregir F-023. Sin commit.
 
 ### 2026-11-18 23:58 -0500
 - El revisor entregó su informe de B + C: **NO PASA** (F-023). Por límite de la sesión (95 %) no se corrigió; queda como primer paso en "Para retomar".
