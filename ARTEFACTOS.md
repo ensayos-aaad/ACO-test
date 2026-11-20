@@ -32,8 +32,8 @@ que el 16. `[x]` = hecho y revisado con PASA · `[~]` = implementado, pero con N
 
 - [x] **A.** Correcciones: F-020 (la madre ya no rescata a la verificadora), experimentos repetidos, notas en F-010/13/18/19.
 - [x] **B + C.** Motor (B1–B7) y métricas (C1–C4). NO PASA (F-023) → corregido (F-024, F-025) → **PASA** (F-026). Tocó los artefactos 5, 8, 9, 10 y 11.
-- [ ] **D.** ← *siguiente* Notebook más fácil de explicar (D1–D8): amplía el artefacto 15.
-- [ ] **Artefacto 17.** Guía de reproducción, verificada por el revisor siguiéndola desde cero.
+- [x] **D.** Notebook más explicable (D1–D8): secciones 1–3 y 5, "Qué mirar", glosario, 4 informes por experimento (F-027, F-028). Notebook más fácil de explicar (D1–D8): amplía el artefacto 15.
+- [ ] **Artefacto 17.** ← *siguiente* Guía de reproducción, verificada por el revisor siguiéndola desde cero.
 - [ ] **E.** Registros (E1–E4).
 - [ ] **Artefacto 16.** Demostración con NetLogo, y su sección en la guía.
 
@@ -53,7 +53,7 @@ que el 16. `[x]` = hecho y revisado con PASA · `[~]` = implementado, pero con N
 12. ✅ Reproduce p1 (celda [5]; error ≤ 1e-12) · ✅ la dinámica (celda [7]; p_s final = 0,924 ≥ 0,9) · ✅ el histograma de r = 1 (extremos 70,7 % ≥ 70 %, **muy justo**) y r = 2 (80–100 %: 75,1 % ≥ 70 %), con las tolerancias de `oraculo/TOLERANCIAS.md` declaradas antes de correr (`oraculo/test_oraculo.py`: 7 PASA, 2026-11-17 03:17 -0500). La comparación del gemelo (C1–C5) está en `oraculo/RESULTADOS.md`.
 13. ✅ Todas las pruebas en PASA: 259 del gemelo y 7 del oráculo, en una sola corrida (2026-11-17 05:05 -0500). Última corrida: **318 del gemelo + 7 del oráculo en PASA** (2026-11-19 23:40 -0500, B + C cerrado con PASA del revisor, F-026).
 14. ✅ Genera un CSV por condición (más `resumen.csv` con intervalos de confianza) · ✅ se puede reproducir con la semilla, sin importar el número de procesos (`tests/test_experimentos.py`: 11 PASA, 2026-11-17 04:49 -0500). Planes: `experimentos/modos.yaml` y `experimentos/rescate.yaml`; datos en `experimentos/datos/`.
-15. ✅ Gráficas comparativas (4 figuras en `notebooks/figuras/`) · ✅ prueba estadística de la varianza con y sin rescate (Brown-Forsythe, más Mann-Whitney y Fisher, con Bonferroni) (`tests/test_notebook.py`: 1 PASA, 2026-11-17 04:58 -0500). Conclusiones calculadas desde los datos.
+15. ✅ Gráficas comparativas (4 figuras en `notebooks/figuras/`; desde el bloque D, 9 figuras y un GIF, con un ensayo comentado) · ✅ prueba estadística de la varianza con y sin rescate (Brown-Forsythe, más Mann-Whitney y Fisher, con Bonferroni) (`tests/test_notebook.py`: 1 PASA, 2026-11-17 04:58 -0500). Conclusiones calculadas desde los datos.
 16. El mundo vive en los patches · `py:setup` usa el Python del entorno · un agente Python se mueve según el protocolo.
 17. Ver la sección siguiente.
 

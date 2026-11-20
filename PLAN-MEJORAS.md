@@ -41,19 +41,23 @@ con retardo, mensajes que cambian la memoria de la madre (`memoria_madre`, `memo
 
 ## D. Notebook: explicabilidad
 
-- [ ] **D1** Sección inicial **"Cómo funciona un ensayo"**: una corrida comentada con semilla fija (mundo, ruta óptima,
+- [x] **D1** Sección inicial **"Cómo funciona un ensayo"**: una corrida comentada con semilla fija (mundo, ruta óptima,
       fases colonia → verificadora → cierre), antes de las estadísticas.
-- [ ] **D2** **Mapas de color de la feromona final con los trazos** de las exploradoras, la ruta verificada y la óptima;
+- [x] **D2** **Mapas de color de la feromona final con los trazos** de las exploradoras, la ruta verificada y la óptima;
       sin madre frente a con madre, en el mismo mundo y semilla **(G9)**.
-- [ ] **D3** **Fotogramas del conocimiento global de la madre:** 6 a 8 cuadros en el tiempo que muestran qué celdas
+- [x] **D3** **Fotogramas del conocimiento global de la madre:** 6 a 8 cuadros en el tiempo que muestran qué celdas
       conoce la madre (y cuáles cree obstáculo) frente al mundo real, a medida que le llegan los `FRAGMENTO`, más la
       curva de conocimiento en el tiempo. También como GIF en `notebooks/figuras/`.
-- [ ] **D4** Tamaño por mensaje, binario frente a JSON, con la línea del límite de ESP-NOW (250 B) **(G8)**.
-- [ ] **D5** Tráfico total apilado por familia y por modo de la madre **(G7)**.
-- [ ] **D6** Bajo cada figura, **"qué mirar"** en dos líneas, y un glosario corto (convergencia, verificadora, rezagada, Δt).
-- [ ] **D8** **Informes cortos por experimento** (objetivo, configuración, tabla, diagnóstico), al estilo de `docs/01–04` de Gemini, pensados para el experto en sistemas embebidos **(G11)**.
-- [ ] **D7** Todo regenerable desde el repositorio: cada figura sale de código o datos del repo (lo que no llegó del
+- [x] **D4** Tamaño por mensaje, binario frente a JSON, con la línea del límite de ESP-NOW (250 B) **(G8)**.
+- [x] **D5** Tráfico total apilado por familia y por modo de la madre **(G7)**.
+- [x] **D6** Bajo cada figura, **"qué mirar"** en dos líneas, y un glosario corto (convergencia, verificadora, rezagada, Δt).
+- [x] **D8** **Informes cortos por experimento** (objetivo, configuración, tabla, diagnóstico), al estilo de `docs/01–04` de Gemini, pensados para el experto en sistemas embebidos **(G11)**.
+- [x] **D7** Todo regenerable desde el repositorio: cada figura sale de código o datos del repo (lo que no llegó del
       trabajo de Gemini). Mantener la prueba `tests/test_notebook.py` al día.
+
+**Estado de D (2026-11-20 04:49 -0500): cerrado.** Tres pasadas del revisor (`gemelo/docs/informes/revision_D.md`): lo técnico pasó desde la
+primera; los NO PASA fueron por textos que afirmaban más de lo que el dato sostiene (F-028). La última frase corregida usa
+la redacción del revisor y, por decisión del operador, no tuvo una cuarta pasada.
 
 ## E. Registros
 

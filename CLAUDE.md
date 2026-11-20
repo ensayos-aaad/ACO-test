@@ -36,7 +36,7 @@ colonia de agentes y una "madre" en el edge) que extiende ese método.
 | `referencia/`     | Copia de solo lectura de `UdeA-IoT/ESP-ACO` @ `3c48648` (ver `PROCEDENCIA.md`) |
 | `CONTEXT.md`      | Inventario de la referencia, parámetros, oráculos, vacíos (I1–I16), NetLogo/hormigas (§5), agentes AIMA (§6), `resumen.pdf` (§7), enfoque del gemelo (§8) |
 | `DECISIONS.md`    | Decisiones en formato ADR (ADR-001 y ADR-002 propuestas; ADR-003 aprobada) |
-| `FAILURES.md`     | Registro de fallas y hallazgos (F-001 a F-026); nunca se borra |
+| `FAILURES.md`     | Registro de fallas y hallazgos (F-001 a F-028); nunca se borra |
 | `ASSUMPTIONS.md`  | Suposiciones y sesgos declarados (A-001 a A-004)             |
 | `CHANGELOG.md`    | Cambios por sesión                                           |
 | `CHECKLIST-ENTORNO.md` | Software necesario: instalado `[x]` / falta `[ ]`       |
@@ -53,25 +53,31 @@ colonia de agentes y una "madre" en el edge) que extiende ese método.
 | `gemelo/`         | **El código**: `aco_gemelo/` (mundo, protocolo, canal, agente, madre, motor, métricas, visual, experimentos), `configs/`, `experimentos/` (planes y datos), `tests/`, `environment.yml` |
 | `bosquejo/`       | Plano de ensayo (a mano y en limpio)                         |
 
-## Para retomar (estado al 2026-11-19 23:45 -0500)
+## Para retomar (estado al 2026-11-20 04:49 -0500)
 
 **Dónde quedamos.** Fase 1 del gemelo de software casi completa: 14 de 17 artefactos hechos (1, 3–15; el 2,
-protocolo, en borrador v0.3); 41 de 49 criterios en PASA. **Bloque B + C cerrado con PASA del revisor** (F-023 →
-F-024 → F-025 → F-026). **318 pruebas del gemelo + 7 del oráculo en PASA.** Los experimentos publicados no cambiaron
-(CSV idénticos byte a byte). Checklist del plan en `ARTEFACTOS.md` ("Orden de trabajo vigente"); visión de conjunto
-en `ESTADO-PREHARDWARE.md`. Informes del revisor en `gemelo/docs/informes/revision_F023`, `_F024` y `_F025`.
+protocolo, en borrador v0.3); 41 de 49 criterios en PASA. **Bloques A, B + C y D cerrados** (F-026, F-028).
+**318 pruebas del gemelo + 7 del oráculo en PASA.** El notebook (`gemelo/notebooks/analisis.ipynb`) explica un ensayo y
+analiza los experimentos; los informes por experimento están en `gemelo/docs/informes/`. Checklist en `ARTEFACTOS.md`
+("Orden de trabajo vigente"); visión de conjunto en `ESTADO-PREHARDWARE.md`.
 
 **Criterios de PROMPT-ZERO** (`oraculo/RESULTADOS.md`): C1 PASA · C2 PASA · **C3 NO PASA** (causa documentada,
 `oraculo/INVESTIGACION-C3.md`, decisión J8) · C4 PASA · C5 PASA · C6 NO PROBADO (lo evalúa el operador).
 
-**Siguiente paso: bloque D de `PLAN-MEJORAS.md`** (notebook más explicable: cómo funciona un ensayo, mapas de
-feromona con trazos, fotogramas del conocimiento de la madre, tamaños frente a ESP-NOW, tráfico, "qué mirar",
-informes por experimento). No se empezó: el operador autorizó cerrar B + C sin seguir con D.
-- Orden aprobado (2026-11-18 23:46 -0500): B + C → **D** → artefacto 17 (guía de reproducción, verificada por el
-  revisor siguiéndola desde cero) → E (registros) → artefacto 16 (NetLogo, y su sección en la guía).
-- Observaciones leves abiertas (F-026): una prueba de reproducibilidad entre procesos (PYTHONHASHSEED) y que la
-  semilla −3 da el mismo mundo que la 3.
-- `USO-DEL-PROTOCOLO.md`: falta que el operador complete la tabla de los casos 1 y 2 (Irán–EE. UU. y Colombia).
+**Siguiente paso: artefacto 17, guía de reproducción** (`gemelo/REPRODUCIR.md`; requisitos al final de `ARTEFACTOS.md`),
+verificada por el revisor siguiéndola desde cero. Después: E (registros) → artefacto 16 (NetLogo, y su sección en la guía).
+
+**Lección vigente (F-028):** los textos explicativos de Claude tienden a afirmar más de lo que el dato sostiene; las
+pruebas no lo atrapan, el revisor sí. Toda frase que explique un mecanismo debe citar el código o la cifra que la sostiene.
+
+**Abierto o pendiente:**
+- Observaciones leves: una prueba de reproducibilidad entre procesos (PYTHONHASHSEED); la semilla −3 da el mismo mundo
+  que la 3; `test_notebook.py` regenera figuras versionadas en git; las figuras f1–f4 del texto de divulgación llevan
+  ahora el título "Figura 4/5/6/9".
+- `USO-DEL-PROTOCOLO.md`: el operador completa la tabla de los casos 1 y 2 (Irán–EE. UU. y Colombia).
+- Bloqueantes de hardware B1–B6 (`ESTADO-PREHARDWARE.md`) y revisión de lo aprobado "con bendición" (rondas A–G, I, J;
+  `PROTOCOLO.md` v0.3; ADR-001 y ADR-002).
+- Sin implementar: `BALIZA`, `ALERTA`, `SIGUEME` (E1) y `STOP`.
 
 **Equipo de agentes** (`.claude/agents/`): `revisor` (verifica sin conocer el razonamiento; solo lee y ejecuta
 pruebas), `experimentador` (corre y analiza experimentos con pruebas declaradas antes; escribe en
@@ -86,7 +92,7 @@ commit; el orquestador verifica lo que entregan.
 - Un ensayo: `python -X utf8 -m aco_gemelo run --config configs/default.yaml [--semilla N] [--motor hilos] [--png f.png] [--animacion e.gif]`.
 - Lote: `python -X utf8 -m aco_gemelo batch --config configs/default.yaml --semillas 30` (CSV en `resultados/`, ignorado por git).
 - Experimentos: `python -X utf8 -m aco_gemelo experimentos --plan experimentos/modos.yaml` (y `rescate.yaml`).
-- Notebook: desde `gemelo/notebooks/`, `python -X utf8 -m jupyter nbconvert --to notebook --execute --inplace analisis.ipynb`.
+- Notebook: desde `gemelo/notebooks/`, `python -X utf8 -m nbconvert --to notebook --execute --inplace analisis.ipynb`.
 
 **Resultados vigentes que conviene recordar:**
 - Opción c (salidas escalonadas y viajes repetidos) activa en el puente doble y en los mundos L y aleatorio.
@@ -116,6 +122,9 @@ sesión empieza con el resumen de 5 líneas (PROMPT-ZERO §6). El modelo en uso 
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-20 04:49 -0500
+- **Bloque D cerrado** con aprobación del operador ("Commit ahora"): notebook más explicable (secciones 1–3 y 5, "Qué mirar", glosario) y 4 informes por experimento (experimentador). Tres pasadas del revisor: lo técnico pasó desde la primera; los NO PASA fueron por textos de Claude que afirmaban más de lo que el dato sostiene (F-028); la última frase usa la redacción del revisor. F-027: el comando del notebook es `python -m nbconvert`; F-013 no se sostiene con la configuración actual. Commit y push.
 
 ### 2026-11-19 23:45 -0500
 - **El revisor da PASA al bloque B + C** (F-026, `gemelo/docs/informes/revision_F025.md`): N1 y N2 corregidos, los 8 puntos de F-023 siguen en PASA, 318 + 7 pruebas en PASA y los experimentos publicados idénticos. Según la autorización del operador para la noche: B y C marcados en el plan, registros al día (`ARTEFACTOS.md`, `CHANGELOG.md`, `FAILURES.md`, `USO-DEL-PROTOCOLO.md`), commit y push. D no se empezó.

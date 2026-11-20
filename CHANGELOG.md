@@ -8,8 +8,11 @@
 ### Corregido
 - F-023 (8 puntos), con las correcciones de F-024: el canal da a cada emisor su propio azar y entrega en orden fijo (el motor de hilos sincronizado ya es determinista con pérdidas y retardo), visualización de ensayos abortados, validación del escenario personalizado y de los campos de 8 bits de `INICIO`, pruebas que no detectaban su defecto, `conocimiento` alineado con el último cuadro.
 - F-025: el azar del canal repetía el de las agentes (N1) y el de la madre, el del mundo (N2).
+- Bloque D: el notebook explica cómo funciona un ensayo (corrida comentada, feromona con trazos, mapa de la madre en el tiempo, tamaño de mensajes frente a ESP-NOW, tráfico por familia), con "Qué mirar" bajo cada figura y glosario; 4 informes cortos por experimento en `gemelo/docs/informes/`.
+- F-027: el comando para regenerar el notebook es `python -m nbconvert` (el de antes usaba el Python de Anaconda base). F-013 no se sostiene con la configuración actual.
+- F-028: textos que afirmaban más de lo que el dato sostiene, corregidos en tres pasadas del revisor.
 ### Resultados
-- **Bloque B + C: PASA del revisor** (F-026). 318 pruebas del gemelo y 7 del oráculo en PASA. Los experimentos publicados salen idénticos byte a byte: ninguna conclusión cambia.
+- **Bloque B + C: PASA del revisor** (F-026). **Bloque D cerrado** (F-028). 318 pruebas del gemelo y 7 del oráculo en PASA. Los experimentos publicados salen idénticos byte a byte: ninguna conclusión cambia.
 
 ## [Sesión 3] — 2026-11-18 (Claude Opus 5.5 con su equipo de agentes)
 ### Añadido

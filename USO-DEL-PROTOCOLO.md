@@ -131,7 +131,11 @@ Ningún agente hace commit.
 | Experimentador: línea base antes de corregir | ≈ 58 000 | 28 | ≈ 23 min |
 | Revisor: nueva revisión de B + C | ≈ 99 000 | 38 | ≈ 18 min |
 | Revisor: confirmar el arreglo de N1 y N2 | ≈ 75 000 | 32 | ≈ 8 min |
-| **Total medido** | **≈ 335 000** | **146** | |
+| Experimentador: informes cortos por experimento (bloque D, D8) | ≈ 66 000 | 10 | ≈ 3 min |
+| Revisor: revisar el bloque D | ≈ 129 000 | 52 | ≈ 10 min |
+| Revisor: confirmar las correcciones del bloque D | ≈ 96 000 | 34 | ≈ 30 min |
+| Revisor: revisión corta final del bloque D | ≈ 71 000 | 24 | ≈ 5 min |
+| **Total medido** | **≈ 697 000** | **266** | |
 
 **Lo que no se puede medir con lo disponible:** los tokens de la conversación principal, los de las sesiones anteriores y
 un contrafactual real (hacer la misma tarea sin agentes y medirla). Por eso la comparación de gasto es una **estimación**:
@@ -146,6 +150,10 @@ un contrafactual real (hacer la misma tarea sin agentes y medirla). Por eso la c
   justifican por **calidad**: verificación independiente y defectos encontrados que la IA principal no vio. En este caso,
   8 defectos a cambio de ≈ 104 000 tokens del revisor, y en la segunda revisión (≈ 99 000) un defecto nuevo que
   la corrección había introducido y que la IA principal no vio: el azar del canal repetía el de las agentes (N1).
+  En el bloque D, las dos pasadas del revisor (≈ 225 000 tokens) no encontraron fallas de código, sino **textos que
+  afirmaban más de lo que el dato sostiene** (F-028): un tipo de error que ninguna prueba automática atrapa.
+  El patrón se repitió en las correcciones: cada frase nueva de la IA principal para explicar un mecanismo volvió a
+  fallar ante el revisor (tres pasadas). Lo que cerró el ciclo fue usar la redacción que propuso el propio revisor.
 
 ## 6. Ajustes propuestos al protocolo
 
