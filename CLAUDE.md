@@ -123,6 +123,12 @@ sesión empieza con el resumen de 5 líneas (PROMPT-ZERO §6). El modelo en uso 
 
 ## Historial
 
+### 2026-11-20 05:05 -0500
+- Divulgación: texto nuevo `gemelo/docs/divulgacion/03_repetir_el_azar.md` y puesta al día de 01 y 02 (divulgador). El revisor verificó las afirmaciones: ninguna cifra equivocada, 13 frases que afirmaban de más (`gemelo/docs/informes/revision_divulgacion.md`), corregidas con su redacción tal cual. `ARTEFACTOS.md` ya no presenta D como "revisado con PASA". Commit y push según la autorización del operador.
+
+### 2026-11-20 04:56 -0500
+- El operador pide al divulgador contar lo logrado (texto 03 y puesta al día de 01 y 02) y **autoriza commit y push cuando termine** (se ausenta hasta la noche). Plan: una pasada del revisor sobre las afirmaciones del texto (lección F-028), correcciones con su redacción, commit y push; no se empieza el artefacto 17.
+
 ### 2026-11-20 04:49 -0500
 - **Bloque D cerrado** con aprobación del operador ("Commit ahora"): notebook más explicable (secciones 1–3 y 5, "Qué mirar", glosario) y 4 informes por experimento (experimentador). Tres pasadas del revisor: lo técnico pasó desde la primera; los NO PASA fueron por textos de Claude que afirmaban más de lo que el dato sostiene (F-028); la última frase usa la redacción del revisor. F-027: el comando del notebook es `python -m nbconvert`; F-013 no se sostiene con la configuración actual. Commit y push.
 

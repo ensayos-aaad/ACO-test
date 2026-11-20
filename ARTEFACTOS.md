@@ -32,7 +32,7 @@ que el 16. `[x]` = hecho y revisado con PASA · `[~]` = implementado, pero con N
 
 - [x] **A.** Correcciones: F-020 (la madre ya no rescata a la verificadora), experimentos repetidos, notas en F-010/13/18/19.
 - [x] **B + C.** Motor (B1–B7) y métricas (C1–C4). NO PASA (F-023) → corregido (F-024, F-025) → **PASA** (F-026). Tocó los artefactos 5, 8, 9, 10 y 11.
-- [x] **D.** Notebook más explicable (D1–D8): secciones 1–3 y 5, "Qué mirar", glosario, 4 informes por experimento (F-027, F-028). Notebook más fácil de explicar (D1–D8): amplía el artefacto 15.
+- [x] **D.** Notebook más explicable (D1–D8, amplía el artefacto 15): secciones 1–3 y 5, "Qué mirar", glosario, 4 informes por experimento (F-027, F-028). Lo técnico, con PASA; cerrado por decisión del operador: la última corrección de texto usa la redacción del revisor y no tuvo una cuarta pasada.
 - [ ] **Artefacto 17.** ← *siguiente* Guía de reproducción, verificada por el revisor siguiéndola desde cero.
 - [ ] **E.** Registros (E1–E4).
 - [ ] **Artefacto 16.** Demostración con NetLogo, y su sección en la guía.

@@ -44,15 +44,24 @@ noviembre, 22:59). Las respuestas:
   ignoraban; quitarlos no movió nada.
 - **Cambió la explicación.** Con umbral 0,5 el rescate solo llegaba a la verificadora; ahora no se envía ninguno y ese
   modo equivale a la madre ausente. Con umbral 0,8 o mayor, la madre envía entre 79 y 129 rescates por cada 30 ensayos
-  a rezagadas reales; se usan entre el 70 % y el 83 %, y el resto llega tarde.
+  a rezagadas reales; se usan entre el 71 % y el 83 %, y el resto llega tarde (la agente ya había llegado a la meta).
 - **Las conclusiones previas se sostienen.** La mejora en el mundo aleatorio (27 de 30 frente a 18 de 30) sigue sin ser
   significativa tras corregir por comparaciones múltiples (p = 0,09), y el rescate no reduce la variación del tiempo
   (p corregido = 1,00).
 
 Los registros viejos no se borraron: llevan una nota de corrección ("se disparaba hacia la verificadora"). Hoy hay 264
-pruebas del gemelo en PASA.
+pruebas del gemelo en PASA. *(Al 20 de noviembre son 318.)*
 
 ## 3. Lo que viene
+
+> **Actualización (2026-11-20).** Esta sección quedó vieja. Los bloques B + C (motor y métricas) y D (notebook más
+> explicable) ya se hicieron. B + C pasó la revisión después de dos NO PASA. En D, lo técnico pasó desde la primera
+> revisión y los tres NO PASA fueron por textos; la última corrección usó la redacción del revisor y, por decisión del
+> operador, no tuvo una cuarta pasada. Las dos figuras que aquí "no existen todavía" ya existen: los fotogramas del
+> mapa de la madre y los mapas de feromona con trazos. El orden que sigue lo aprobó el operador el 18 de noviembre a
+> las 23:46, pero aquí no quedó escrito completo: primero la guía de reproducción, luego los registros y después la
+> demostración con NetLogo. Todo eso se cuenta en [«Repetir el azar, mirar por dentro»](03_repetir_el_azar.md). Lo de
+> abajo se deja como estaba escrito el 18 de noviembre.
 
 Hay un plan por bloques. El primero, corregir el rescate, está hecho; los demás esperan la decisión del operador. Sigue
 mejorar el motor y medir más, entre otras cosas lo que la madre sabe del mundo en cada instante.
@@ -80,7 +89,7 @@ demostración con NetLogo.
 ## Lo que todavía no sabemos
 
 - Si la madre mejora de verdad la convergencia: falta un experimento confirmatorio, con unas 100 semillas por condición.
-- Cómo afectan a la convergencia la pérdida y el retardo de mensajes de una radio real: no se ha medido.
+- Cómo afectan a la convergencia la pérdida y el retardo de mensajes de una radio real: no se ha medido. *(Al 20 de noviembre sigue sin medirse. Los ensayos con pérdidas y retardo simulados que existen, los de este texto y los del texto 03, se hicieron para comprobar otras cosas —que el rescate no va a la verificadora y que los resultados se repiten—, no para medir ese efecto.)*
 - Si lo que funciona en el gemelo funcionará en los micros: antes hay que cerrar los seis bloqueantes.
 
 ## Fuentes
@@ -91,5 +100,8 @@ demostración con NetLogo.
 - Defecto, corrección y verificación: `FAILURES.md` (F-020, F-022), `PLAN-MEJORAS.md` (A1–A3, C4).
 - Repetición de los 480 ensayos: `gemelo/docs/informes/rescate_tras_F020.md`.
 - Plan: `PLAN-MEJORAS.md` (bloques B–E, en especial C3, D2 y D3).
+- Actualizaciones del 2026-11-20: `FAILURES.md` (F-024 a F-028), `gemelo/docs/informes/rescate_tras_F020.md` (tabla de
+  mecanismos: 71,1 % a 83,2 % usados), `gemelo/docs/informes/experimento_rescate.md`,
+  `gemelo/docs/informes/experimento_reproducibilidad_canal.md`, `CLAUDE.md` ("Para retomar": 318 pruebas, orden de trabajo).
 - NetLogo y hardware: `ESTADO-PREHARDWARE.md` (artefacto 16, bloqueantes B1–B6, exploraciones X1 y X2); `CLAUDE.md`
   ("Abierto o pendiente": JSON y ESP-NOW).

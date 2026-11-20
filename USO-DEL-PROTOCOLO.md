@@ -135,7 +135,9 @@ Ningún agente hace commit.
 | Revisor: revisar el bloque D | ≈ 129 000 | 52 | ≈ 10 min |
 | Revisor: confirmar las correcciones del bloque D | ≈ 96 000 | 34 | ≈ 30 min |
 | Revisor: revisión corta final del bloque D | ≈ 71 000 | 24 | ≈ 5 min |
-| **Total medido** | **≈ 697 000** | **266** | |
+| Divulgador: texto 03 y puesta al día de 01 y 02 | ≈ 128 000 | 53 | ≈ 5 min |
+| Revisor: verificar las afirmaciones de la divulgación | ≈ 145 000 | 32 | ≈ 7 min |
+| **Total medido** | **≈ 970 000** | **351** | |
 
 **Lo que no se puede medir con lo disponible:** los tokens de la conversación principal, los de las sesiones anteriores y
 un contrafactual real (hacer la misma tarea sin agentes y medirla). Por eso la comparación de gasto es una **estimación**:

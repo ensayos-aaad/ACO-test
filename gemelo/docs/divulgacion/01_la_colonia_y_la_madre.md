@@ -110,6 +110,11 @@ camino). Cuántas veces llegó la verificadora:
 | Rescate, umbral 0,5 | 21 | 18 |
 | Rescate, umbral 0,8 / 0,95 / 1,0 | 24 / 22 / 23 | 25 / 27 / 27 |
 
+*Nota sobre las figuras de esta sección (2026-11-20).* Vienen del notebook de análisis, que se reorganizó para explicar
+primero un ensayo (ver [«Repetir el azar, mirar por dentro»](03_repetir_el_azar.md)). Por eso el título que llevan
+dentro de la imagen dice ahora "Figura 4", "Figura 5", "Figura 6" y "Figura 9". Son las mismas cuatro figuras, con los
+mismos datos; solo cambió el número.
+
 ![Fracción de colonias que convergen por modo, con intervalos de confianza](../../notebooks/figuras/f1_convergencia_por_modo.png)
 
 La tendencia es que la madre ayuda, sobre todo en el mundo aleatorio. Pero con 30 semillas la tendencia **no alcanza
@@ -121,7 +126,8 @@ de confianza lo dicen también: 74–97 % para 27 de 30 y 42–75 % para 18 de 3
 La propuesta técnica tenía una hipótesis más precisa: que el rescate **reduce la variación** del tiempo que tarda la
 colonia en converger. Los datos **no la apoyan**: en las seis comparaciones, p corregido = 1,00. Algo parecido pasó con
 la pista de baile y la difusión: en una configuración anterior, con un solo viaje por agente, bajaban esa variación a
-menos de un tercio; con diez viajes, el efecto desapareció.
+menos de un tercio; con diez viajes, el efecto desapareció. (El registro lo confirmó después, F-027: aquel resultado
+vale solo para la configuración anterior, que no se repitió.)
 
 ![Tiempo hasta que se asienta la última agente, por modo](../../notebooks/figuras/f2_tiempo_por_modo.png)
 
@@ -152,7 +158,7 @@ buena noticia: los dos motores, escritos por separado, dieron exactamente los mi
 
 Se corrigió el defecto y se repitieron los 480 ensayos, esta vez con las pruebas declaradas antes de correr. Ningún
 rescate llegó a la verificadora. Con umbral alto, la madre envió entre 79 y 129 rescates por cada 30 ensayos; entre el
-70 % y el 83 % se usaron, y el resto llegó tarde. Los resultados salieron **idénticos fila por fila** a los de antes:
+71 % y el 83 % se usaron, y el resto llegó tarde: la agente ya había llegado a la meta al menos una vez. Los resultados salieron **idénticos fila por fila** a los de antes:
 las cifras se sostienen; lo que cambió fue la lectura del mecanismo. Con umbral 0,5, el rescate nunca ayudó porque no llegaba a ninguna agente útil.
 
 La lección quedó escrita en el registro: **medir cada mecanismo** (envíos, usos y descartes), no inferirlo del
@@ -184,6 +190,8 @@ resultado. Un resultado igual puede esconder un mecanismo roto.
 - Criterios C1–C5: `oraculo/RESULTADOS.md`, `oraculo/TOLERANCIAS.md`; primera comparación: `FAILURES.md` (F-014, F-015).
 - Investigación de C3: `oraculo/INVESTIGACION-C3.md`, `FAILURES.md` (F-017), `DECISIONES-PRUEBA.md` (J8).
 - Modos de la madre: `gemelo/experimentos/datos/modos/resumen.csv`, `gemelo/experimentos/datos/rescate/resumen.csv`,
-  `FAILURES.md` (F-013, F-018, F-019), `gemelo/notebooks/analisis.ipynb` y `gemelo/notebooks/figuras/`.
+  `FAILURES.md` (F-013, F-018, F-019, F-027), `gemelo/docs/informes/experimento_modos.md`,
+  `gemelo/notebooks/analisis.ipynb`, `gemelo/notebooks/figuras/` y `gemelo/notebooks/README.md` (numeración de las figuras).
 - Error del rescate: `FAILURES.md` (F-020, F-021), `otras/ANALISIS-gemini-artefacto9.md`,
-  `gemelo/docs/informes/rescate_tras_F020.md`.
+  `gemelo/docs/informes/rescate_tras_F020.md` (tabla de mecanismos: usados de 86 de 121, el 71,1 %, a 79 de 95, el 83,2 %) y
+  `gemelo/docs/informes/experimento_rescate.md` ("llega tarde" = `rescate_ya_llego`; F-028).

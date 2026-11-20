@@ -49,7 +49,7 @@ sin madre; p entre 0,81 y 0,91 sin corregir, 1,00 corregido en las 6. Sin difere
 | aleatorio | 0,95 | 122 | 92 | 30 | 0 / 0 / 0 / 0 |
 | aleatorio | 1,0 | 129 | 98 | 31 | 0 / 0 / 0 / 0 |
 
-Cada envío termina en "usado" o "llega tarde": 70-83 % se usan.
+Cada envío termina en "usado" o "llega tarde": 71-83 % se usan.
 
 ## Comparación con antes de la corrección
 
