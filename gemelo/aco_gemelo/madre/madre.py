@@ -137,7 +137,9 @@ class Madre:
 
         Los mensajes se procesan en un orden fijo (tick en que se enviaron y emisor), no en el
         orden de llegada. Así, si las agentes corren en hilos y sus mensajes llegan intercalados,
-        la madre llega al mismo estado que con un solo hilo (motor ``hilos_sincronos``).
+        la madre llega al mismo estado que con un solo hilo (motor ``hilos_sincronos``). Desde
+        F-023 el canal también entrega en orden fijo; este orden queda como segunda defensa y
+        tiene su propia prueba (``test_b7_la_madre_lee_en_orden_de_tick_y_emisor``).
         """
         mensajes = self.canal.recibir(ID_MADRE)
         if self.config.modo is Modo.AUSENTE:

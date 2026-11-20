@@ -18,20 +18,25 @@ Notación: **(G#)** = idea tomada de Gemini · ⚠ = toca el comportamiento del 
 
 ## B. Mejoras del motor (tomadas de Gemini)
 
-- [ ] **B1** Enviar `INICIO` al empezar el ensayo **(G2)**. El mensaje ya existe; ahora se ejercita y su costo se cuenta.
-- [ ] **B2** Cerrar como **abortado** (`FIN` motivo 3) cuando ninguna agente puede seguir **(G3)**.
-- [ ] **B3** Registrar la **memoria máxima** de la madre durante el ensayo, no solo la final **(G4)**.
-- [ ] **B4** Vaciar los mensajes pendientes antes de cerrar, para que la madre registre la verificación aunque haya retardo **(G5)**.
-- [ ] **B5** Aplicar las acciones en orden canónico (por agente) **(G6)**.
-- [ ] **B7** Modo de hilos **en paso fijo** (sincronizados por tick) como tercer motor, solo para probar que con madre da lo mismo que el determinista **(G10)**. El motor de hilos asíncrono se conserva para la demostración.
-- [ ] **B6** Escenario **personalizado** en el YAML (obstáculos, inicio y meta escritos a mano) **(G1)**, con su prueba.
+- [x] **B1** Enviar `INICIO` al empezar el ensayo **(G2)**. El mensaje ya existe; ahora se ejercita y su costo se cuenta.
+- [x] **B2** Cerrar como **abortado** (`FIN` motivo 3) cuando ninguna agente puede seguir **(G3)**.
+- [x] **B3** Registrar la **memoria máxima** de la madre durante el ensayo, no solo la final **(G4)**.
+- [x] **B4** Vaciar los mensajes pendientes antes de cerrar, para que la madre registre la verificación aunque haya retardo **(G5)**.
+- [x] **B5** Aplicar las acciones en orden canónico (por agente) **(G6)**.
+- [x] **B7** Modo de hilos **en paso fijo** (sincronizados por tick) como tercer motor, solo para probar que con madre da lo mismo que el determinista **(G10)**. El motor de hilos asíncrono se conserva para la demostración.
+- [x] **B6** Escenario **personalizado** en el YAML (obstáculos, inicio y meta escritos a mano) **(G1)**, con su prueba.
+
+**Estado de B + C (2026-11-19 23:40 -0500): PASA del revisor** (`gemelo/docs/informes/revision_F025.md`). Primero NO PASA
+(F-023); sus 8 puntos se corrigieron (F-024); la corrección trajo un defecto nuevo (N1/N2, F-025), ya corregido. Efecto de B4, a saber: la lectura final puede traer,
+con retardo, mensajes que cambian la memoria de la madre (`memoria_madre`, `memoria_madre_max`), pero **no**
+`conocimiento`, que se mide al cerrar el último tick, igual que el último cuadro de `mapa_madre`.
 
 ## C. Métricas nuevas
 
-- [ ] **C1** **Bytes totales** por ensayo, incluido el tráfico mundo ↔ agente, en el CSV y en el resumen **(G7)**.
-- [ ] **C2** Tabla de tamaño de **JSON frente a binario** por mensaje, calculada con nuestros codificadores **(G8)**.
+- [x] **C1** **Bytes totales** por ensayo, incluido el tráfico mundo ↔ agente, en el CSV y en el resumen **(G7)**.
+- [x] **C2** Tabla de tamaño de **JSON frente a binario** por mensaje, calculada con nuestros codificadores **(G8)**.
 - [x] **C4** **Medir los mecanismos, no solo el resultado** (lección de F-020/F-021): en el CSV, rescates enviados, usados e ignorados (y por qué), reclutamientos, rutas pedidas y heredadas, y ticks por fase (exploración y verificación).
-- [ ] **C3** Con `registrar`, guardar tick a tick **lo que la madre sabe del mundo** (celdas conocidas y obstáculos).
+- [x] **C3** Con `registrar`, guardar tick a tick **lo que la madre sabe del mundo** (celdas conocidas y obstáculos).
       Es la base de los fotogramas de D3.
 
 ## D. Notebook: explicabilidad

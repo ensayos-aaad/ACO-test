@@ -20,7 +20,11 @@ Hay tres motores que ejecutan **el mismo** ``paso()`` de cada actor:
 - ``"hilos_sincronos"``: un hilo por agente, pero todos dan su paso a la vez en cada tick
   (barreras) y la madre corre después, en el hilo principal. No es asíncrono; sirve para
   **probar** que repartir las agentes en hilos no cambia el resultado, también con madre
-  (B7 de ``PLAN-MEJORAS.md``, idea tomada del trabajo de Gemini).
+  (B7 de ``PLAN-MEJORAS.md``, idea tomada del trabajo de Gemini). Da exactamente lo mismo que
+  el determinista, también con pérdidas y retardo, porque el canal da a cada emisor su propio
+  generador y entrega en orden fijo (F-023, punto 1). El motor ``"hilos"`` no da esa garantía
+  con madre: la madre corre en su propio hilo y el momento en que actúa depende del sistema
+  operativo (artefacto 8).
 
 El motor mira el estado de las agentes directamente para saber cuándo cambiar de fase: es el
 punto de vista del gemelo, que conoce la verdad. En el sistema real eso lo sabría la madre por
@@ -66,6 +70,10 @@ class ConfigEnsayo:
         pausa: segundos que duerme cada hilo entre dos pasos (solo motor de hilos).
         salida_cada: ticks entre la salida de una agente y la siguiente (J1). Con 0 salen
             todas en el tick 0.
+
+    Con madre, ``madre.delta_t`` y ``agente.K`` viajan en campos de 8 bits del mensaje
+    ``INICIO`` y deben estar entre 0 y 255 (F-023, punto 7). La semilla viaja en 16 bits: se
+    envían sus 16 bits bajos (es solo informativa; las agentes no leen ``INICIO`` todavía).
     """
 
     n_agentes: int = 6
@@ -82,12 +90,20 @@ class ConfigEnsayo:
     pausa: float = 0.0002
     salida_cada: int = 0
 
+    def __post_init__(self) -> None:
+        if self.madre.modo is Modo.AUSENTE:
+            return  # sin madre no se envía INICIO
+        for nombre, valor in (("madre.delta_t", self.madre.delta_t), ("agente.K", self.agente.K)):
+            if not 0 <= valor <= 255:
+                raise ValueError(f"{nombre} = {valor} no cabe en el mensaje INICIO (8 bits): "
+                                 "con madre debe estar entre 0 y 255")
+
 
 @dataclass
 class Resultado:
     """Lo que deja un ensayo."""
 
-    motivo: str  #: "verificada", "verificadora_fallo" o "limite"
+    motivo: str  #: "verificada", "verificadora_fallo", "limite" o "abortado"
     asentadas: bool  #: todas las agentes llegaron a la meta y se quedaron
     verificada: bool  #: además, la verificadora llegó siguiendo el rastro (criterio G1)
     ticks_asentadas: int | None  #: tick en que se asentó la última agente
@@ -177,7 +193,7 @@ class ActorMundo:
 
 
 class Simulacion:
-    """Arma un ensayo sobre un mundo y lo hace correr con uno de los dos motores."""
+    """Arma un ensayo sobre un mundo y lo hace correr con uno de los tres motores."""
 
     def __init__(self, mundo: Mundo, config: ConfigEnsayo | None = None) -> None:
         self.mundo = mundo
@@ -205,6 +221,9 @@ class Simulacion:
         self.abortado = False
         self.tick = 0
         if self.con_madre:  # B1: la madre anuncia el ensayo (el mensaje ya existía en el protocolo)
+            # Lleva ACK: no se pierde, pero se le sortea retardo con el generador de la madre
+            # (F-023, punto 2). Como cada emisor tiene su propio generador, no altera el azar de
+            # las agentes. Ninguna agente lo lee todavía: solo cuenta como tráfico.
             self.canal.enviar(crear(
                 "INICIO", src=ID_MADRE, dst=ID_DIFUSION, tick=0, flags=FLAG_ACK,
                 ancho_m1=mundo.ancho - 1, alto_m1=mundo.alto - 1, nido=celda_a_byte(mundo.inicio),
@@ -303,9 +322,15 @@ class Simulacion:
         else:
             motivo = "limite"
         codigo = {"verificada": 0, "limite": 1, "verificadora_fallo": 2, "abortado": 3}[motivo]
+        # El conocimiento se mide al cerrar el último tick, el mismo instante del último cuadro
+        # de mapa_madre y de serie, antes de la lectura final de B4 (F-023, punto 6). Con
+        # retardo, esa lectura puede traer FRAGMENTO que agrandan el mapa de la madre; quedan
+        # fuera de la métrica, igual que sus ticks. Sin retardo no trae nada y no cambia.
+        conocimiento = self._conocimiento()
         if self.con_madre and v is not None:
             # B4: la madre lee lo que aún venga en camino (con retardo), sin actuar, para que
             # registre el resultado de la verificadora. No cuenta como ticks del ensayo.
+            # Sí puede cambiar la memoria de la madre (memoria_madre y memoria_madre_max).
             for extra in range(self.config.retardo[1] + 1):
                 if self.madre.verificacion is not None:
                     break
@@ -327,7 +352,7 @@ class Simulacion:
             trafico=trafico or self.canal.resumen(),
             memoria_madre=self.madre.memoria_usada() if self.con_madre else 0,
             modo_madre=self.config.madre.modo.name.lower(),
-            conocimiento=self._conocimiento(),
+            conocimiento=conocimiento,
             historial=self.actor_mundo.historial,
             serie=self.serie,
             feromona=self.feromona,

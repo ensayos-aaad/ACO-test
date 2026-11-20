@@ -6,7 +6,13 @@
 semilla: 2026            # define el mundo (inicio y meta), las agentes y el canal
 
 mundo:
-  escenario: L           # L | aleatorio | puente_doble
+  escenario: L           # L | aleatorio | puente_doble | personalizado
+  # Con personalizado el mundo se escribe a mano (no usa la semilla ni distancia_minima), p. ej.:
+  #   ancho: 5
+  #   alto: 4
+  #   obstaculos: [[2, 0], [2, 1], [2, 2]]
+  #   inicio: [0, 0]
+  #   meta: [4, 0]
   distancia_minima: 4    # movimientos mínimos de la ruta óptima entre inicio y meta (I13)
   tau_max: 1.0           # tope de feromona por celda; los 16 niveles percibidos van de 0 a este valor
   unidad_deposito: 1/255 # feromona que suma cada unidad del campo "deposito" de una ACCION

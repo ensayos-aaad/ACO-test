@@ -36,7 +36,7 @@ colonia de agentes y una "madre" en el edge) que extiende ese método.
 | `referencia/`     | Copia de solo lectura de `UdeA-IoT/ESP-ACO` @ `3c48648` (ver `PROCEDENCIA.md`) |
 | `CONTEXT.md`      | Inventario de la referencia, parámetros, oráculos, vacíos (I1–I16), NetLogo/hormigas (§5), agentes AIMA (§6), `resumen.pdf` (§7), enfoque del gemelo (§8) |
 | `DECISIONS.md`    | Decisiones en formato ADR (ADR-001 y ADR-002 propuestas; ADR-003 aprobada) |
-| `FAILURES.md`     | Registro de fallas y hallazgos (F-001 a F-022); nunca se borra |
+| `FAILURES.md`     | Registro de fallas y hallazgos (F-001 a F-026); nunca se borra |
 | `ASSUMPTIONS.md`  | Suposiciones y sesgos declarados (A-001 a A-004)             |
 | `CHANGELOG.md`    | Cambios por sesión                                           |
 | `CHECKLIST-ENTORNO.md` | Software necesario: instalado `[x]` / falta `[ ]`       |
@@ -45,6 +45,7 @@ colonia de agentes y una "madre" en el edge) que extiende ese método.
 | `ARTEFACTOS.md`   | Los 17 artefactos de software (→ `gemelo/`), su estado, su avance y los requisitos de reproducción |
 | `ESTADO-PREHARDWARE.md` | Estado antes del hardware: avance, checklist de hallazgos, bloqueantes B1–B6 y exploraciones X1–X8 |
 | `IDEAS.md`        | Cuaderno de asociación libre del operador (sin filtro; las ideas no se corrigen) |
+| `USO-DEL-PROTOCOLO.md` | Evaluación del método de trabajo con IA en este proyecto (caso 3, junto a Irán–EE. UU. y la elección en Colombia): qué guió, qué evitó, qué salió mal |
 | `PLAN-MEJORAS.md` | Plan de correcciones y mejoras (bloques A–E) tras el análisis de Gemini; A1–A3 y C4 hechos |
 | `.claude/agents/` | Agentes del equipo: `revisor` (solo lee), `experimentador` (experimentos y docs), `divulgador` (textos para no especialistas) |
 | `otras/`          | Trabajo de terceros: `gemini/` (Gemini, en la nube) y su análisis `ANALISIS-gemini-artefacto9.md` |
@@ -52,34 +53,25 @@ colonia de agentes y una "madre" en el edge) que extiende ese método.
 | `gemelo/`         | **El código**: `aco_gemelo/` (mundo, protocolo, canal, agente, madre, motor, métricas, visual, experimentos), `configs/`, `experimentos/` (planes y datos), `tests/`, `environment.yml` |
 | `bosquejo/`       | Plano de ensayo (a mano y en limpio)                         |
 
-## Para retomar (estado al 2026-11-19 21:00 -0500)
+## Para retomar (estado al 2026-11-19 23:45 -0500)
 
 **Dónde quedamos.** Fase 1 del gemelo de software casi completa: 14 de 17 artefactos hechos (1, 3–15; el 2,
-protocolo, en borrador v0.3). **281 pruebas del gemelo + 7 del oráculo en PASA** (2026-11-19 20:58), pero el bloque
-B + C tiene NO PASA del revisor (F-023). Detalle y checklist del plan vigente en `ARTEFACTOS.md` ("Orden de trabajo
-vigente"); visión de conjunto en `ESTADO-PREHARDWARE.md`. Último commit: `42e0943`.
+protocolo, en borrador v0.3); 41 de 49 criterios en PASA. **Bloque B + C cerrado con PASA del revisor** (F-023 →
+F-024 → F-025 → F-026). **318 pruebas del gemelo + 7 del oráculo en PASA.** Los experimentos publicados no cambiaron
+(CSV idénticos byte a byte). Checklist del plan en `ARTEFACTOS.md` ("Orden de trabajo vigente"); visión de conjunto
+en `ESTADO-PREHARDWARE.md`. Informes del revisor en `gemelo/docs/informes/revision_F023`, `_F024` y `_F025`.
 
 **Criterios de PROMPT-ZERO** (`oraculo/RESULTADOS.md`): C1 PASA · C2 PASA · **C3 NO PASA** (causa documentada,
 `oraculo/INVESTIGACION-C3.md`, decisión J8) · C4 PASA · C5 PASA · C6 NO PROBADO (lo evalúa el operador).
 
-**AL RETOMAR (2026-11-18 23:58 -0500):** el revisor dio **NO PASA** al bloque B + C (ver **F-023** en `FAILURES.md`). Primero corregir,
-en este orden: (1) que el canal no dependa del orden de los envíos concurrentes (un generador por emisor, o encolar
-los envíos del tick y pasarlos en orden de id), para que `hilos_sincronos` sea determinista también con pérdidas y
-retardo; (2) que `INICIO` no gaste números del generador del canal (o documentar el cambio y repetir F-022 con
-pérdidas); (3) `"abortado"` en `visual.py` y en el docstring de `Resultado.motivo`; (4) rechazar inicio = meta en el
-escenario personalizado (y avisar si se dan obstáculos/inicio/meta en otros escenarios); (5) reforzar `test_b3`,
-`test_b5` y `test_b7` (con pérdidas y varias semillas); (6) documentar el efecto de la lectura final (B4) sobre
-`conocimiento`; (7) validar `delta_t` ≤ 255. Luego volver a pedir la revisión, marcar B y C en el plan y seguir con D.
-
-**Siguiente paso (ya hecho, falta la revisión): bloque B + C de `PLAN-MEJORAS.md`.**
-- B: en el motor, enviar `INICIO`, cerrar como abortado, memoria máxima de la madre, vaciar mensajes pendientes,
-  orden canónico de acciones, hilos en paso fijo como tercer motor (para pruebas), y **escenario personalizado**
-  en el YAML.
-- C: bytes totales (C1, ya en el CSV), tabla JSON frente a binario (C2) y **registro tick a tick de lo que la madre
-  sabe del mundo** (C3, base de los fotogramas del notebook).
-- Orden aprobado (2026-11-18 23:46 -0500): **B + C → D** (notebook más explicable: mapas de feromona con trazos y fotogramas del
-  conocimiento de la madre) **→ artefacto 17** (guía de reproducción, verificada por el revisor siguiéndola desde
-  cero) **→ E** (registros) **→ artefacto 16** (demostración con NetLogo, y su sección en la guía).
+**Siguiente paso: bloque D de `PLAN-MEJORAS.md`** (notebook más explicable: cómo funciona un ensayo, mapas de
+feromona con trazos, fotogramas del conocimiento de la madre, tamaños frente a ESP-NOW, tráfico, "qué mirar",
+informes por experimento). No se empezó: el operador autorizó cerrar B + C sin seguir con D.
+- Orden aprobado (2026-11-18 23:46 -0500): B + C → **D** → artefacto 17 (guía de reproducción, verificada por el
+  revisor siguiéndola desde cero) → E (registros) → artefacto 16 (NetLogo, y su sección en la guía).
+- Observaciones leves abiertas (F-026): una prueba de reproducibilidad entre procesos (PYTHONHASHSEED) y que la
+  semilla −3 da el mismo mundo que la 3.
+- `USO-DEL-PROTOCOLO.md`: falta que el operador complete la tabla de los casos 1 y 2 (Irán–EE. UU. y Colombia).
 
 **Equipo de agentes** (`.claude/agents/`): `revisor` (verifica sin conocer el razonamiento; solo lee y ejecuta
 pruebas), `experimentador` (corre y analiza experimentos con pruebas declaradas antes; escribe en
@@ -124,6 +116,17 @@ sesión empieza con el resumen de 5 líneas (PROMPT-ZERO §6). El modelo en uso 
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-19 23:45 -0500
+- **El revisor da PASA al bloque B + C** (F-026, `gemelo/docs/informes/revision_F025.md`): N1 y N2 corregidos, los 8 puntos de F-023 siguen en PASA, 318 + 7 pruebas en PASA y los experimentos publicados idénticos. Según la autorización del operador para la noche: B y C marcados en el plan, registros al día (`ARTEFACTOS.md`, `CHANGELOG.md`, `FAILURES.md`, `USO-DEL-PROTOCOLO.md`), commit y push. D no se empezó.
+
+### 2026-11-19 23:20 -0500
+- La nueva revisión dio **NO PASA** solo por un defecto nuevo (N1: el azar del canal repetía el de las agentes; N2: el de la madre, el del mundo con semilla 0); los 8 puntos de F-023 pasan (`gemelo/docs/informes/revision_F024.md`). Arreglado (semilla del canal con etiqueta propia) con prueba y mutante; comprobaciones en curso.
+- **Autorización del operador para la noche** (se va a dormir): si el revisor da PASA a N1/N2 y los experimentos publicados salen idénticos → marcar B y C en el plan, actualizar este archivo, **commit y push**; no empezar D. Si da NO PASA → una sola ronda de corrección, solo si es pequeña y no cambia resultados publicados; si vuelve a fallar o es grande, parar, sin commit, y dejar informe y opciones.
+
+### 2026-11-19 23:05 -0500
+- Correcciones de F-023 aplicadas (F-024): 314 pruebas del gemelo + 7 del oráculo en PASA; experimentos publicados idénticos byte a byte. El revisor hace la nueva revisión; sin commit.
+- A pedido del operador se crea `USO-DEL-PROTOCOLO.md`: este proyecto como **tercer uso** del protocolo de trabajo con IA (los otros dos: conflicto Irán–EE. UU. y elección presidencial en Colombia, no disponibles para Claude). Tabla comparativa para que la complete el operador.
 
 ### 2026-11-19 21:00 -0500
 - Apertura de sesión. A pedido del operador, `ARTEFACTOS.md` se pone al día: sección "Orden de trabajo vigente" (checklist A → B + C → D → 17 → E → 16), artefactos 8–11 marcados con el NO PASA de F-023, protocolo v0.3 y última corrida de pruebas (281 + 7 en PASA). Se invoca a los agentes antes de corregir F-023. Sin commit.

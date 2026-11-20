@@ -201,13 +201,29 @@ def test_escenario_personalizado():
     {"escenario": "personalizado", "inicio": [0, 0], "meta": [2, 0], "obstaculos": [[1, 0], [1, 1], [1, 2], [1, 3], [1, 4], [1, 5], [1, 6], [1, 7]]},  # sin camino
     {"escenario": "personalizado", "inicio": "0,0", "meta": [2, 0]},  # celda mal escrita
     {"escenario": "personalizado", "inicio": [0, 0], "meta": [1, 0], "obstaculos": [[1, 0]]},  # meta en obstáculo
+    {"escenario": "personalizado", "inicio": [2, 2], "meta": [2, 2]},  # inicio = meta (F-023, 4)
+    {"escenario": "personalizado", "inicio": [0, 0], "meta": [4, 0], "obstaculos": [[2, 0], [2, 0]]},  # repetido
 ])
 def test_escenario_personalizado_invalido(mundo):
     with pytest.raises(ValueError):
         crear_mundo({"mundo": mundo})
 
 
+@pytest.mark.parametrize("escenario", ["L", "aleatorio", "puente_doble"])
+@pytest.mark.parametrize("clave, valor", [("obstaculos", [[0, 0]]), ("inicio", [7, 7]), ("meta", [0, 1])])
+def test_claves_del_personalizado_en_otro_escenario_son_error(escenario, clave, valor):
+    """F-023 (4): antes se ignoraban sin aviso."""
+    with pytest.raises(ValueError, match="personalizado"):
+        crear_mundo({"mundo": {"escenario": escenario, clave: valor}}, semilla=1)
+
+
 def test_motor_hilos_sincronos_desde_la_linea_de_comandos(capsys):
     assert main(["run", "--config", str(CONFIGS / "default.yaml"), "--semilla", "1",
                  "--motor", "hilos_sincronos"]) == 0
     assert "motivo" in capsys.readouterr().out
+
+
+def test_delta_t_fuera_de_rango_es_error_al_cargar_el_yaml():
+    """F-023 (7): el error sale al leer la configuración, no a mitad del ensayo."""
+    with pytest.raises(ValueError, match="INICIO"):
+        config_ensayo({"madre": {"modo": "pista_de_baile", "delta_t": 256}})

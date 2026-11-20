@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## [Sesión 4] — 2026-11-19 (Claude Opus 5.5 con su equipo de agentes)
+### Añadido
+- Bloque B + C de `PLAN-MEJORAS.md` (implementado en la sesión 3, cerrado aquí): `INICIO`, cierre como abortado, memoria máxima de la madre, lectura final, orden canónico de acciones, motor `hilos_sincronos`, escenario personalizado, bytes totales, tamaños JSON frente a binario y mapa de la madre tick a tick.
+- `USO-DEL-PROTOCOLO.md`: este proyecto como tercer uso del protocolo de trabajo con IA (con agentes y gasto de tokens).
+- Informes del revisor con sus scripts y mutantes (`gemelo/docs/informes/revision_F023`, `_F024`, `_F025`) y línea base del experimentador (`gemelo/experimentos/linea_base_f023/`).
+### Corregido
+- F-023 (8 puntos), con las correcciones de F-024: el canal da a cada emisor su propio azar y entrega en orden fijo (el motor de hilos sincronizado ya es determinista con pérdidas y retardo), visualización de ensayos abortados, validación del escenario personalizado y de los campos de 8 bits de `INICIO`, pruebas que no detectaban su defecto, `conocimiento` alineado con el último cuadro.
+- F-025: el azar del canal repetía el de las agentes (N1) y el de la madre, el del mundo (N2).
+### Resultados
+- **Bloque B + C: PASA del revisor** (F-026). 318 pruebas del gemelo y 7 del oráculo en PASA. Los experimentos publicados salen idénticos byte a byte: ninguna conclusión cambia.
+
 ## [Sesión 3] — 2026-11-18 (Claude Opus 5.5 con su equipo de agentes)
 ### Añadido
 - `otras/`: trabajo de Gemini (en la nube) y su análisis; `PLAN-MEJORAS.md`.

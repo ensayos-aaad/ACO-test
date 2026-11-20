@@ -93,13 +93,20 @@ def _mundo_personalizado(mundo: dict[str, Any], escalas: dict[str, float]) -> Mu
     """Mundo escrito a mano en el YAML: obstáculos, inicio y meta fijos (B6, idea de Gemini).
 
     No usa la semilla ni ``distancia_minima``: el mundo es exactamente el que se escribe. Debe
-    haber camino entre el inicio y la meta.
+    haber camino entre el inicio y la meta, y no pueden coincidir (F-023, punto 4: con inicio =
+    meta el ensayo es trivial y la pista de baile dividía por cero). Un obstáculo repetido es
+    un error, porque suele ser una celda mal copiada.
     """
     if mundo["inicio"] is None or mundo["meta"] is None:
         raise ValueError("El escenario personalizado necesita 'inicio' y 'meta'")
     if not isinstance(mundo["obstaculos"], list):
         raise ValueError("'obstaculos' debe ser una lista de celdas [x, y]")
     obstaculos = [_celda(c, "obstaculos") for c in mundo["obstaculos"]]
+    repetidos = sorted({c for c in obstaculos if obstaculos.count(c) > 1})
+    if repetidos:
+        raise ValueError(f"Obstáculos repetidos en el escenario personalizado: {repetidos}")
+    if _celda(mundo["inicio"], "inicio") == _celda(mundo["meta"], "meta"):
+        raise ValueError("En el escenario personalizado el inicio y la meta no pueden coincidir")
     resultado = Mundo(mundo["ancho"], mundo["alto"], obstaculos, _celda(mundo["inicio"], "inicio"),
                       _celda(mundo["meta"], "meta"), **escalas)
     if resultado.bfs() is None:
@@ -111,7 +118,9 @@ def crear_mundo(datos: dict[str, Any], semilla: int | None = None) -> Mundo:
     """Crea el mundo del ensayo. La misma semilla da siempre el mismo mundo.
 
     En los escenarios con azar se regenera hasta que la ruta óptima entre el inicio y la meta
-    mida al menos ``distancia_minima`` movimientos (decisión I13).
+    mida al menos ``distancia_minima`` movimientos (decisión I13). El escenario
+    ``personalizado`` toma ``obstaculos``, ``inicio`` y ``meta`` del YAML (B6); en los demás
+    escenarios esas claves son un error, porque se ignorarían sin aviso (F-023, punto 4).
     """
     mundo = {**_MUNDO, **(datos.get("mundo") or {})}
     _revisar("mundo", mundo, _MUNDO)
@@ -119,6 +128,11 @@ def crear_mundo(datos: dict[str, Any], semilla: int | None = None) -> Mundo:
     escalas = dict(tau0=0.0, tau_max=_numero(mundo["tau_max"]),
                    unidad_deposito=_numero(mundo["unidad_deposito"]))
     escenario = mundo["escenario"]
+    if escenario != "personalizado":
+        dadas = [c for c in ("obstaculos", "inicio", "meta") if mundo[c] != _MUNDO[c]]
+        if dadas:
+            raise ValueError(f"Las claves {dadas} solo valen con escenario: personalizado "
+                             f"(el escenario {escenario!r} las ignoraría)")
     if escenario == "personalizado":
         return _mundo_personalizado(mundo, escalas)
     if escenario == "puente_doble":

@@ -82,6 +82,29 @@ def test_png_del_estado_final(tmp_path):
         assert pixeles_de(imagen, COLORES_HEX[elemento]) > 20, elemento
 
 
+@pytest.mark.parametrize("modo", [Modo.AUSENTE, Modo.DIFUSION])
+def test_un_ensayo_abortado_tambien_se_dibuja(tmp_path, modo):
+    """F-023 (3): antes, un ensayo abortado daba KeyError('abortado') al dibujarlo."""
+    from aco_gemelo.agente import Estado
+
+    mundo = mundo_l(random.Random(0), **CUADRICULA)
+    cfg = ConfigEnsayo(semilla=0, n_agentes=1, rho=0.0, registrar=True,
+                       madre=ConfigMadre(modo=modo))
+    sim = Simulacion(mundo, cfg)
+    agente, original = sim.agentes[0], sim.agentes[0].paso
+
+    def paso(t):  # la única agente queda FALLIDA en el tick 2: nadie puede seguir
+        if t >= 2:
+            agente.estado = Estado.FALLIDA
+        return original(t)
+
+    agente.paso = paso
+    r = sim.correr()
+    assert r.motivo == "abortado" and r.feromona
+    assert png_final(mundo, r, 1, tmp_path / "f.png").stat().st_size > 0
+    assert Image.open(animar(mundo, r, 1, tmp_path / "e.gif")).n_frames == r.ticks_total + 1
+
+
 def test_png_sin_madre_no_dibuja_la_madre(tmp_path):
     mundo, r = ensayo(modo=Modo.AUSENTE)
     imagen = Image.open(png_final(mundo, r, 6, tmp_path / "a.png"))

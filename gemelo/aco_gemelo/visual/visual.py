@@ -204,7 +204,8 @@ def _figura(mundo: Mundo, modo: str):
 def _texto(resultado, cuadro: Cuadro, final: bool) -> str:
     if final:
         estado = {"verificada": "camino verificado", "verificadora_fallo": "la verificadora falló",
-                  "limite": "se agotó el límite"}[resultado.motivo]
+                  "limite": "se agotó el límite",
+                  "abortado": "abortado: ninguna agente puede seguir"}[resultado.motivo]
         extra = f" · ruta {resultado.largo_verificado} / óptima {resultado.largo_optimo}" \
             if resultado.verificada else f" · óptima {resultado.largo_optimo}"
         return f"tick {cuadro.tick} · {estado}{extra}"

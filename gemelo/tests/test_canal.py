@@ -125,6 +125,46 @@ def test_se_entregan_en_orden_de_llegada():
     assert [m["seq"] for m in canal.recibir(ID_MADRE)] == list(range(10))
 
 
+def test_el_orden_de_los_envios_concurrentes_no_cambia_nada():
+    """F-023 (1): cada emisor tiene su propio azar, y en un mismo tick se entrega por emisor.
+
+    Dos emisores envían a la vez (como en el motor de hilos): sea cual sea el orden en que
+    sus envíos llegan al canal, las pérdidas, los retardos y el orden de entrega son los mismos.
+    """
+    def recibido(orden):
+        canal = canal_con_agentes(p_perdida=0.3, retardo=(0, 3), semilla=7)
+        for t in range(6):
+            canal.avanzar(t)
+            for src, seq in orden(t):
+                canal.enviar(estado(src, seq=seq))
+        canal.avanzar(10)
+        return [(m["src"], m["seq"]) for m in canal.recibir(ID_MADRE)]
+
+    envios = lambda t: [(1, t * 10 + k) for k in range(5)] + [(2, t * 10 + k) for k in range(5)]
+    alternados = lambda t: [e for par in zip(envios(t)[5:], envios(t)[:5]) for e in par]
+    invertidos = lambda t: envios(t)[5:] + envios(t)[:5]
+    base = recibido(envios)
+    assert 0 < len(base) < 60  # hubo pérdidas, pero no todas
+    assert recibido(alternados) == base
+    assert recibido(invertidos) == base
+
+
+@pytest.mark.parametrize("semilla", [0, 3, 2026, -1])
+def test_el_azar_del_canal_es_independiente_del_de_las_agentes_y_del_mundo(semilla):
+    """Revisión de F-024 (N1, N2): el generador del canal de cada emisor no repite el de la
+    agente con el mismo id (agente.py), ni el del mundo (config.py), ni el de otro emisor."""
+    import random
+
+    canal = CanalMemoria(semilla=semilla)
+    primeros = lambda rng: [rng.random() for _ in range(8)]
+    del_canal = {src: primeros(canal._rng_de(src)) for src in (ID_MADRE, *range(1, 8), 255)}
+    for src in range(1, 8):
+        assert del_canal[src] != primeros(random.Random(semilla * 256 + src))  # la agente src
+    assert del_canal[ID_MADRE] != primeros(random.Random(semilla))  # el mundo
+    assert len({tuple(v) for v in del_canal.values()}) == len(del_canal)  # emisores distintos
+    assert primeros(CanalMemoria(semilla=semilla)._rng_de(1)) == del_canal[1]  # reproducible
+
+
 def test_perdida_total_salvo_los_garantizados():
     canal = canal_con_agentes(p_perdida=1.0)
     canal.enviar(baliza(1))  # se pierde

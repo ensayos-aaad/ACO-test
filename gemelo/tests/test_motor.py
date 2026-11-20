@@ -182,34 +182,78 @@ def test_b2_cierre_abortado_si_ninguna_puede_seguir():
 
 
 def test_b3_memoria_maxima_de_la_madre():
-    sim = Simulacion(mundo(1), ConfigEnsayo(semilla=1, rho=0.0, madre=ConfigMadre(modo=Modo.DIFUSION)))
-    maxima = 0
-    original = sim.madre.paso
+    """F-023 (5): la máxima se mide durante el ensayo, no al final.
 
-    def espia(t):
-        nonlocal maxima
-        original(t)
-        maxima = max(maxima, sim.madre.memoria_usada())
+    El espía mide la memoria después de cada lectura (también la lectura final de B4) y de cada
+    paso de la madre. Al menos un ensayo debe tener máxima > final; si no, la prueba no
+    distinguiría la máxima de la final.
+    """
+    supera = 0
+    for semilla in range(4):
+        sim = Simulacion(mundo(semilla), ConfigEnsayo(semilla=semilla, rho=0.0,
+                                                      madre=ConfigMadre(modo=Modo.PISTA_DE_BAILE)))
+        maxima = 0
+        leer, paso = sim.madre.leer, sim.madre.paso
 
-    sim.madre.paso = espia
-    r = sim.correr()
-    assert r.memoria_madre_max == maxima >= r.memoria_madre and r.memoria_madre_max <= 64
+        def medir():
+            nonlocal maxima
+            maxima = max(maxima, sim.madre.memoria_usada())
+
+        def espia_leer(*a, **k):
+            salida = leer(*a, **k)
+            medir()
+            return salida
+
+        def espia_paso(*a, **k):
+            salida = paso(*a, **k)
+            medir()
+            return salida
+
+        sim.madre.leer, sim.madre.paso = espia_leer, espia_paso
+        r = sim.correr()
+        assert r.memoria_madre_max == maxima >= r.memoria_madre
+        assert r.memoria_madre_max <= sim.config.madre.memoria
+        supera += r.memoria_madre_max > r.memoria_madre
+    assert supera > 0
 
 
 def test_b4_la_madre_registra_la_verificacion_aun_con_retardo():
+    comprobados = 0
     for semilla in range(4):
         r = ensayo(semilla, Modo.PISTA_DE_BAILE, retardo=(2, 4))
         if r.motivo == "verificada":
             assert r.madre_verificacion == "ok"
+            comprobados += 1
         elif r.motivo == "verificadora_fallo":
             assert r.madre_verificacion == "fallo"
+            comprobados += 1
+    assert comprobados > 0  # F-023 (5): si ningún ensayo llega a verificar, no se probó nada
 
 
 def test_b5_acciones_en_orden_fijo():
-    r = ensayo(2)
-    for t in {t for t, _, _ in r.historial}:
-        ids = [i for tt, i, _ in r.historial if tt == t]
-        assert ids == sorted(ids)
+    """F-023 (5): unas ACCION que llegan desordenadas se aplican en orden de id.
+
+    El motor determinista ya llama a las agentes en orden, y desde F-023 (1) el canal también
+    entrega por emisor, así que ni un ensayo completo ni el canal lo prueban: se le pasan al
+    mundo las ACCION desordenadas a propósito, sin pasar por el canal. (Las agentes pueden
+    compartir celda, por eso no hay un choque cuyo resultado dependa del orden; queda el orden
+    del historial.)
+    """
+    from aco_gemelo.canal import CanalMemoria
+    from aco_gemelo.motor.simulacion import ActorMundo
+    from aco_gemelo.protocolo import ID_MUNDO, Contexto, crear
+
+    m = Mundo(4, 4, [], inicio=(0, 0), meta=(3, 3), tau0=0.0, tau_max=1.0)
+    canal = CanalMemoria(Contexto(4, 4, 8))
+    actor = ActorMundo(m, canal, 0.0, True)
+    for i in (1, 2, 3):
+        canal.registrar(i)
+        actor.agregar(i)
+    desordenadas = [crear("ACCION", src=i, dst=ID_MUNDO, tick=0, accion=0, dir=0, deposito=0)
+                    for i in (3, 1, 2)]
+    actor.canal = type("CanalFijo", (), {"recibir": lambda self, _id: list(desordenadas)})()
+    assert actor.aplicar_acciones(0) == {1, 2, 3}
+    assert [i for _, i, _ in actor.historial] == [1, 2, 3]
 
 
 @pytest.mark.parametrize("modo", list(Modo))
@@ -217,6 +261,18 @@ def test_b7_hilos_sincronos_dan_lo_mismo_que_el_determinista_tambien_con_madre(m
     sincronos = ensayo(1, modo, motor="hilos_sincronos")
     determinista = ensayo(1, modo)
     assert sincronos == determinista
+
+
+@pytest.mark.parametrize("canal", [dict(p_perdida=0.2), dict(retardo=(0, 3)),
+                                   dict(p_perdida=0.2, retardo=(1, 4))])
+@pytest.mark.parametrize("modo", list(Modo))
+def test_b7_hilos_sincronos_deterministas_con_perdidas_y_retardo(modo, canal):
+    """F-023 (1): con pérdidas o retardo, repartir las agentes en hilos tampoco cambia nada."""
+    for semilla in range(3):
+        extra = dict(canal, rho=0.01, fabrica=mundo_aleatorio)
+        determinista = ensayo(semilla, modo, **extra)
+        for _ in range(2):
+            assert ensayo(semilla, modo, motor="hilos_sincronos", **extra) == determinista
 
 
 def test_c3_mapa_de_la_madre_tick_a_tick():
@@ -229,3 +285,51 @@ def test_c3_mapa_de_la_madre_tick_a_tick():
     assert len(final) == conocidas[-1]
     sin_mapa = ensayo(1, Modo.PISTA_DE_BAILE)  # la pista de baile no guarda mapa
     assert all(c == 0 and o == 0 for c, o in sin_mapa.mapa_madre)
+
+
+def test_b7_la_madre_lee_en_orden_de_tick_y_emisor():
+    """F-023 (5): el orden propio de la madre, aparte del orden de entrega del canal.
+
+    Desde F-023 (1) el canal ya entrega en orden fijo, así que quitar este orden no rompe el
+    determinismo y ninguna prueba de motores lo nota (mutante ``mut_b7`` del revisor). Se
+    prueba directo: mensajes desordenados se escuchan por (tick, emisor).
+    """
+    from aco_gemelo.madre import Madre
+
+    llegada = [{"src": 3, "tick": 5}, {"src": 1, "tick": 7}, {"src": 2, "tick": 5}, {"src": 1, "tick": 5}]
+    canal = type("CanalFijo", (), {"registrar": lambda self, _id: None,
+                                   "recibir": lambda self, _id: list(llegada)})()
+    madre = Madre(canal, ConfigMadre(modo=Modo.DIFUSION))
+    escuchados = []
+    madre._escuchar = escuchados.append
+    madre.leer()
+    assert [(m["tick"], m["src"]) for m in escuchados] == [(5, 1), (5, 2), (5, 3), (7, 1)]
+
+
+@pytest.mark.parametrize("modo", [Modo.DIFUSION, Modo.RESCATE])
+def test_c3_el_ultimo_cuadro_coincide_con_el_conocimiento_aun_con_retardo(modo):
+    """F-023 (6): la lectura final de B4 ya no cambia `conocimiento` después del último cuadro.
+
+    Antes, con retardo (2, 4), DIFUSION semilla 3 daba 0,671875 frente a 0,640625 del cuadro.
+    """
+    for semilla in range(15):
+        m = mundo(semilla)
+        r = ensayo(semilla, modo, retardo=(2, 4))
+        conocidas, obstaculos = r.mapa_madre[-1]
+        aciertos = sum(
+            bool(conocidas >> (y * m.ancho + x) & 1)
+            and bool(obstaculos >> (y * m.ancho + x) & 1) == ((x, y) in m.obstaculos)
+            for y in range(m.alto) for x in range(m.ancho))
+        assert aciertos / (m.ancho * m.alto) == r.conocimiento == r.serie[-1]["conocimiento"]
+
+
+@pytest.mark.parametrize("campo, valor", [("delta_t", 256), ("delta_t", 300), ("K", 256)])
+def test_inicio_valida_los_campos_de_8_bits(campo, valor):
+    """F-023 (7): antes fallaba al construir INICIO, con un error del codificador."""
+    agente = ConfigAgente(K=valor) if campo == "K" else ConfigAgente()
+    madre = ConfigMadre(modo=Modo.PISTA_DE_BAILE, delta_t=valor if campo == "delta_t" else 10)
+    with pytest.raises(ValueError, match="INICIO"):
+        ConfigEnsayo(agente=agente, madre=madre)
+    sin_madre = ConfigMadre(modo=Modo.AUSENTE, delta_t=madre.delta_t)
+    ConfigEnsayo(agente=agente, madre=sin_madre)  # sin madre no se envía INICIO: vale
+    assert ConfigEnsayo(madre=ConfigMadre(modo=Modo.PISTA_DE_BAILE, delta_t=255)).madre.delta_t == 255

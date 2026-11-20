@@ -13,7 +13,12 @@ Reglas de entrega (PROTOCOLO.md):
 - **Familia 0** (mundo ↔ agente): es el sensor y el actuador simulados; no se pierde ni
   se retrasa.
 - Un mensaje con ``FLAG_ACK`` es de entrega garantizada: no se pierde (el tráfico de las
-  confirmaciones no se modela todavía).
+  confirmaciones no se modela todavía). Sí se le sortea retardo, con el generador de su emisor.
+
+Reproducibilidad (F-023): **cada emisor tiene su propio generador** de pérdidas y retardos,
+derivado de la semilla y de su id, como cada micro tendría su propio azar. Los mensajes que
+llegan en el mismo tick se entregan por tick de envío, id del emisor y orden de envío de ese
+emisor. Así, el orden en que los hilos llaman a ``enviar`` dentro de un tick no cambia nada.
 """
 
 from __future__ import annotations
@@ -82,7 +87,7 @@ class CanalMemoria(Canal):
         radio: alcance de la familia 1, en celdas.
         p_perdida: probabilidad de que se pierda cada copia no garantizada.
         retardo: ``(mínimo, máximo)`` en ticks, ambos incluidos; se sortea por copia.
-        semilla: semilla de las pérdidas y los retardos.
+        semilla: semilla de las pérdidas y los retardos (cada emisor deriva la suya de esta).
         formato: ``"binario"`` o ``"json"``; define cómo viaja y cuántos bytes se cuentan.
     """
 
@@ -110,9 +115,10 @@ class CanalMemoria(Canal):
         self.formato = formato
         self.ahora = 0
         self.trafico: dict[int, Trafico] = {fam: Trafico() for fam in range(4)}
-        self._rng = random.Random(semilla)
-        self._buzones: dict[int, list[tuple[int, int, bytes | str]]] = {}
-        self._orden = 0
+        self.semilla = semilla
+        self._rngs: dict[int, random.Random] = {}  # un generador por emisor
+        self._enviados: dict[int, int] = {}  # envíos de cada emisor, para desempatar
+        self._buzones: dict[int, list[tuple[int, int, int, int, bytes | str]]] = {}
         self._candado = threading.Lock()
 
     # ------------------------------------------------------------------ interfaz
@@ -141,13 +147,16 @@ class CanalMemoria(Canal):
             trafico.enviados += 1
             trafico.bytes += tamano
             garantizado = fam == 0 or bool(msg.get("flags", 0) & FLAG_ACK)
+            src = msg["src"]
+            rng = self._rng_de(src)
             for destino in destinos:
-                if not garantizado and self._rng.random() < self.p_perdida:
+                if not garantizado and rng.random() < self.p_perdida:
                     trafico.perdidos += 1
                     continue
-                espera = 0 if fam == 0 else self._rng.randint(*self.retardo)
-                self._orden += 1
-                heapq.heappush(self._buzones[destino], (self.ahora + espera, self._orden, datos))
+                espera = 0 if fam == 0 else rng.randint(*self.retardo)
+                n = self._enviados[src] = self._enviados.get(src, 0) + 1
+                heapq.heappush(self._buzones[destino],
+                               (self.ahora + espera, self.ahora, src, n, datos))
                 trafico.entregados += 1
 
     def recibir(self, id_actor: int) -> list[Mensaje]:
@@ -157,7 +166,7 @@ class CanalMemoria(Canal):
             buzon = self._buzones[id_actor]
             listos = []
             while buzon and buzon[0][0] <= self.ahora:
-                listos.append(heapq.heappop(buzon)[2])
+                listos.append(heapq.heappop(buzon)[-1])
         decodificar = de_binario if self.formato == "binario" else de_json
         return [decodificar(datos, self.ctx) for datos in listos]  # type: ignore[arg-type]
 
@@ -174,6 +183,16 @@ class CanalMemoria(Canal):
         return {nombres[fam]: vars(t).copy() for fam, t in self.trafico.items()}
 
     # ------------------------------------------------------------------ interno
+
+    def _rng_de(self, src: int) -> random.Random:
+        """Generador propio del emisor ``src`` (se crea la primera vez que envía)."""
+        if src not in self._rngs:
+            # Semilla con etiqueta propia: si fuera semilla * 256 + src, el azar de la red de cada
+            # agente sería el mismo que el de sus decisiones (agente.py) y el de la madre con
+            # semilla 0 sería el del mundo (config.py) (revisión de F-024, N1 y N2). Una semilla de
+            # texto es determinista en Python (no depende de PYTHONHASHSEED).
+            self._rngs[src] = random.Random(f"canal:{self.semilla}:{src}")
+        return self._rngs[src]
 
     def _destinos(self, msg: Mensaje) -> list[int]:
         src = msg["src"]
