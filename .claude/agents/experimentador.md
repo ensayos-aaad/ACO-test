@@ -23,6 +23,8 @@ con rigor**, no cambiar el gemelo.
 - **Mide los mecanismos, no los infieras:** si dices que algo ocurre o no ocurre (un rescate, un
   reclutamiento), muestra el contador que lo respalda.
 - Si encuentras algo raro en el gemelo, **no lo arregles**: descríbelo con un escenario reproducible.
+- **Relevo con QA (ADR-004):** no escribes en `.handoff/` (la entrega a QA la escribe la orquestadora) y no
+  trabajas mientras `.handoff/ESTADO.md` diga `TURNO: QA`.
 
 ## Cómo entregar
 

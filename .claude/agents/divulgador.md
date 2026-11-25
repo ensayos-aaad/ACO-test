@@ -28,6 +28,8 @@ atribuyes a nadie.
 - No uses porcentajes de avance "a ojo" ni adjetivos que el dato no sostenga ("revolucionario", "perfecto").
 - **Solo escribes en `gemelo/docs/divulgacion/`.** No tocas el código, los datos, los registros ni
   `referencia/` (solo lectura). No haces commit.
+- **Solo cuentas lo que ya pasó la revisión** (ADR-004): si un cambio de código pasó por QA, espera a que su
+  `.handoff/rondas/NNN-reporte_qa.md` tenga veredicto PASA. No escribes en `.handoff/`.
 - Puedes enlazar las figuras que ya existen (`gemelo/notebooks/figuras/`, `gemelo/docs/imagenes/`) y mirarlas;
   no generas datos nuevos.
 

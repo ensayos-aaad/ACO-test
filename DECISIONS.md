@@ -26,3 +26,14 @@ Estados: Propuesta · Aprobada · Rechazada · Reemplazada. Solo el operador apr
 - **Meta a diciembre de 2026:** fase 1 completa + demostración mínima con NetLogo (A2). Disponibilidad indefinida: se planifica por prioridad de etapas (A3).
 - **Modo de falla más probable:** que la disponibilidad indefinida deje la fase 1 a medias sin un punto de corte claro.
 - **Cómo se detecta:** cada etapa termina con pruebas en estado PASA / NO PASA registradas; lo que no llegue queda NO PROBADO, sin porcentajes.
+
+## ADR-004 — Flujo de pares Desarrollo + QA con una IA externa (Gemini)
+- **Fecha:** 2026-11-25 14:03 -0500
+- **Estado:** **Aprobada** por el operador ("Sí", 2026-11-25), tras una propuesta de QA y una contrapropuesta de Desarrollo aceptadas por las dos IA.
+- **Decisión:** Claude (orquestadora) y sus agentes son **Desarrollo**; Gemini, desde Antigravity y sobre el mismo directorio, es **QA externo** (audita el código y las pruebas, escribe pruebas nuevas). El relevo se hace por `.handoff/`, **versionada en git**: `ESTADO.md` (turno y ronda; **solo el operador cambia el turno**), `rondas/NNN-para_qa.md` (Desarrollo) y `rondas/NNN-reporte_qa.md` (solo QA), `pruebas_qa/test_qa_NNN_<tema>.py`. Reglamento completo en `.handoff/README.md`.
+- **Roles:** la orquestadora implementa y decide las correcciones; el revisor verifica antes de entregar y reproduce los hallazgos de QA, sin coordinar (conserva su independencia); el experimentador sigue solo con experimentos; el divulgador cuenta solo lo que pasó QA. QA es solo lectura fuera de su carpeta y no hace commit. Ningún commit sin el operador.
+- **Reglas de QA:** PASA / NO PASA / NO PROBADO; resumen de máximo 5 líneas al inicio del reporte; cada hallazgo con archivo:línea, escenario, comando y salida; ejecución sobre una copia en `%TEMP%/aco-qa/ronda-NNN/` y `git status` antes y después; un hallazgo sin evidencia reproducible cuenta como NO PROBADO (F-028).
+- **Alternativas descartadas:** el experimentador implementando el código y el revisor coordinando las correcciones (propuesta inicial de QA: cambiaba el método y quitaba independencia al revisor); `.handoff/` fuera de git con un solo reporte que se sobrescribe (se perdería la memoria, como en F-023).
+- **Modo de falla más probable:** colisión de escrituras si alguna de las dos IA trabaja fuera de su turno, o un reporte de QA que afirma sin evidencia.
+- **Cómo se detecta:** `git status` antes y después de cada ronda en el reporte de QA; el revisor reproduce cada hallazgo antes de corregir nada.
+
