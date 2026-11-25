@@ -125,6 +125,9 @@ sesión empieza con el resumen de 5 líneas (PROMPT-ZERO §6). El modelo en uso 
 
 ## Historial
 
+### 2026-11-25 15:03 -0500
+- **Ronda 000 de QA (prueba en seco de ADR-004): PASA.** Gemini corrió en una copia las 318 pruebas del gemelo, las 7 del oráculo y una prueba de humo propia (`.handoff/pruebas_qa/test_qa_000_humo.py`), sin efectos sobre el repositorio. La orquestadora lo reprodujo (humo, oráculo, código sin cambios desde `8685a9e`). Commit y push aprobados por el operador. Plan aprobado: **ronda 001** = las 2 observaciones leves (reproducibilidad entre procesos con PYTHONHASHSEED; la semilla −3 da el mismo mundo que la 3); **ronda 002** = artefacto 17 (guía de reproducción, que QA también sigue desde cero).
+
 ### 2026-11-25 14:03 -0500
 - **ADR-004 aprobada:** flujo de pares Desarrollo (Claude y sus agentes) + QA externo (Gemini en Antigravity). Se negoció en dos vueltas: QA propuso; Desarrollo ajustó (la orquestadora implementa, el revisor no coordina, `.handoff/` versionada con una ronda por archivo); QA aceptó con 3 ajustes (resumen de 5 líneas, ejecución en `%TEMP%`, nombres `test_qa_NNN_<tema>.py`); Desarrollo agregó `git status` antes y después y un `conftest.py` para que las pruebas de QA importen el gemelo (probado). Se crea `.handoff/` y se ajustan los tres agentes. Sin commit.
 

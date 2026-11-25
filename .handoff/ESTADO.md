@@ -1,6 +1,6 @@
 # Estado del relevo
 
-TURNO: OPERADOR
+TURNO: DESARROLLO
 RONDA: 000
 
 <!-- Solo el operador cambia este archivo. Valores de TURNO: DESARROLLO | QA | OPERADOR. -->
