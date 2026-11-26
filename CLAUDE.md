@@ -37,7 +37,7 @@ colonia de agentes y una "madre" en el edge) que extiende ese método.
 | `referencia/`     | Copia de solo lectura de `UdeA-IoT/ESP-ACO` @ `3c48648` (ver `PROCEDENCIA.md`) |
 | `CONTEXT.md`      | Inventario de la referencia, parámetros, oráculos, vacíos (I1–I16), NetLogo/hormigas (§5), agentes AIMA (§6), `resumen.pdf` (§7), enfoque del gemelo (§8) |
 | `DECISIONS.md`    | Decisiones en formato ADR (ADR-001 y ADR-002 propuestas; ADR-003 y ADR-004 aprobadas) |
-| `FAILURES.md`     | Registro de fallas y hallazgos (F-001 a F-031); nunca se borra |
+| `FAILURES.md`     | Registro de fallas y hallazgos (F-001 a F-032); nunca se borra |
 | `ASSUMPTIONS.md`  | Suposiciones y sesgos declarados (A-001 a A-004)             |
 | `CHANGELOG.md`    | Cambios por sesión                                           |
 | `CHECKLIST-ENTORNO.md` | Software necesario: instalado `[x]` / falta `[ ]`       |
@@ -79,6 +79,10 @@ trabaja en pares con QA externo (Gemini en Antigravity, ADR-004, `.handoff/READM
 **Siguiente paso:** el **bloque E** de `PLAN-MEJORAS.md` (registros: E1 qué se tomó de Gemini; E2 poner al día
 `ESTADO-PREHARDWARE.md`; E3 notebooks de Gemini si el operador los tiene; E4 sincronizar), y después el **artefacto 16**
 (demostración con NetLogo, y su sección en `gemelo/REPRODUCIR.md`), que podría ser una ronda de QA.
+
+**Pendiente para la próxima entrega a QA:** avisar que `gemelo/reproducir/comparar.py` cambió solo en un comentario
+(`≈ 5 min` → `≈ 3–4 min en total`, F-032). **Decisión abierta del operador (F-032):** en el hardware, ¿la percepción es
+local (sensores del chip) o viaja desde el mundo virtual (PC o RPi) por algún enlace? Afecta a B2.
 
 **Lecciones vigentes:**
 - F-028: los textos explicativos de Claude tienden a afirmar más de lo que el dato sostiene; toda frase que explique un
@@ -136,6 +140,12 @@ sesión empieza con el resumen de 5 líneas (PROMPT-ZERO §6). El modelo en uso 
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-25 23:33 -0500
+- Divulgación: texto nuevo `gemelo/docs/divulgacion/05_una_danza_para_desconocidos.md` (guía de reproducción, F-031, tamaños de mensaje) y puesta al día de 03 y 04 (divulgador). El revisor verificó en la misma pasada la divulgación y `ESTADO-PREHARDWARE.md`: NO PASA en los dos, sin cifras equivocadas; 14 frases corregidas con su redacción tal cual (`gemelo/docs/informes/revision_div05.md`). Las 8 de `ESTADO-PREHARDWARE.md` eran de Claude (**F-032**), que además había escrito "faltan 2 criterios" del protocolo (es 1). F-032 deja abierta una decisión del operador: si la percepción en el hardware es local o viaja desde el mundo virtual. Sin commit.
+
+### 2026-11-25 23:16 -0500
+- A pedido del operador, `ESTADO-PREHARDWARE.md` al día (E2 del plan): resumen con la guía de reproducción y la reproducibilidad; avance 15/17 artefactos y 45/49 criterios; hallazgos F-020 a F-031 y ADR-004; B1 con el protocolo v0.3; B2 y B3 con el dato medido de tamaños (binario cabe en ESP-NOW, JSON no para `PERCEPCION` y `MAPA`) y el tráfico con la madre; X1 con el experimento del rescate tras F-020; X2, X7 y X8 con lo que ya se midió. Sin commit.
 
 ### 2026-11-25 23:09 -0500
 - **Ronda 003 de QA: PASA** (`.handoff/rondas/003-reporte_qa.md`): QA siguió la guía desde un clon limpio y con `conda env create` real; 350 + 7 pruebas, `comparar.py` y `--completo` (18/18 CSV), `RESULTADOS.md` sin cambios, criterios 17.1–17.4 en PASA, 11 pruebas nuevas suyas; revisó los cambios de texto de F-030. La orquestadora lo verificó. Corregidas sus 2 observaciones cosméticas. **Artefacto 17 hecho: 45/49 criterios (92 %).** Pruebas de QA en `.handoff/pruebas_qa/` (98). Commit y push aprobados por el operador. Siguiente: bloque E, luego artefacto 16.

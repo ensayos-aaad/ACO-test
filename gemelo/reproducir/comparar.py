@@ -3,7 +3,7 @@
 Uso, desde `gemelo/` y con el Python del entorno `aco-gemelo`:
 
     python -X utf8 reproducir/comparar.py              # escenario L, semilla 2026 (≈ 30 s)
-    python -X utf8 reproducir/comparar.py --completo   # además, los 18 CSV de los experimentos publicados (≈ 5 min)
+    python -X utf8 reproducir/comparar.py --completo   # además, los 18 CSV de los experimentos publicados (≈ 3–4 min en total)
 
 Corre los mismos comandos que la guía, por la línea de comandos del gemelo, en una carpeta temporal (no escribe nada en
 el repositorio) y compara con `reproducir/esperado/`. Imprime PASA o NO PASA por punto y termina con código 0 solo si

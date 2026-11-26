@@ -62,7 +62,7 @@ la redacción del revisor y, por decisión del operador, no tuvo una cuarta pasa
 ## E. Registros
 
 - [ ] **E1** `DECISIONES-PRUEBA.md`, ronda 4: qué se toma de Gemini y qué no, con el porqué.
-- [ ] **E2** `ESTADO-PREHARDWARE.md`: sumar el dato de JSON (no cabe en ESP-NOW) a los bloqueantes B2 y B3, y el nuevo
+- [x] **E2** `ESTADO-PREHARDWARE.md`: sumar el dato de JSON (no cabe en ESP-NOW) a los bloqueantes B2 y B3, y el nuevo
       experimento del rescate a X1.
 - [ ] **E3** Si el operador tiene los **notebooks de Gemini en la nube**, agregarlos a `otras/gemini/` para citarlos
       con su autoría.

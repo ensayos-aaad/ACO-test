@@ -157,6 +157,14 @@ máquina, otro sistema operativo u otra versión de Python: todo se comprobó en
 
 ## 9. Lo que viene
 
+> **Actualización (2026-11-25, noche).** La guía de reproducción se hizo esa misma noche y fue la ronda 003. El revisor
+> la siguió desde un clon y encontró que su comparador de imágenes no veía los colores (F-031), lo que se corrigió antes
+> de entregarla. QA la siguió desde un clon con un entorno creado de nuevo y dio **PASA** (12 puntos en PASA, 0 en NO
+> PASA, 2 NO PROBADOS). Si QA rinde igual con entregas que no son código sigue sin poder decirse: cuando le llegó la
+> guía, el defecto ya estaba corregido. Además, al verificar este texto, el revisor encontró aquí una frase falsa sobre la
+> semilla −3 que venía de la entrega de la ronda 001 (F-030); ya está corregida en la sección 4. Todo eso se cuenta en
+> [«Una danza para desconocidos»](05_una_danza_para_desconocidos.md). Lo de abajo se deja como estaba escrito.
+
 El siguiente paso es la **guía de reproducción** (artefacto 17), como ronda 003. Será la primera entrega que no es
 código; no se sabe todavía si QA rinde igual con ella. Después vienen los registros y la demostración con NetLogo. Los
 seis bloqueantes para el hardware siguen abiertos, y las preguntas científicas de los textos anteriores, por ejemplo si
@@ -176,8 +184,10 @@ experimentos publicados solo se repitieron para comprobar que salían idénticos
 ## Lo que todavía no sabemos
 
 - Si el QA externo rinde igual en más rondas o en entregas que no son código, y cuánto cuesta: el gasto de tokens de
-  Gemini no se conoce, y tres rondas son pocas para concluir.
-- Si los ensayos se repiten en otra máquina, otro sistema operativo u otra versión de Python: NO PROBADO.
+  Gemini no se conoce, y tres rondas son pocas para concluir. *(Actualización: hubo una cuarta, la 003, con PASA; sigue
+  sin poder decirse, ver el texto 05.)*
+- Si los ensayos se repiten en otra máquina, otro sistema operativo u otra versión de Python: NO PROBADO. *(Sigue así
+  tras la ronda 003: la guía de reproducción solo se probó en el computador de desarrollo, con Windows.)*
 - Por qué una corrida de las pruebas de QA en manos del revisor dio un tiempo de espera negativo (−4124 segundos). Al
   repetirla pasó; se sospecha una suspensión del equipo o un salto del reloj, pero la causa no se midió.
 
@@ -204,3 +214,5 @@ experimentos publicados solo se repitieron para comprobar que salían idénticos
 - Costo y límites: `USO-DEL-PROTOCOLO.md` §6.
 - Lo que viene: `CLAUDE.md` ("Para retomar" e historial del 2026-11-25, 21:02), `ARTEFACTOS.md` ("Orden de trabajo
   vigente"), `ESTADO-PREHARDWARE.md` (B1–B6).
+- Actualizaciones de la noche del 2026-11-25: `FAILURES.md` (F-030, F-031), `gemelo/docs/informes/revision_div04.md`,
+  `gemelo/docs/informes/revision_r003.md`, `.handoff/rondas/003-reporte_qa.md`, `ARTEFACTOS.md` (punto 17).

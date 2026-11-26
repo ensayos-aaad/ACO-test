@@ -213,10 +213,11 @@ afirmaban de más.
 
 > **Actualización (2026-11-25).** Antes de la guía de reproducción hubo un paso que este texto no preveía: el 25 de
 > noviembre entró al equipo un segundo modelo de IA, Gemini, como QA externo (ADR-004), y en sus rondas 001 y 002 se cerraron
-> las dos observaciones leves de la sección 3 (F-029). Al cierre de ese día: 347 pruebas del gemelo y 7 del oráculo en PASA,
-> más 87 pruebas de QA, y los experimentos publicados sin cambios. La guía de reproducción sigue siendo el siguiente
-> paso, ahora como ronda 003 de QA. Todo eso se cuenta en [«El punto ciego»](04_el_punto_ciego.md). Lo de abajo se deja
-> como estaba escrito el 20 de noviembre.
+> las dos observaciones leves de la sección 3 (F-029). Al cerrar la ronda 002, a las 21:02: 347 pruebas del gemelo y 7 del
+> oráculo en PASA, más 87 pruebas de QA, y los experimentos publicados sin cambios; la guía de reproducción quedaba como el
+> siguiente paso, la ronda 003 de QA. Todo eso se cuenta en [«El punto ciego»](04_el_punto_ciego.md). La guía se hizo esa
+> misma noche y QA le dio PASA; se cuenta en [«Una danza para desconocidos»](05_una_danza_para_desconocidos.md). Lo de
+> abajo se deja como estaba escrito el 20 de noviembre.
 
 El orden aprobado: primero una **guía de reproducción**, que el revisor deberá seguir desde cero para comprobar que
 cualquiera puede repetir los resultados; luego, poner al día los registros; después, la demostración con NetLogo, en la
