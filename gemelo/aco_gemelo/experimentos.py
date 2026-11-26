@@ -44,12 +44,34 @@ def cargar_plan(ruta: str | Path) -> dict[str, Any]:
             raise ValueError(f"Al plan le falta '{clave}'")
     plan.setdefault("nombre", ruta.stem)
     plan["base"] = (ruta.parent / plan["base"]).resolve()
-    semillas = plan.get("semillas", 30)
-    plan["semillas"] = list(range(semillas)) if isinstance(semillas, int) else list(semillas)
+    plan["semillas"] = _semillas(plan.get("semillas", 30))
     for clave, valores in plan["factores"].items():
         if "." not in clave or not isinstance(valores, list) or not valores:
             raise ValueError(f"Factor mal escrito: '{clave}' debe ser 'seccion.clave' con una lista de valores")
     return plan
+
+
+def _entero(valor: Any) -> bool:
+    return isinstance(valor, int) and not isinstance(valor, bool)  # en Python, True es un int
+
+
+def _semillas(valor: Any) -> list[int]:
+    """``semillas`` del plan: un entero n ≥ 1 (las semillas 0 … n−1) o una lista no vacía de enteros ≥ 0.
+
+    Se valida al leer el plan, antes de crear la carpeta de salida o correr nada (H2 y H3, ronda 001 de QA): antes,
+    ``true`` se tomaba como ``[0]`` y ``1.5``, ``false``, ``0`` o ``-3`` terminaban en una traza sin controlar.
+    """
+    if _entero(valor):
+        if valor < 1:
+            raise ValueError(f"semillas = {valor}: si es un número, debe ser al menos 1")
+        return list(range(valor))
+    if isinstance(valor, list) and valor:
+        malas = [s for s in valor if not _entero(s) or s < 0]
+        if malas:  # el mismo texto que en ConfigEnsayo y crear_mundo, para los demás puntos de entrada
+            raise ValueError(f"semilla = {malas[0]!r} (en 'semillas' del plan): debe ser un entero mayor o "
+                             "igual que 0")
+        return list(valor)
+    raise ValueError(f"semillas = {valor!r}: debe ser un entero ≥ 1 o una lista no vacía de enteros ≥ 0")
 
 
 def _poner(datos: dict[str, Any], clave: str, valor: Any) -> None:
@@ -70,7 +92,9 @@ def condiciones(plan: dict[str, Any]) -> list[tuple[str, dict[str, Any], dict[st
         valores = dict(zip(claves, combinacion))
         for clave, valor in valores.items():
             _poner(datos, clave, valor)
-        config_ensayo(datos)  # valida la configuración antes de correr nada
+        # Valida la configuración antes de correr nada, con una semilla del plan: la del archivo base no se usa
+        # (H3, ronda 001 de QA).
+        config_ensayo(datos, plan["semillas"][0])
         crear_mundo(datos, plan["semillas"][0])
         nombre = "__".join(f"{c.split('.')[-1]}-{v}" for c, v in valores.items())
         salida.append((nombre, datos, valores))
@@ -115,8 +139,8 @@ def correr_plan(ruta_plan: str | Path, salida: str | Path | None = None,
     """
     plan = cargar_plan(ruta_plan)
     carpeta = Path(salida) if salida else Path(ruta_plan).parent / "datos" / plan["nombre"]
+    lista = condiciones(plan)  # valida todo antes de crear la carpeta (H3, ronda 001 de QA)
     carpeta.mkdir(parents=True, exist_ok=True)
-    lista = condiciones(plan)
     trabajos = [(datos, s, valores) for _, datos, valores in lista for s in plan["semillas"]]
     if procesos == 1:
         filas = [_ensayo(t) for t in trabajos]

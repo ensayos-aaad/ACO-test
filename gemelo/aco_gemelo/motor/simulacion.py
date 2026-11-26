@@ -91,6 +91,10 @@ class ConfigEnsayo:
     salida_cada: int = 0
 
     def __post_init__(self) -> None:
+        # Python siembra con el valor absoluto: Random(-3) da lo mismo que Random(3), así que una
+        # semilla negativa repetiría el ensayo de la positiva (observación de F-026).
+        if not isinstance(self.semilla, int) or isinstance(self.semilla, bool) or self.semilla < 0:
+            raise ValueError(f"semilla = {self.semilla!r}: debe ser un entero mayor o igual que 0")
         if self.madre.modo is Modo.AUSENTE:
             return  # sin madre no se envía INICIO
         for nombre, valor in (("madre.delta_t", self.madre.delta_t), ("agente.K", self.agente.K)):

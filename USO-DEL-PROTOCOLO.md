@@ -137,7 +137,10 @@ Ningún agente hace commit.
 | Revisor: revisión corta final del bloque D | ≈ 71 000 | 24 | ≈ 5 min |
 | Divulgador: texto 03 y puesta al día de 01 y 02 | ≈ 128 000 | 53 | ≈ 5 min |
 | Revisor: verificar las afirmaciones de la divulgación | ≈ 145 000 | 32 | ≈ 7 min |
-| **Total medido** | **≈ 970 000** | **351** | |
+| Revisor: revisión interna previa de la ronda 001 de QA (2026-11-25) | ≈ 66 000 | 20 | ≈ 7 min |
+| Revisor: reproducir los hallazgos de QA de la ronda 001 | ≈ 79 000 | 23 | ≈ 7 min |
+| Revisor: revisión interna previa de la ronda 002 | ≈ 89 000 | 34 | ≈ 88 min (una prueba quedó colgada) |
+| **Total medido** | **≈ 1 204 000** | **428** | |
 
 **Lo que no se puede medir con lo disponible:** los tokens de la conversación principal, los de las sesiones anteriores y
 un contrafactual real (hacer la misma tarea sin agentes y medirla). Por eso la comparación de gasto es una **estimación**:

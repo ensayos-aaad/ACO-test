@@ -125,6 +125,9 @@ def crear_mundo(datos: dict[str, Any], semilla: int | None = None) -> Mundo:
     mundo = {**_MUNDO, **(datos.get("mundo") or {})}
     _revisar("mundo", mundo, _MUNDO)
     semilla = datos.get("semilla", 0) if semilla is None else semilla
+    if not isinstance(semilla, int) or isinstance(semilla, bool) or semilla < 0:
+        # Random(-3) == Random(3): una semilla negativa repetiría el mundo de la positiva (F-026).
+        raise ValueError(f"semilla = {semilla!r}: debe ser un entero mayor o igual que 0")
     escalas = dict(tau0=0.0, tau_max=_numero(mundo["tau_max"]),
                    unidad_deposito=_numero(mundo["unidad_deposito"]))
     escenario = mundo["escenario"]

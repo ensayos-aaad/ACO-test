@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## [Sesión 5] — 2026-11-25 (Claude Opus 5.5 con su equipo de agentes y Gemini como QA externo)
+### Añadido
+- ADR-004: flujo de pares Desarrollo (Claude y sus agentes) + QA externo (Gemini en Antigravity) con relevo en `.handoff/` (reglamento, turno, plantillas, rondas, pruebas de QA).
+- `gemelo/tests/test_reproducibilidad.py`: el mismo ensayo da la misma huella en procesos con PYTHONHASHSEED distinto.
+- 87 pruebas de QA en `.handoff/pruebas_qa/` (rondas 000 a 002).
+### Corregido
+- Las semillas negativas o no enteras se rechazan (Python siembra con el valor absoluto: −3 repetía el ensayo de la 3).
+- F-029: la ronda 001 introdujo una regresión (`run --semilla` y los planes validaban la semilla del archivo que ya no se usaba); la atrapó QA. Además, `semillas` de un plan y `batch --semillas` se validan antes de escribir nada, con error limpio.
+### Resultados
+- Rondas 000, 001 y 002 de QA cerradas (la 002 con PASA). 347 pruebas del gemelo + 7 del oráculo + 87 de QA en PASA; los experimentos publicados no cambian.
+
 ## [Sesión 4] — 2026-11-19 (Claude Opus 5.5 con su equipo de agentes)
 ### Añadido
 - Bloque B + C de `PLAN-MEJORAS.md` (implementado en la sesión 3, cerrado aquí): `INICIO`, cierre como abortado, memoria máxima de la madre, lectura final, orden canónico de acciones, motor `hilos_sincronos`, escenario personalizado, bytes totales, tamaños JSON frente a binario y mapa de la madre tick a tick.

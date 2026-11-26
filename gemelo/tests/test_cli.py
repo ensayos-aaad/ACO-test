@@ -227,3 +227,26 @@ def test_delta_t_fuera_de_rango_es_error_al_cargar_el_yaml():
     """F-023 (7): el error sale al leer la configuración, no a mitad del ensayo."""
     with pytest.raises(ValueError, match="INICIO"):
         config_ensayo({"madre": {"modo": "pista_de_baile", "delta_t": 256}})
+
+
+@pytest.mark.parametrize("semilla_archivo", [-3, 1.5, "3", True, None])
+def test_run_con_semilla_reemplaza_la_del_archivo_aunque_sea_invalida(tmp_path, capsys, semilla_archivo):
+    """H1 (regresión de la ronda 001 de QA): `run --semilla 3` sobre un YAML con semilla inválida corría el
+    ensayo y terminaba con error al final, sin generar el PNG."""
+    config = tmp_path / "c.yaml"
+    config.write_text(yaml.safe_dump({"semilla": semilla_archivo, "ensayo": {"limite": 50}}), encoding="utf-8")
+    png = tmp_path / "final.png"
+    assert main(["run", "--config", str(config), "--semilla", "3", "--png", str(png)]) == 0
+    assert png.stat().st_size > 0
+    assert "Error" not in capsys.readouterr().err
+    assert main(["run", "--config", str(config)]) == 2  # sin --semilla, la del archivo sí se valida
+
+
+@pytest.mark.parametrize("n", [0, -2])
+def test_batch_con_cero_semillas_da_error_limpio(tmp_path, capsys, n):
+    """O3 de la revisión de la ronda 002 (ya pasaba antes): `batch --semillas 0` terminaba en IndexError con traza."""
+    salida = tmp_path / "sub" / "b.csv"
+    assert main(["batch", "--config", str(CONFIGS / "default.yaml"), "--semillas", str(n),
+                 "--salida", str(salida)]) == 2
+    assert "Error: --semillas" in capsys.readouterr().err
+    assert not salida.parent.exists()

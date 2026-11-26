@@ -37,7 +37,7 @@ colonia de agentes y una "madre" en el edge) que extiende ese método.
 | `referencia/`     | Copia de solo lectura de `UdeA-IoT/ESP-ACO` @ `3c48648` (ver `PROCEDENCIA.md`) |
 | `CONTEXT.md`      | Inventario de la referencia, parámetros, oráculos, vacíos (I1–I16), NetLogo/hormigas (§5), agentes AIMA (§6), `resumen.pdf` (§7), enfoque del gemelo (§8) |
 | `DECISIONS.md`    | Decisiones en formato ADR (ADR-001 y ADR-002 propuestas; ADR-003 y ADR-004 aprobadas) |
-| `FAILURES.md`     | Registro de fallas y hallazgos (F-001 a F-028); nunca se borra |
+| `FAILURES.md`     | Registro de fallas y hallazgos (F-001 a F-029); nunca se borra |
 | `ASSUMPTIONS.md`  | Suposiciones y sesgos declarados (A-001 a A-004)             |
 | `CHANGELOG.md`    | Cambios por sesión                                           |
 | `CHECKLIST-ENTORNO.md` | Software necesario: instalado `[x]` / falta `[ ]`       |
@@ -55,27 +55,35 @@ colonia de agentes y una "madre" en el edge) que extiende ese método.
 | `gemelo/`         | **El código**: `aco_gemelo/` (mundo, protocolo, canal, agente, madre, motor, métricas, visual, experimentos), `configs/`, `experimentos/` (planes y datos), `tests/`, `environment.yml` |
 | `bosquejo/`       | Plano de ensayo (a mano y en limpio)                         |
 
-## Para retomar (estado al 2026-11-20 04:49 -0500)
+## Para retomar (estado al 2026-11-25 20:27 -0500)
 
 **Dónde quedamos.** Fase 1 del gemelo de software casi completa: 14 de 17 artefactos hechos (1, 3–15; el 2,
-protocolo, en borrador v0.3); 41 de 49 criterios en PASA. **Bloques A, B + C y D cerrados** (F-026, F-028).
-**318 pruebas del gemelo + 7 del oráculo en PASA.** El notebook (`gemelo/notebooks/analisis.ipynb`) explica un ensayo y
-analiza los experimentos; los informes por experimento están en `gemelo/docs/informes/`. Checklist en `ARTEFACTOS.md`
-("Orden de trabajo vigente"); visión de conjunto en `ESTADO-PREHARDWARE.md`.
+protocolo, en borrador v0.3); 41 de 49 criterios en PASA. Bloques A, B + C y D cerrados. **Desde el 2026-11-25 se
+trabaja en pares con QA externo (Gemini en Antigravity, ADR-004, `.handoff/README.md`).**
+
+**Relevo con QA, en curso:**
+- Ronda 000 (prueba en seco): PASA, con commit (`ffcf646`).
+- Ronda 001 (semillas negativas rechazadas y reproducibilidad entre procesos): QA dio NO PASA (H1–H4); H1 y H3.2 eran
+  regresión de Claude que el revisor no vio (**F-029**).
+- **Ronda 002 (correcciones): PASA de QA**, sin hallazgos nuevos. Rondas 001 y 002 cerradas con commit (ver historial).
+- Pruebas: **347 del gemelo + 7 del oráculo** en PASA; las **87 de QA** (`.handoff/pruebas_qa/`) pasan y se quedan ahí
+  como regresión de QA, **sin incorporar** a `gemelo/tests/` (decisión del operador pendiente; la orquestadora lo
+  recomendó así). Los 18 CSV publicados siguen idénticos.
 
 **Criterios de PROMPT-ZERO** (`oraculo/RESULTADOS.md`): C1 PASA · C2 PASA · **C3 NO PASA** (causa documentada,
 `oraculo/INVESTIGACION-C3.md`, decisión J8) · C4 PASA · C5 PASA · C6 NO PROBADO (lo evalúa el operador).
 
-**Siguiente paso: artefacto 17, guía de reproducción** (`gemelo/REPRODUCIR.md`; requisitos al final de `ARTEFACTOS.md`),
-verificada por el revisor siguiéndola desde cero. Después: E (registros) → artefacto 16 (NetLogo, y su sección en la guía).
+**Siguiente paso:** el **artefacto 17** (guía de reproducción, `gemelo/REPRODUCIR.md`; requisitos al final de `ARTEFACTOS.md`)
+como ronda siguiente de QA, que QA y el revisor siguen desde cero. Luego E (registros) → artefacto 16 (NetLogo).
 
-**Lección vigente (F-028):** los textos explicativos de Claude tienden a afirmar más de lo que el dato sostiene; las
-pruebas no lo atrapan, el revisor sí. Toda frase que explique un mecanismo debe citar el código o la cifra que la sostiene.
+**Lecciones vigentes:**
+- F-028: los textos explicativos de Claude tienden a afirmar más de lo que el dato sostiene; toda frase que explique un
+  mecanismo debe citar el código o la cifra que la sostiene.
+- F-029: al endurecer una validación, buscar todas las llamadas que reconstruyen el objeto validado.
 
 **Abierto o pendiente:**
-- Observaciones leves: una prueba de reproducibilidad entre procesos (PYTHONHASHSEED); la semilla −3 da el mismo mundo
-  que la 3; `test_notebook.py` regenera figuras versionadas en git; las figuras f1–f4 del texto de divulgación llevan
-  ahora el título "Figura 4/5/6/9".
+- Observaciones leves: `test_notebook.py` regenera figuras versionadas en git; las figuras f1–f4 del texto de
+  divulgación llevan ahora el título "Figura 4/5/6/9"; construir `Agente` a mano no valida la semilla.
 - `USO-DEL-PROTOCOLO.md`: el operador completa la tabla de los casos 1 y 2 (Irán–EE. UU. y Colombia).
 - Bloqueantes de hardware B1–B6 (`ESTADO-PREHARDWARE.md`) y revisión de lo aprobado "con bendición" (rondas A–G, I, J;
   `PROTOCOLO.md` v0.3; ADR-001 y ADR-002).
@@ -124,6 +132,18 @@ sesión empieza con el resumen de 5 líneas (PROMPT-ZERO §6). El modelo en uso 
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-25 21:02 -0500
+- **Ronda 002 de QA: PASA** (`.handoff/rondas/002-reporte_qa.md`): H1–H4 y O1–O3 cerrados, sin hallazgos nuevos; QA agregó 27 pruebas (`test_qa_002_borde_cli_y_planes.py`). La orquestadora lo reprodujo: 87 pruebas de QA en PASA. Las pruebas de QA se quedan en `.handoff/pruebas_qa/` (recomendación de la orquestadora; el mensaje de QA dejaba la opción abierta). Commit y push de las rondas 001 y 002 aprobados por el operador. Siguiente: artefacto 17 como ronda 003.
+
+### 2026-11-25 20:27 -0500
+- "Para retomar" reescrita: relevo con QA en curso (ronda 002 entregada, sin commit), 347 + 7 pruebas, lecciones F-028 y F-029, observaciones ya cerradas retiradas. Rango de `FAILURES.md` hasta F-029.
+
+### 2026-11-25 20:18 -0500
+- **Ronda 001 de QA: NO PASA** (H1–H4, `.handoff/rondas/001-reporte_qa.md`); el revisor los reprodujo: H1 y H3.2 eran regresión introducida por Claude al validar las semillas, que la revisión interna no vio (**F-029**). Corregidos, con 21 pruebas nuevas de Desarrollo; también O1–O3 de la revisión interna de la ronda 002 (PASA, `gemelo/docs/informes/revision_r002.md`). 347 + 7 pruebas y las 60 de QA en PASA; 18 CSV publicados idénticos. **Ronda 002 entregada** (`.handoff/rondas/002-para_qa.md`), sin commit sobre `ffcf646`. La guía de reproducción (artefacto 17) pasa a la ronda siguiente.
+
+### 2026-11-25 15:19 -0500
+- **Ronda 001 entregada a QA** (`.handoff/rondas/001-para_qa.md`, sin commit sobre `ffcf646`): semillas negativas o no enteras rechazadas en `ConfigEnsayo` y `crear_mundo` (Random(-3) == Random(3)); prueba nueva `tests/test_reproducibilidad.py` (misma huella en procesos con PYTHONHASHSEED distinto; detecta el mutante `mut_hash`). 326 + 7 pruebas en PASA; 18 CSV publicados idénticos. Revisión interna previa: PASA (`gemelo/docs/informes/revision_r001.md`). Falta que el operador pase el turno a QA.
 
 ### 2026-11-25 15:03 -0500
 - **Ronda 000 de QA (prueba en seco de ADR-004): PASA.** Gemini corrió en una copia las 318 pruebas del gemelo, las 7 del oráculo y una prueba de humo propia (`.handoff/pruebas_qa/test_qa_000_humo.py`), sin efectos sobre el repositorio. La orquestadora lo reprodujo (humo, oráculo, código sin cambios desde `8685a9e`). Commit y push aprobados por el operador. Plan aprobado: **ronda 001** = las 2 observaciones leves (reproducibilidad entre procesos con PYTHONHASHSEED; la semilla −3 da el mismo mundo que la 3); **ronda 002** = artefacto 17 (guía de reproducción, que QA también sigue desde cero).

@@ -107,3 +107,37 @@ def test_linea_de_comandos(tmp_path, capsys):
                  str(tmp_path / "cli"), "--procesos", "1"]) == 0
     salida = capsys.readouterr().out
     assert "escenario-aleatorio__modo-difusion" in salida and "verificadas" in salida
+
+
+# ---------------------------------------------------------------- ronda 001 de QA: semillas del plan (H2, H3)
+
+
+@pytest.mark.parametrize("semillas", [True, False, 1.5, "3", 0, -3, [], [0, -1], [0, 1.5], [0, "3"], [0, True], None])
+def test_semillas_invalidas_del_plan_dan_error_limpio_sin_crear_nada(tmp_path, capsys, semillas):
+    """H2: antes, `true` se tomaba como [0] y escribía CSV; 1.5, false, 0 y -3 terminaban en una traza.
+    H3: antes, la carpeta de salida se creaba antes de validar y las semillas válidas de la lista ya corrían."""
+    salida = tmp_path / "salida"
+    assert main(["experimentos", "--plan", str(plan_pequeno(tmp_path, semillas=semillas)), "--salida",
+                 str(salida), "--procesos", "1"]) == 2
+    assert "Error: semilla" in capsys.readouterr().err
+    assert not salida.exists()
+
+
+def test_la_semilla_del_archivo_base_no_se_usa_en_un_plan(tmp_path):
+    """H3: con semillas válidas en el plan, una semilla inválida en el archivo base no importa (como `--semilla`
+    en `run`): antes, el plan fallaba al validar la configuración con la semilla del archivo."""
+    ruta = plan_pequeno(tmp_path, semillas=[0, 1])
+    base = tmp_path / "base.yaml"
+    base.write_text(yaml.safe_dump({"semilla": -3, "ensayo": {"rho": 0.0}, "agente": {"viajes": 1}}),
+                    encoding="utf-8")
+    carpeta = correr_plan(ruta, tmp_path / "s", procesos=1)
+    assert [f["semilla"] for f in leer(carpeta / "escenario-L__modo-ausente.csv")] == ["0", "1"]
+
+
+def test_un_plan_invalido_no_crea_la_carpeta_de_salida(tmp_path):
+    """O1 de la revisión de la ronda 002: con semillas válidas, un factor inválido (que solo detecta `condiciones`)
+    debe fallar antes de crear la carpeta. Protege el orden de `correr_plan`: validar y después crear."""
+    salida = tmp_path / "salida"
+    with pytest.raises(ValueError):
+        correr_plan(plan_pequeno(tmp_path, factores={"madre.modo": ["ausente", "inventado"]}), salida, procesos=1)
+    assert not salida.exists()

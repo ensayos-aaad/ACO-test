@@ -44,7 +44,7 @@ def _run(args: argparse.Namespace) -> int:
     print(f"Mundo (semilla {semilla}):\n{dibujo}\n")
     for clave, valor in fila(semilla, _escenario(datos), resultado).items():
         print(f"{clave:28} {'' if valor is None else valor}")
-    n_agentes = config_ensayo(datos).n_agentes
+    n_agentes = config_ensayo(datos, semilla).n_agentes  # con la semilla que se usó (H1, ronda 001 de QA)
     if args.png:
         from .visual import png_final
 
@@ -58,6 +58,8 @@ def _run(args: argparse.Namespace) -> int:
 
 def _batch(args: argparse.Namespace) -> int:
     datos = cargar(args.config)
+    if args.semillas < 1:  # antes: IndexError con traza al escribir un CSV vacío (O3, ronda 002 de QA)
+        raise ValueError(f"--semillas {args.semillas}: debe ser al menos 1")
     semillas = range(args.semilla_inicial, args.semilla_inicial + args.semillas)
     filas = [fila(s, _escenario(datos), ejecutar(datos, s)[2]) for s in semillas]
     salida = Path(args.salida or f"resultados/{Path(args.config).stem}.csv")
