@@ -133,6 +133,9 @@ sesión empieza con el resumen de 5 líneas (PROMPT-ZERO §6). El modelo en uso 
 
 ## Historial
 
+### 2026-11-25 21:08 -0500
+- A pedido del operador, la novedad del QA externo queda en los documentos: `README.md` (estado al día, sección "Cómo se trabaja" con Desarrollo y QA, insignia y fila de Gemini en "Uso de IA", mapa de documentos con `.handoff/` y `USO-DEL-PROTOCOLO.md`), `USO-DEL-PROTOCOLO.md` (sección 6 nueva sobre el QA externo con las rondas 000–002 y F-029; ajustes 7 y 8; fila nueva en la comparación) y `ARTEFACTOS.md` (347 + 7 pruebas).
+
 ### 2026-11-25 21:02 -0500
 - **Ronda 002 de QA: PASA** (`.handoff/rondas/002-reporte_qa.md`): H1–H4 y O1–O3 cerrados, sin hallazgos nuevos; QA agregó 27 pruebas (`test_qa_002_borde_cli_y_planes.py`). La orquestadora lo reprodujo: 87 pruebas de QA en PASA. Las pruebas de QA se quedan en `.handoff/pruebas_qa/` (recomendación de la orquestadora; el mensaje de QA dejaba la opción abierta). Commit y push de las rondas 001 y 002 aprobados por el operador. Siguiente: artefacto 17 como ronda 003.
 

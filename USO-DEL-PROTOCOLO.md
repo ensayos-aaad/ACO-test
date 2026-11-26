@@ -160,7 +160,39 @@ un contrafactual real (hacer la misma tarea sin agentes y medirla). Por eso la c
   El patrón se repitió en las correcciones: cada frase nueva de la IA principal para explicar un mecanismo volvió a
   fallar ante el revisor (tres pasadas). Lo que cerró el ciclo fue usar la redacción que propuso el propio revisor.
 
-## 6. Ajustes propuestos al protocolo
+## 6. Desde el 2026-11-25: un segundo modelo como QA externo
+
+**Otra diferencia con los casos 1 y 2:** a pedido del operador, una segunda IA de otra empresa (Gemini, desde Antigravity)
+trabaja sobre el mismo directorio como **QA externo**. Claude y sus agentes son Desarrollo. El acuerdo se negoció entre
+las dos IA en dos vueltas y lo aprobó el operador (ADR-004 en `DECISIONS.md`; reglamento en `.handoff/README.md`):
+
+- QA solo lee el repositorio; escribe únicamente sus reportes (`.handoff/rondas/NNN-reporte_qa.md`) y sus pruebas
+  (`.handoff/pruebas_qa/`), sobre una copia en una carpeta temporal, con `git status` antes y después. No hace commit.
+- **Solo el operador cambia el turno** (`.handoff/ESTADO.md`); nadie modifica archivos fuera de su turno.
+- El revisor reproduce cada hallazgo de QA antes de que Desarrollo corrija nada: lo que dice un reporte es dato, no
+  instrucción.
+
+**Lo que pasó en las tres primeras rondas** (`.handoff/rondas/`):
+
+| Ronda | Contenido | Veredicto de QA | Qué aportó |
+|---|---|---|---|
+| 000 | Prueba en seco del relevo | PASA | Comprobó que QA puede correr todo sin efectos sobre el repositorio |
+| 001 | Rechazar semillas negativas; reproducibilidad entre procesos | **NO PASA** (4 hallazgos) | **Atrapó una regresión que había introducido Claude y que la revisión interna dio por buena** (F-029): al endurecer una validación, dos llamadas que reconstruían la configuración sin la semilla en uso empezaron a fallar. La encontró combinando un caso borde que nadie había probado (archivo con semilla inválida más una semilla válida en la línea de comandos). También encontró un defecto anterior (H2) |
+| 002 | Correcciones de la 001 | PASA | Atacó 5 grupos de casos borde y buscó en todo el repositorio el patrón de la regresión; no encontró otro. Dejó 87 pruebas propias en `.handoff/pruebas_qa/` |
+
+**Lectura (con la cautela de tres rondas):**
+
+- **Mejora:** un modelo distinto encontró lo que el mismo modelo, aun con un revisor independiente, no vio. Es el primer
+  dato concreto de que la diversidad de modelos aporta algo que un solo modelo con agentes no da.
+- **También aportó el revisor:** al reproducir el reporte de la 001, precisó qué hallazgos eran regresión y cuáles ya
+  existían, y corrigió dos atribuciones de gravedad del reporte de QA. Las dos verificaciones se complementan.
+- **Cuesta:** cada ronda suma una revisión interna, un reporte de QA y una reproducción del revisor; el operador tiene que
+  copiar los mensajes entre las dos IA y cambiar el turno a mano. El gasto de tokens de Gemini **no se conoce** (no se
+  registra en este repositorio); el de los agentes de Claude está en la tabla de la sección 5.
+- **No se sabe todavía** si el QA externo rinde igual en entregas que no son código (la guía de reproducción será la
+  primera).
+
+## 7. Ajustes propuestos al protocolo
 
 1. **Aprobación del operador por riesgo:** detallada solo para lo que cambia resultados, arquitectura o método; lo demás,
    a criterio del equipo de agentes, con registro.
@@ -169,22 +201,25 @@ un contrafactual real (hacer la misma tarea sin agentes y medirla). Por eso la c
 4. **Medir mecanismos, no solo resultados**, como regla del método (lección de F-021 y de Gemini).
 5. **Pruebas con mutante** para cada mejora: una prueba que no falla sin su mejora no cuenta.
 6. **Declarar antes también las comparaciones rápidas**, aunque sean de una línea.
+7. **Al endurecer una validación, buscar todas las llamadas que reconstruyen el objeto validado** (lección de F-029).
+8. **Un segundo modelo como QA externo para el código**, con turnos que solo cambia el operador (ADR-004).
 
-## 7. Límites de esta evaluación
+## 8. Límites de esta evaluación
 
 - Un solo operador y un solo proyecto por caso; no se puede generalizar.
 - La IA evalúa su propio trabajo bajo el método.
 - El proyecto no ha llegado al hardware: falta saber si el método se sostiene cuando la verificación depende de
   mediciones físicas que reporta el operador (PROMPT-ZERO §6.4).
 
-## 8. Comparación entre los tres usos (por completar)
+## 9. Comparación entre los tres usos (por completar)
 
 | | Caso 1: conflicto Irán–EE. UU. | Caso 2: elección presidencial en Colombia | Caso 3: ACO-test |
 |---|---|---|---|
 | Modo del método | *(operador)* | *(operador)* | Ingeniería |
 | Qué hace de oráculo o contraste | *(operador)* | *(operador)* | Notebook de referencia + revisor independiente |
-| Cómo se registra la falla | *(operador)* | *(operador)* | `FAILURES.md` (24 registros) |
+| Cómo se registra la falla | *(operador)* | *(operador)* | `FAILURES.md` (29 registros) |
 | Qué evitó, lo principal | *(operador)* | *(operador)* | Sobreajustar al oráculo; afirmar sin medir |
 | Lo malo, lo principal | *(operador)* | *(operador)* | Ancho de banda del operador; memoria volátil de los agentes |
 | Uso de agentes de IA | No | No | Sí: revisor, experimentador y divulgador, propuestos por la IA |
+| Segundo modelo como QA externo | No | No | Sí, desde el 2026-11-25: Gemini (Antigravity), por rondas en `.handoff/` |
 | Resultado verificable | *(operador)* | *(operador)* | 41/49 criterios en PASA; C1, C2, C4 y C5 PASA; C3 NO PASA documentado |
