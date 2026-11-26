@@ -25,7 +25,7 @@ solo con esta definición.
 | 14 | Experimentos en lote → CSV (4 modos × 30 semillas) | `gemelo/experimentos/` | **Hecho** | 100 % (2/2) |
 | 15 | Notebook de análisis | `gemelo/notebooks/` | **Hecho** | 100 % (2/2) |
 | 16 | Demostración del mundo en NetLogo + puente Python | `gemelo/netlogo/` | Por hacer | 0 % (0/3) |
-| 17 | **Guía de reproducción autocontenida** | `gemelo/REPRODUCIR.md` | Por hacer | 0 % (0/4) |
+| 17 | **Guía de reproducción autocontenida** | `gemelo/REPRODUCIR.md` | **Hecho** | 100 % (4/4) |
 
 **Orden de trabajo vigente** (aprobado el 2026-11-18 23:46 -0500; detalle en `PLAN-MEJORAS.md`): el 17 va **antes**
 que el 16. `[x]` = hecho y revisado con PASA · `[~]` = implementado, pero con NO PASA o sin revisar · `[ ]` = por hacer.
@@ -33,8 +33,8 @@ que el 16. `[x]` = hecho y revisado con PASA · `[~]` = implementado, pero con N
 - [x] **A.** Correcciones: F-020 (la madre ya no rescata a la verificadora), experimentos repetidos, notas en F-010/13/18/19.
 - [x] **B + C.** Motor (B1–B7) y métricas (C1–C4). NO PASA (F-023) → corregido (F-024, F-025) → **PASA** (F-026). Tocó los artefactos 5, 8, 9, 10 y 11.
 - [x] **D.** Notebook más explicable (D1–D8, amplía el artefacto 15): secciones 1–3 y 5, "Qué mirar", glosario, 4 informes por experimento (F-027, F-028). Lo técnico, con PASA; cerrado por decisión del operador: la última corrección de texto usa la redacción del revisor y no tuvo una cuarta pasada.
-- [ ] **Artefacto 17.** ← *siguiente* Guía de reproducción, verificada por el revisor siguiéndola desde cero.
-- [ ] **E.** Registros (E1–E4).
+- [x] **Artefacto 17.** Guía de reproducción (`gemelo/REPRODUCIR.md`), con su comparador y salida de referencia. Revisión interna NO PASA → corregida (F-031) → **PASA de QA** (ronda 003: siguió la guía desde un clon limpio y con `conda env create` real).
+- [ ] **E.** ← *siguiente* Registros (E1–E4).
 - [ ] **Artefacto 16.** Demostración con NetLogo, y su sección en la guía.
 
 ## Criterios de aceptación por artefacto
@@ -51,11 +51,23 @@ que el 16. `[x]` = hecho y revisado con PASA · `[~]` = implementado, pero con N
 10. ✅ Mide la convergencia según G1 (también como serie tick a tick) · ✅ calidad = largo de la ruta / largo del BFS · ✅ cuenta bytes por familia de mensaje (`tests/test_metricas.py`: 15 PASA, 2026-11-17 03:02 -0500). Además: **conocimiento del mundo de la madre** (fracción de celdas que conoce y clasifica bien) y resumen de lote con intervalos de confianza de Wilson al 95 %.
 11. ✅ PNG del estado final (con la ruta de la verificadora) · ✅ animación GIF/MP4, un cuadro por tick (`tests/test_visual.py`: 11 PASA, 2026-11-17 03:10 -0500). Desde la línea de comandos: `run ... --png final.png --animacion ensayo.gif`. Ejemplo en `gemelo/docs/imagenes/`.
 12. ✅ Reproduce p1 (celda [5]; error ≤ 1e-12) · ✅ la dinámica (celda [7]; p_s final = 0,924 ≥ 0,9) · ✅ el histograma de r = 1 (extremos 70,7 % ≥ 70 %, **muy justo**) y r = 2 (80–100 %: 75,1 % ≥ 70 %), con las tolerancias de `oraculo/TOLERANCIAS.md` declaradas antes de correr (`oraculo/test_oraculo.py`: 7 PASA, 2026-11-17 03:17 -0500). La comparación del gemelo (C1–C5) está en `oraculo/RESULTADOS.md`.
-13. ✅ Todas las pruebas en PASA: 259 del gemelo y 7 del oráculo, en una sola corrida (2026-11-17 05:05 -0500). Última corrida: **347 del gemelo + 7 del oráculo en PASA** (2026-11-25, rondas 001 y 002 de QA cerradas, F-029), más 87 pruebas del QA externo en `.handoff/pruebas_qa/`.
+13. ✅ Todas las pruebas en PASA: 259 del gemelo y 7 del oráculo, en una sola corrida (2026-11-17 05:05 -0500). Última corrida: **350 del gemelo + 7 del oráculo en PASA** (con las 3 de la guía de reproducción; antes, 347) (2026-11-25, rondas 001 y 002 de QA cerradas, F-029), más 87 pruebas del QA externo en `.handoff/pruebas_qa/`.
 14. ✅ Genera un CSV por condición (más `resumen.csv` con intervalos de confianza) · ✅ se puede reproducir con la semilla, sin importar el número de procesos (`tests/test_experimentos.py`: 11 PASA, 2026-11-17 04:49 -0500). Planes: `experimentos/modos.yaml` y `experimentos/rescate.yaml`; datos en `experimentos/datos/`.
 15. ✅ Gráficas comparativas (4 figuras en `notebooks/figuras/`; desde el bloque D, 9 figuras y un GIF, con un ensayo comentado) · ✅ prueba estadística de la varianza con y sin rescate (Brown-Forsythe, más Mann-Whitney y Fisher, con Bonferroni) (`tests/test_notebook.py`: 1 PASA, 2026-11-17 04:58 -0500). Conclusiones calculadas desde los datos.
 16. El mundo vive en los patches · `py:setup` usa el Python del entorno · un agente Python se mueve según el protocolo.
-17. Ver la sección siguiente.
+17. Criterios declarados el 2026-11-25 21:36 -0500, antes de escribir la guía (requisitos en la sección siguiente):
+    (17.1) **Prerrequisitos con versiones**, con el hardware de las fases 2 y 3 aparte (requisito 1).
+    (17.2) **Desde cero reproduce la salida esperada:** alguien que no escribió la guía la sigue en un clon limpio, en una
+    carpeta nueva, y obtiene la salida de referencia incluida en el repositorio (texto, CSV y PNG del escenario L con la
+    semilla de referencia) y los resultados publicados; lo comprueban el revisor y QA, cada uno por su cuenta (requisito 2).
+    (17.3) **Explica el porqué** de cada paso y experimento e **incorpora los experimentos previos de la referencia**, con
+    lo que aportó cada uno, enlazando a archivos del repositorio; cada afirmación con su fuente (requisitos 3 y 4, F-028).
+    (17.4) **Autocontenida:** fuera de clonar el repositorio y crear el entorno, no depende de enlaces externos
+    (requisito 5).
+    **Estado (2026-11-25 23:09 -0500):** 17.1 ✅ · 17.2 ✅ (el revisor la siguió desde un clon de la máquina de desarrollo; QA, desde un clon
+    limpio y con un entorno conda nuevo: 350 + 7 pruebas, `comparar.py` y `--completo` en PASA, `RESULTADOS.md` sin cambios)
+    · 17.3 ✅ · 17.4 ✅ (`gemelo/docs/informes/revision_r003.md`, `.handoff/rondas/003-reporte_qa.md`). Sin probar: el
+    paso 2.1 desde GitHub (la guía aún no estaba publicada) y otra máquina u otro sistema operativo.
 
 ## Requisitos de la guía de reproducción (artefacto 17)
 

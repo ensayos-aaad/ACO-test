@@ -8,8 +8,10 @@
 ### Corregido
 - Las semillas negativas o no enteras se rechazan (Python siembra con el valor absoluto: −3 repetía el mundo de la 3; las decisiones de las agentes no, porque cada una mezcla la semilla con su número).
 - F-029: la ronda 001 introdujo una regresión (`run --semilla` y los planes validaban la semilla del archivo que ya no se usaba); la atrapó QA. Además, `semillas` de un plan y `batch --semillas` se validan antes de escribir nada, con error limpio.
+- **Artefacto 17:** guía de reproducción `gemelo/REPRODUCIR.md`, comparador `gemelo/reproducir/comparar.py` con salida de referencia en `esperado/`, y `tests/test_reproducir.py`. F-031: el comparador estaba ciego al color (corregido antes de entregar).
+- Divulgación 04 «El punto ciego»; F-030 (la semilla −3 repetía solo el mundo de la 3).
 ### Resultados
-- Rondas 000, 001 y 002 de QA cerradas (la 002 con PASA). 347 pruebas del gemelo + 7 del oráculo + 87 de QA en PASA; los experimentos publicados no cambian.
+- Rondas 000 a 003 de QA cerradas (002 y 003 con PASA). **Artefacto 17 hecho: 45 de 49 criterios en PASA.** 350 pruebas del gemelo + 7 del oráculo + 98 de QA en PASA; los experimentos publicados no cambian.
 
 ## [Sesión 4] — 2026-11-19 (Claude Opus 5.5 con su equipo de agentes)
 ### Añadido

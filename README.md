@@ -14,10 +14,11 @@ en las abejas (danza y reclutamiento).
 ## Estado
 
 Fase 1 casi completa: el gemelo en [gemelo/](gemelo/) (agentes, madre, motores, métricas, visualización, experimentos y
-un notebook que explica un ensayo y analiza los resultados) y el oráculo en [oraculo/](oraculo/). **347 pruebas del gemelo
-y 7 del oráculo** pasan, más 87 pruebas escritas por el QA externo en [.handoff/pruebas_qa/](.handoff/pruebas_qa/). Frente a
-los notebooks de referencia, los criterios C1, C2, C4 y C5 pasan y C3 no (causa documentada). Faltan la guía de
-reproducción y la demostración con NetLogo. El avance de cada artefacto está en [ARTEFACTOS.md](ARTEFACTOS.md).
+un notebook que explica un ensayo y analiza los resultados) y el oráculo en [oraculo/](oraculo/). **350 pruebas del gemelo
+y 7 del oráculo** pasan, más 98 pruebas escritas por el QA externo en [.handoff/pruebas_qa/](.handoff/pruebas_qa/). Frente a
+los notebooks de referencia, los criterios C1, C2, C4 y C5 pasan y C3 no (causa documentada). **Para reproducirlo desde
+cero:** [gemelo/REPRODUCIR.md](gemelo/REPRODUCIR.md). Falta la demostración con NetLogo. El avance de cada artefacto está en
+[ARTEFACTOS.md](ARTEFACTOS.md).
 
 | Fase | Contenido | Meta |
 |---|---|---|

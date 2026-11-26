@@ -71,3 +71,7 @@ Las primeras entradas son intuiciones que el operador ya había dicho en la conv
 ---
 
 *(Escribe aquí las siguientes.)*
+
+### 2026-11-25 — MLflow para el proceso experimental
+> "Como ideas: es posible hacer una mejora posterior para aplicar el proceso a MLFlow o una aplicacion de manera similar
+> que permita organizar el proceso experimental y de replicacion del ACO-Test?"

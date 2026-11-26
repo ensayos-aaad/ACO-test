@@ -1,0 +1,53 @@
+Mundo (semilla 2026):
+. . . . . . . .
+. # . . . . . .
+. # . . . . . .
+. # . . . . . .
+. # . . I . . .
+. . # # # . . .
+F . . . . . . .
+. . . . . . . .
+
+semilla                      2026
+escenario                    L
+modo_madre                   pista_de_baile
+motivo                       verificada
+asentadas                    1
+verificada                   1
+ticks_asentadas              739
+ticks_total                  760
+largo_optimo                 8
+largo_verificado             20
+razon                        2.5
+conocimiento                 
+bloqueadas                   0
+memoria_madre                58
+memoria_madre_max            64
+madre_verificacion           ok
+ticks_verificacion           21
+mensajes_mundo_agente        9132
+bytes_mundo_agente           123282
+mensajes_agente_agente       0
+bytes_agente_agente          0
+mensajes_agente_madre        520
+bytes_agente_madre           6123
+mensajes_madre_agente        80
+bytes_madre_agente           1319
+bytes_totales                130724
+rescates_enviados            0
+recluta_enviados             73
+rutas_enviadas               5
+rutas_difundidas             0
+mapas_difundidos             0
+rutas_pedidas                5
+rutas_heredadas              5
+rutas_ignoradas              0
+rescate_usado                0
+rescate_ya_llego             0
+rescate_ya_tiene_ruta        0
+rescate_fallida              0
+rescate_ocupada              0
+rescate_no_cabe              0
+rescate_otro_nido            0
+rescate_verificadora         0
+rescate_sin_clasificar       0
