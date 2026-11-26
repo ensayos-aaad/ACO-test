@@ -68,6 +68,10 @@ Dejó dos observaciones leves, que siguen abiertas: ninguna prueba vigila que el
 distintos del computador, y la semilla −3 produce el mismo mundo que la 3 (no afecta a los experimentos publicados,
 que usan las semillas 0 a 29).
 
+*(Actualización, 2026-11-25: las dos quedaron cerradas. Una prueba nueva compara el mismo ensayo en tres procesos y las
+semillas negativas se rechazan. Al cerrarlas apareció una regresión, que atrapó el QA externo. Se cuenta en
+[«El punto ciego»](04_el_punto_ciego.md).)*
+
 ## 4. ¿Cambió algo de lo publicado?
 
 Antes de tocar el código, el experimentador guardó una **línea base**: el "antes", para poder decir con números qué
@@ -207,6 +211,13 @@ afirmaban de más.
 
 ## 11. Lo que viene
 
+> **Actualización (2026-11-25).** Antes de la guía de reproducción hubo un paso que este texto no preveía: el 25 de
+> noviembre entró al equipo un segundo modelo de IA, Gemini, como QA externo (ADR-004), y en sus rondas 001 y 002 se cerraron
+> las dos observaciones leves de la sección 3 (F-029). Al cierre de ese día: 347 pruebas del gemelo y 7 del oráculo en PASA,
+> más 87 pruebas de QA, y los experimentos publicados sin cambios. La guía de reproducción sigue siendo el siguiente
+> paso, ahora como ronda 003 de QA. Todo eso se cuenta en [«El punto ciego»](04_el_punto_ciego.md). Lo de abajo se deja
+> como estaba escrito el 20 de noviembre.
+
 El orden aprobado: primero una **guía de reproducción**, que el revisor deberá seguir desde cero para comprobar que
 cualquiera puede repetir los resultados; luego, poner al día los registros; después, la demostración con NetLogo, en la
 que el mundo correrá en otro programa y los mensajes saldrán por primera vez de la memoria de un solo proceso. Los seis
@@ -245,3 +256,5 @@ bloqueantes para el hardware siguen abiertos.
 - Textos que afirmaban de más: `FAILURES.md` (F-028), `gemelo/docs/informes/revision_D.md` (tres pasadas).
 - Protocolo de trabajo, agentes y tokens: `USO-DEL-PROTOCOLO.md` (encabezado, §5).
 - Lo que viene: `CLAUDE.md` ("Para retomar", estado al 2026-11-20), `ESTADO-PREHARDWARE.md` (B1–B6).
+- Actualizaciones del 2026-11-25: `DECISIONS.md` (ADR-004), `FAILURES.md` (F-029), `.handoff/rondas/002-reporte_qa.md`,
+  `CHANGELOG.md` (sesión 5), `CLAUDE.md` (historial del 2026-11-25, 21:02).

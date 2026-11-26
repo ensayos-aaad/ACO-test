@@ -92,7 +92,8 @@ class ConfigEnsayo:
 
     def __post_init__(self) -> None:
         # Python siembra con el valor absoluto: Random(-3) da lo mismo que Random(3), así que una
-        # semilla negativa repetiría el ensayo de la positiva (observación de F-026).
+        # semilla negativa repetiría el mundo de la positiva (observación de F-026; las decisiones de
+        # las agentes no, porque cada una siembra con semilla * 256 + id, F-030).
         if not isinstance(self.semilla, int) or isinstance(self.semilla, bool) or self.semilla < 0:
             raise ValueError(f"semilla = {self.semilla!r}: debe ser un entero mayor o igual que 0")
         if self.madre.modo is Modo.AUSENTE:

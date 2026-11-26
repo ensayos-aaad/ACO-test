@@ -6,7 +6,7 @@
 - `gemelo/tests/test_reproducibilidad.py`: el mismo ensayo da la misma huella en procesos con PYTHONHASHSEED distinto.
 - 87 pruebas de QA en `.handoff/pruebas_qa/` (rondas 000 a 002).
 ### Corregido
-- Las semillas negativas o no enteras se rechazan (Python siembra con el valor absoluto: −3 repetía el ensayo de la 3).
+- Las semillas negativas o no enteras se rechazan (Python siembra con el valor absoluto: −3 repetía el mundo de la 3; las decisiones de las agentes no, porque cada una mezcla la semilla con su número).
 - F-029: la ronda 001 introdujo una regresión (`run --semilla` y los planes validaban la semilla del archivo que ya no se usaba); la atrapó QA. Además, `semillas` de un plan y `batch --semillas` se validan antes de escribir nada, con error limpio.
 ### Resultados
 - Rondas 000, 001 y 002 de QA cerradas (la 002 con PASA). 347 pruebas del gemelo + 7 del oráculo + 87 de QA en PASA; los experimentos publicados no cambian.

@@ -2,9 +2,11 @@
 
 1. El mismo ensayo da exactamente el mismo resultado en procesos distintos, con PYTHONHASHSEED distinto. Dentro
    de un proceso la suite ya lo comprueba; esto atrapa un generador sembrado con algo que dependa del proceso, como
-   ``hash()`` de un texto (mutante ``docs/informes/revision_F025/mut_hash.py``, que pasaba toda la suite).
+   ``hash()`` de un texto (mutante ``docs/informes/revision_F025/mut_hash.py``, que pasaba las 127 pruebas de canal,
+   motor, línea de comandos y experimentos).
 2. Las semillas negativas se rechazan: Python siembra con el valor absoluto (``Random(-3)`` da lo mismo que
-   ``Random(3)``), así que una semilla negativa repetiría el ensayo de la positiva.
+   ``Random(3)``), así que una semilla negativa repetiría el mundo de la positiva (las decisiones de las agentes no;
+   F-030).
 """
 import os
 import subprocess

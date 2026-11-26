@@ -37,7 +37,7 @@ colonia de agentes y una "madre" en el edge) que extiende ese método.
 | `referencia/`     | Copia de solo lectura de `UdeA-IoT/ESP-ACO` @ `3c48648` (ver `PROCEDENCIA.md`) |
 | `CONTEXT.md`      | Inventario de la referencia, parámetros, oráculos, vacíos (I1–I16), NetLogo/hormigas (§5), agentes AIMA (§6), `resumen.pdf` (§7), enfoque del gemelo (§8) |
 | `DECISIONS.md`    | Decisiones en formato ADR (ADR-001 y ADR-002 propuestas; ADR-003 y ADR-004 aprobadas) |
-| `FAILURES.md`     | Registro de fallas y hallazgos (F-001 a F-029); nunca se borra |
+| `FAILURES.md`     | Registro de fallas y hallazgos (F-001 a F-030); nunca se borra |
 | `ASSUMPTIONS.md`  | Suposiciones y sesgos declarados (A-001 a A-004)             |
 | `CHANGELOG.md`    | Cambios por sesión                                           |
 | `CHECKLIST-ENTORNO.md` | Software necesario: instalado `[x]` / falta `[ ]`       |
@@ -72,6 +72,8 @@ trabaja en pares con QA externo (Gemini en Antigravity, ADR-004, `.handoff/READM
 
 **Criterios de PROMPT-ZERO** (`oraculo/RESULTADOS.md`): C1 PASA · C2 PASA · **C3 NO PASA** (causa documentada,
 `oraculo/INVESTIGACION-C3.md`, decisión J8) · C4 PASA · C5 PASA · C6 NO PROBADO (lo evalúa el operador).
+
+**Pendiente para la entrega de la ronda 003:** anotar que `simulacion.py` (un comentario) y `tests/test_reproducibilidad.py` (la docstring) cambiaron solo en texto por F-030, para que QA lo vea (acordado con el operador).
 
 **Siguiente paso:** el **artefacto 17** (guía de reproducción, `gemelo/REPRODUCIR.md`; requisitos al final de `ARTEFACTOS.md`)
 como ronda siguiente de QA, que QA y el revisor siguen desde cero. Luego E (registros) → artefacto 16 (NetLogo).
@@ -132,6 +134,9 @@ sesión empieza con el resumen de 5 líneas (PROMPT-ZERO §6). El modelo en uso 
 - Mantener actualizada la sección "Estado actual" cuando cambie la estructura del proyecto.
 
 ## Historial
+
+### 2026-11-25 21:32 -0500
+- Divulgación: texto nuevo `gemelo/docs/divulgacion/04_el_punto_ciego.md` (QA externo y F-029) y puesta al día del 03 (divulgador). El revisor verificó: NO PASA por 4 frases (`gemelo/docs/informes/revision_div04.md`), corregidas con su redacción tal cual. La grave venía de Claude (**F-030**): la semilla −3 repetía solo el mundo de la 3, no las decisiones; corregido también en CHANGELOG, `simulacion.py` (comentario) y `test_reproducibilidad.py` (docstring). Se guardó en el repositorio el informe del revisor que reprodujo los hallazgos de QA de la ronda 001 (`revision_qa001.md`), que había quedado solo en la conversación. Sin commit.
 
 ### 2026-11-25 21:08 -0500
 - A pedido del operador, la novedad del QA externo queda en los documentos: `README.md` (estado al día, sección "Cómo se trabaja" con Desarrollo y QA, insignia y fila de Gemini en "Uso de IA", mapa de documentos con `.handoff/` y `USO-DEL-PROTOCOLO.md`), `USO-DEL-PROTOCOLO.md` (sección 6 nueva sobre el QA externo con las rondas 000–002 y F-029; ajustes 7 y 8; fila nueva en la comparación) y `ARTEFACTOS.md` (347 + 7 pruebas).
